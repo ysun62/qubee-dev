@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import http from "../../services/httpService";
-import { Button, Modal, Form, Input, Progress } from "reactstrap";
+import { Button, Modal, Form, Input } from "reactstrap";
 
 const UploadFile = (props) => {
   const { buttonLabel, buttonIcon, modalClassName } = props;
@@ -13,10 +13,6 @@ const UploadFile = (props) => {
   const toggle = () => setModal(!modal);
 
   const handleOnChange = (e) => setInputField(e.currentTarget.value);
-
-  const handleDisabled = () => {
-    return true;
-  };
 
   const handleSubmit = (e) => {
     e.preventDefault();

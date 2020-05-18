@@ -1,7 +1,7 @@
 /*!
 
 =========================================================
-* Argon Dashboard React - v1.0.0
+* Argon Dashboard React - v1.1.0
 =========================================================
 
 * Product Page: https://www.creative-tim.com/product/argon-dashboard-react
@@ -31,7 +31,7 @@ class Footer extends React.Component {
               © 2020{" "}
               <a
                 className="font-weight-bold ml-1 white"
-                href="https://c-istudios.com?ref=adr-admin-footer"
+                href="https://c-istudios.com?ref=qubee-admin-footer"
                 rel="noopener"
                 target="_blank"
               >
@@ -42,9 +42,9 @@ class Footer extends React.Component {
 
           <Col xl="6">
             <Nav className="nav-footer justify-content-center justify-content-xl-end">
-              <NavItem>
+            <NavItem>
                 <NavLink
-                  href="https://www.creative-tim.com/presentation?ref=adr-admin-footer"
+                  href="https://c-istudios.com/about/?ref=qubee-admin-footer"
                   rel="noopener noreferrer"
                   target="_blank"
                 >
@@ -54,21 +54,11 @@ class Footer extends React.Component {
 
               <NavItem>
                 <NavLink
-                  href="http://blog.creative-tim.com?ref=adr-admin-footer"
+                  href="https://c-istudios.com/uncreative/?ref=qubee-admin-footer"
                   rel="noopener noreferrer"
                   target="_blank"
                 >
                   Blog
-                </NavLink>
-              </NavItem>
-
-              <NavItem>
-                <NavLink
-                  href="https://github.com/creativetimofficial/argon-dashboard/blob/master/LICENSE.md?ref=adr-admin-footer"
-                  rel="noopener noreferrer"
-                  target="_blank"
-                >
-                  MIT License
                 </NavLink>
               </NavItem>
             </Nav>

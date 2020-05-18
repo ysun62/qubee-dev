@@ -1,7 +1,7 @@
 /*!
 
 =========================================================
-* Argon Dashboard React - v1.0.0
+* Argon Dashboard React - v1.1.0
 =========================================================
 
 * Product Page: https://www.creative-tim.com/product/argon-dashboard-react
@@ -28,10 +28,10 @@ import {
   Input,
   Container,
   Row,
-  Col,
+  Col
 } from "reactstrap";
 // core components
-import UserHeader from "components/Headers/UserHeader.jsx";
+import UserHeader from "components/Headers/UserHeader";
 
 class Profile extends React.Component {
   render() {
@@ -46,7 +46,7 @@ class Profile extends React.Component {
                 <Row className="justify-content-center">
                   <Col className="order-lg-2" lg="3">
                     <div className="card-profile-image">
-                      <a href="#pablo" onClick={(e) => e.preventDefault()}>
+                      <a href="#pablo" onClick={e => e.preventDefault()}>
                         <img
                           alt="..."
                           className="rounded-circle"
@@ -62,7 +62,7 @@ class Profile extends React.Component {
                       className="mr-4"
                       color="info"
                       href="#pablo"
-                      onClick={(e) => e.preventDefault()}
+                      onClick={e => e.preventDefault()}
                       size="sm"
                     >
                       Connect
@@ -71,7 +71,7 @@ class Profile extends React.Component {
                       className="float-right"
                       color="default"
                       href="#pablo"
-                      onClick={(e) => e.preventDefault()}
+                      onClick={e => e.preventDefault()}
                       size="sm"
                     >
                       Message
@@ -82,23 +82,23 @@ class Profile extends React.Component {
                   <Row>
                     <div className="col">
                       <div className="card-profile-stats d-flex justify-content-center mt-md-5">
-                        <div className="mt-md-5">
+                        <div>
                           <span className="heading">22</span>
                           <span className="description">Friends</span>
                         </div>
-                        <div className="mt-md-5">
+                        <div>
                           <span className="heading">10</span>
                           <span className="description">Photos</span>
                         </div>
-                        <div className="mt-md-5">
+                        <div>
                           <span className="heading">89</span>
                           <span className="description">Comments</span>
                         </div>
                       </div>
                     </div>
                   </Row>
-                  <div className="text-center mt-md-5">
-                    <h3 className="pt-md-5">
+                  <div className="text-center">
+                    <h3>
                       Jessica Jones
                       <span className="font-weight-light">, 27</span>
                     </h3>
@@ -120,7 +120,7 @@ class Profile extends React.Component {
                       Nick Murphy — writes, performs and records all of his own
                       music.
                     </p>
-                    <a href="#pablo" onClick={(e) => e.preventDefault()}>
+                    <a href="#pablo" onClick={e => e.preventDefault()}>
                       Show more
                     </a>
                   </div>
@@ -138,7 +138,7 @@ class Profile extends React.Component {
                       <Button
                         color="primary"
                         href="#pablo"
-                        onClick={(e) => e.preventDefault()}
+                        onClick={e => e.preventDefault()}
                         size="sm"
                       >
                         Settings

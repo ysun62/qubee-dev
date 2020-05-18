@@ -1,7 +1,7 @@
 /*!
 
 =========================================================
-* Argon Dashboard React - v1.0.0
+* Argon Dashboard React - v1.1.0
 =========================================================
 
 * Product Page: https://www.creative-tim.com/product/argon-dashboard-react
@@ -28,7 +28,7 @@ import {
 import { Card, Container, Row } from "reactstrap";
 
 // core components
-import Header from "components/Headers/Header.jsx";
+import Header from "components/Headers/Header";
 // mapTypeId={google.maps.MapTypeId.ROADMAP}
 const MapWrapper = withScriptjs(
   withGoogleMap(props => (
