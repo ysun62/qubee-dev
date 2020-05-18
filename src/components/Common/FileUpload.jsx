@@ -20,16 +20,25 @@ import { Form, FormGroup, Button, Input, Progress, Label } from "reactstrap";
 // );
 
 class FileUpload extends Component {
-  state = {
-    selectedFiles: null,
-    filenames: "Choose file",
-    loaded: 0,
-    mediaTags: [],
-    tagNames: "",
-    taskCompleted: "Waiting to upload",
-  };
+  constructor(props) {
+    super(props);
 
-  maxSelectFile = (e) => {
+    this.state = {
+      selectedFiles: null,
+      filenames: "Choose file",
+      loaded: 0,
+      mediaTags: [],
+      tagNames: "",
+      taskCompleted: "Waiting to upload",
+    };
+
+    this.handleFileChange = this.handleFileChange.bind(this);
+    this.handleSubmit = this.handleSubmit.bind(this);
+    this.handleMediaTags = this.handleMediaTags.bind(this);
+    this.maxSelectFile = this.maxSelectFile.bind(this);
+  }
+
+  maxSelectFile(e) {
     let files = e.target.files; // create file object
 
     if (files.length > 3) {
@@ -39,9 +48,9 @@ class FileUpload extends Component {
       return false;
     }
     return true;
-  };
+  }
 
-  handleFileChange = async (e) => {
+  async handleFileChange(e) {
     let files = e.target.files[0];
     //let selectedFiles = this.state.selectedFiles;
 
@@ -53,9 +62,9 @@ class FileUpload extends Component {
       loaded: 0,
       uploadedFile: {},
     });
-  };
+  }
 
-  handleSubmit = async (e) => {
+  async handleSubmit(e) {
     e.preventDefault();
 
     const formData = new FormData();
@@ -83,13 +92,13 @@ class FileUpload extends Component {
     } catch (err) {
       console.log(err);
     }
-  };
+  }
 
-  handleMediaTags = (e) => {
+  async handleMediaTags(e) {
     const allTags = e.currentTarget.value;
     const tagArray = allTags.split(",");
     this.setState({ mediaTags: tagArray, tagNames: allTags });
-  };
+  }
 
   render() {
     const { loaded, filenames } = this.state;
