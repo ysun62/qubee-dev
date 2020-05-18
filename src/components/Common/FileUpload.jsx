@@ -1,23 +1,23 @@
 import React, { Component } from "react";
 import http from "../../services/httpService";
-import { FilePond, registerPlugin } from "react-filepond";
-import FilePondPluginImageExifOrientation from "filepond-plugin-image-exif-orientation";
-import FilePondPluginImageResize from "filepond-plugin-image-resize";
-import FilePondPluginFileRename from "filepond-plugin-file-rename";
-import FilePondPluginFileEncode from "filepond-plugin-file-encode";
-import FilePondPluginFileValidateType from "filepond-plugin-file-validate-type";
-import FilePondPluginFileMetadata from "filepond-plugin-file-metadata";
+// import { FilePond, registerPlugin } from "react-filepond";
+// import FilePondPluginImageExifOrientation from "filepond-plugin-image-exif-orientation";
+// import FilePondPluginImageResize from "filepond-plugin-image-resize";
+// import FilePondPluginFileRename from "filepond-plugin-file-rename";
+// import FilePondPluginFileEncode from "filepond-plugin-file-encode";
+// import FilePondPluginFileValidateType from "filepond-plugin-file-validate-type";
+// import FilePondPluginFileMetadata from "filepond-plugin-file-metadata";
 import "filepond/dist/filepond.min.css";
 import { Form, FormGroup, Button, Input, Progress, Label } from "reactstrap";
 
-registerPlugin(
-  FilePondPluginImageExifOrientation,
-  FilePondPluginImageResize,
-  FilePondPluginFileRename,
-  FilePondPluginFileEncode,
-  FilePondPluginFileValidateType,
-  FilePondPluginFileMetadata
-);
+// registerPlugin(
+//   FilePondPluginImageExifOrientation,
+//   FilePondPluginImageResize,
+//   FilePondPluginFileRename,
+//   FilePondPluginFileEncode,
+//   FilePondPluginFileValidateType,
+//   FilePondPluginFileMetadata
+// );
 
 class FileUpload extends Component {
   state = {
@@ -62,7 +62,7 @@ class FileUpload extends Component {
     formData.append("mediaFile", this.state.selectedFiles);
 
     try {
-      const res = http
+      http
         .post("http://localhost:5000/images", formData, {
           onUploadProgress: (ProgressEvent) => {
             this.setState({

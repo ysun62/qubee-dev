@@ -1,15 +1,33 @@
+/*!
+
+=========================================================
+* Argon Dashboard React - v1.1.0
+=========================================================
+
+* Product Page: https://www.creative-tim.com/product/argon-dashboard-react
+* Copyright 2019 Creative Tim (https://www.creative-tim.com)
+* Licensed under MIT (https://github.com/creativetimofficial/argon-dashboard-react/blob/master/LICENSE.md)
+
+* Coded by Creative Tim
+
+=========================================================
+
+* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+*/
 import React from "react";
 import { Link } from "react-router-dom";
+// reactstrap components
 import {
   UncontrolledCollapse,
   NavbarBrand,
   Navbar,
-  NavItem,
-  NavLink,
-  Nav,
+  // NavItem,
+  // NavLink,
+  // Nav,
   Container,
   Row,
-  Col,
+  Col
 } from "reactstrap";
 
 class AdminNavbar extends React.Component {
@@ -22,10 +40,7 @@ class AdminNavbar extends React.Component {
         >
           <Container className="px-4">
             <NavbarBrand to="/" tag={Link}>
-              {/* <img
-                alt="..."
-                src={require("assets/img/brand/argon-react-white.png")}
-              /> */}
+              {/* <img alt="..." src={require("assets/img/brand/argon-react-white.png")} /> */}
               <i className="ni ni-box-2" /> qubee
             </NavbarBrand>
             <button className="navbar-toggler" id="navbar-collapse-main">
@@ -53,13 +68,9 @@ class AdminNavbar extends React.Component {
                   </Col>
                 </Row>
               </div>
-              <Nav className="ml-auto" navbar>
+              {/* <Nav className="ml-auto" navbar>
                 <NavItem>
-                  <NavLink
-                    className="nav-link-icon"
-                    to="/admin/index"
-                    tag={Link}
-                  >
+                  <NavLink className="nav-link-icon" to="/" tag={Link}>
                     <i className="ni ni-planet" />
                     <span className="nav-link-inner--text">Dashboard</span>
                   </NavLink>
@@ -94,7 +105,7 @@ class AdminNavbar extends React.Component {
                     <span className="nav-link-inner--text">Profile</span>
                   </NavLink>
                 </NavItem>
-              </Nav>
+              </Nav> */}
             </UncontrolledCollapse>
           </Container>
         </Navbar>

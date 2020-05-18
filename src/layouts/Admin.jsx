@@ -1,9 +1,25 @@
+/*!
+
+=========================================================
+* Argon Dashboard React - v1.1.0
+=========================================================
+
+* Product Page: https://www.creative-tim.com/product/argon-dashboard-react
+* Copyright 2019 Creative Tim (https://www.creative-tim.com)
+* Licensed under MIT (https://github.com/creativetimofficial/argon-dashboard-react/blob/master/LICENSE.md)
+
+* Coded by Creative Tim
+
+=========================================================
+
+* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+*/
 import React from "react";
-import { Route, Switch } from "react-router-dom";
-import { ToastContainer } from "react-toastify";
-import http from "services/httpService";
-import Folders from "../views/Folders";
+import { Route, Switch, Redirect } from "react-router-dom";
+// reactstrap components
 import { Container } from "reactstrap";
+// core components
 import AdminNavbar from "components/Navbars/AdminNavbar";
 import AdminFooter from "components/Footers/AdminFooter";
 import Sidebar from "components/Sidebar/Sidebar";
@@ -11,18 +27,12 @@ import Sidebar from "components/Sidebar/Sidebar";
 import routes from "routes.js";
 
 class Admin extends React.Component {
-  componentDidMount() {
-    document.body.classList.add("bg-dark");
-  }
-  componentWillUnmount() {
-    document.body.classList.remove("bg-dark");
-  }
   componentDidUpdate(e) {
     document.documentElement.scrollTop = 0;
     document.scrollingElement.scrollTop = 0;
     this.refs.mainContent.scrollTop = 0;
   }
-  getRoutes = (routes) => {
+  getRoutes = routes => {
     return routes.map((prop, key) => {
       if (prop.layout === "/admin") {
         return (
@@ -37,7 +47,7 @@ class Admin extends React.Component {
       }
     });
   };
-  getBrandText = (path) => {
+  getBrandText = path => {
     for (let i = 0; i < routes.length; i++) {
       if (
         this.props.location.pathname.indexOf(
@@ -51,15 +61,14 @@ class Admin extends React.Component {
   };
   render() {
     return (
-      <React.Fragment>
-        <ToastContainer />
+      <>
         <Sidebar
           {...this.props}
           routes={routes}
           logo={{
             innerLink: "/admin/index",
             imgSrc: require("assets/img/brand/argon-react.png"),
-            imgAlt: "...",
+            imgAlt: "..."
           }}
         />
         <div className="main-content" ref="mainContent">
@@ -68,17 +77,14 @@ class Admin extends React.Component {
             brandText={this.getBrandText(this.props.location.pathname)}
           />
           <Switch>
-          {/* <Route
-        path="/folder/:id"
-        render={(props) => <Folders {...props} />}
-      /> */}
             {this.getRoutes(routes)}
+            <Redirect from="*" to="/admin/index" />
           </Switch>
           <Container fluid>
             <AdminFooter />
           </Container>
         </div>
-      </React.Fragment>
+      </>
     );
   }
 }
