@@ -13,6 +13,10 @@ const foldersRoute = require("./routes/folders");
 
 const app = express();
 const port = process.env.PORT || 5000;
+const corsOptions = {
+  origin: '*',
+  optionsSuccessStatus: 200,
+}
 
 mongoose.connect(process.env.DATABASE_URL, {
   useNewUrlParser: true,
@@ -30,7 +34,7 @@ app.use(
     limit: "16mb",
   })
 );
-app.use(cors());
+app.use(cors(corsOptions));
 app.use(cookieParser());
 app.use(fileUpload());
 
