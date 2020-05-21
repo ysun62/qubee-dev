@@ -7,16 +7,17 @@ const { v4: uuidv4 } = require("uuid");
 const router = express.Router();
 const Folder = require("../models/folder");
 
-const DIR = path.join(__dirname, "../../public/uploads/folder");
+const DIR = path.join(__dirname, Folder.folderBasePath);
 
 router.post("/", async (req, res) => {
+  const url = req.protocol + "://" + req.get("host");
+  console.log(url);
+
   const objectId = new mongoose.Types.ObjectId();
   const folder = new Folder({
     _id: objectId,
-    name: req.body.folderName,
-    folderAbsolutePath:
-      "http://localhost:3000/public/uploads/folder/" + objectId,
-    folderRelativePath: "/public/uploads/folder/" + objectId,
+    folderName: req.body.folderName,
+    folderPath: objectId,
     dateAdded: moment().format("MMMM D, YYYY"),
   });
 
@@ -24,7 +25,7 @@ router.post("/", async (req, res) => {
     .save()
     .then((result) => {
       res.status(201).json({
-        message: "Folder uploaded successfully",
+        message: "Folder created successfully",
         folder: {
           _id: result._id,
           folderAbsolutePath: result.folderAbsolutePath,
@@ -40,16 +41,11 @@ router.post("/", async (req, res) => {
       );
     });
 
-  // Create directory
-  fs.mkdir(`${DIR}/${objectId}`, () => {
-    fs.writeFile(
-      `${DIR}/${objectId}/index.html`,
-      `Folder ID: ${objectId}`,
-      (err) => {
-        if (err) throw err;
-        console.log("The file has been added!");
-      }
-    );
+  // Create folder
+  fs.mkdir(`${DIR}/${objectId}`, (err) => {
+    if (err) {
+      console.error(err);
+    }
   });
 
   //res.send(req.body.folderName);

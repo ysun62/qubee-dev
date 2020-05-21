@@ -1,4 +1,4 @@
 {
-  "imagesEndpoint": "http://localhost:5000/images",
+  "filesEndpoint": "http://localhost:5000/files",
   "foldersEndpoint": "http://localhost:5000/folders"
 }

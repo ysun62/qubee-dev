@@ -17,8 +17,8 @@ const UploadFile = (props) => {
     <div className="file-upload-component">
       <Button
         block
-        className="mb-3"
-        color="primary"
+        className="mb-3 bg-gradient-cyan"
+        color="default"
         type="button"
         onClick={toggle}
       >

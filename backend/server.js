@@ -8,15 +8,15 @@ const path = require("path");
 const cookieParser = require("cookie-parser");
 const bodyParser = require("body-parser");
 const fileUpload = require("express-fileupload");
-const imagesRoute = require("./routes/images");
+const filesRoute = require("./routes/files");
 const foldersRoute = require("./routes/folders");
 
 const app = express();
 const port = process.env.PORT || 5000;
 const corsOptions = {
-  origin: '*',
+  origin: "*",
   optionsSuccessStatus: 200,
-}
+};
 
 mongoose.connect(process.env.DATABASE_URL, {
   useNewUrlParser: true,
@@ -39,8 +39,8 @@ app.use(cookieParser());
 app.use(fileUpload());
 
 // configuring the upload file routes
-app.use(express.static(path.join(__dirname, "public")));
-app.use("/images", imagesRoute);
+app.use("/public", express.static(path.join(__dirname, "public")));
+app.use("/files", filesRoute);
 app.use("/folders", foldersRoute);
 
 app.use((req, res, next) => {

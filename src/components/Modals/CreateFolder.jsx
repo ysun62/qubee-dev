@@ -24,7 +24,7 @@ const UploadFile = (props) => {
         .post("http://localhost:5000/folders", formData, {})
         .then((response) => {
           console.log(response);
-          this.props.history.push("/folder")
+          //this.props.history.push("/folder")
         });
       console.log(res);
     } catch (err) {

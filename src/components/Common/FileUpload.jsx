@@ -27,7 +27,7 @@ class FileUpload extends Component {
       selectedFiles: null,
       filenames: "Choose file",
       loaded: 0,
-      mediaTags: [],
+      metaTags: null,
       tagNames: "",
       taskCompleted: "Waiting to upload",
     };
@@ -69,10 +69,11 @@ class FileUpload extends Component {
 
     const formData = new FormData();
     formData.append("mediaFile", this.state.selectedFiles);
+    formData.append("metaTags", this.state.metaTags);
 
     try {
       http
-        .post("http://localhost:5000/images", formData, {
+        .post("http://localhost:5000/files", formData, {
           onUploadProgress: (ProgressEvent) => {
             this.setState({
               loaded: (ProgressEvent.loaded / ProgressEvent.total) * 100,
@@ -94,10 +95,10 @@ class FileUpload extends Component {
     }
   }
 
-  async handleMediaTags(e) {
+  async handleMetaTags(e) {
     const allTags = e.currentTarget.value;
     const tagArray = allTags.split(",");
-    this.setState({ mediaTags: tagArray, tagNames: allTags });
+    this.setState({ metaTags: tagArray, tagNames: allTags });
   }
 
   render() {
@@ -167,12 +168,12 @@ class FileUpload extends Component {
           </div>
           <FormGroup>
             <Input
-              name="mediaTags"
-              id="mediaTags"
+              name="metaTags"
+              id="metaTags"
               placeholder="Add tags seperated by a comma (,)"
               type="text"
               value={this.state.tagNames}
-              onChange={this.handleMediaTags}
+              onChange={this.handleMetaTags}
             />
           </FormGroup>
           <Button color="primary" type="submit">

@@ -27,10 +27,10 @@ class Footer extends React.Component {
       <footer className="footer">
         <Row className="align-items-center justify-content-xl-between">
           <Col xl="6">
-            <div className="copyright text-center text-xl-left text-muted">
-              © 2020{" "}
+            <div className="copyright text-center text-xl-left">
+              &copy; {new Date().getFullYear()}{" "}
               <a
-                className="font-weight-bold ml-1 white"
+                className="ml-1 footer-link"
                 href="https://c-istudios.com?ref=qubee-admin-footer"
                 rel="noopener"
                 target="_blank"
@@ -40,9 +40,9 @@ class Footer extends React.Component {
             </div>
           </Col>
 
-          <Col xl="6">
+          {/* <Col xl="6">
             <Nav className="nav-footer justify-content-center justify-content-xl-end">
-            <NavItem>
+              <NavItem>
                 <NavLink
                   href="https://c-istudios.com/about/?ref=qubee-admin-footer"
                   rel="noopener noreferrer"
@@ -62,7 +62,7 @@ class Footer extends React.Component {
                 </NavLink>
               </NavItem>
             </Nav>
-          </Col>
+          </Col> */}
         </Row>
       </footer>
     );
