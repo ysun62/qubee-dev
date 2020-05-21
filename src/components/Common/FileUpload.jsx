@@ -24,17 +24,17 @@ class FileUpload extends Component {
     super(props);
 
     this.state = {
-      selectedFiles: null,
+      selectedFiles: [],
       filenames: "Choose file",
       loaded: 0,
-      metaTags: null,
+      metaTags: [],
       tagNames: "",
       taskCompleted: "Waiting to upload",
     };
 
     this.handleFileChange = this.handleFileChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
-    this.handleMediaTags = this.handleMediaTags.bind(this);
+    this.handleMetaTags = this.handleMetaTags.bind(this);
     this.maxSelectFile = this.maxSelectFile.bind(this);
   }
 
@@ -51,29 +51,46 @@ class FileUpload extends Component {
   }
 
   async handleFileChange(e) {
-    let files = e.target.files[0];
-    //let selectedFiles = this.state.selectedFiles;
-
-    //selectedFiles.push(files);
+    let files = e.target.files;
 
     this.setState({
       selectedFiles: files,
-      filenames: files.name,
+      filenames: files.length + " files selected",
       loaded: 0,
-      uploadedFile: {},
     });
+  }
+
+  async handleMetaTags(e) {
+    const allTags = e.currentTarget.value;
+    const tagArray = allTags.split(",");
+    this.setState({ metaTags: tagArray, tagNames: allTags });
   }
 
   async handleSubmit(e) {
     e.preventDefault();
 
     const formData = new FormData();
-    formData.append("mediaFile", this.state.selectedFiles);
-    formData.append("metaTags", this.state.metaTags);
+    for (const file of this.state.selectedFiles) {
+      formData.append("mediaFiles", file);
+    }
+
+    // for (const tag of this.state.metaTags) {
+    //   formData.append("metaTags", tag);
+    // }
+
+    // console.log(
+    //   this.state.selectedFiles,
+    //   this.state.filenames,
+    //   this.state.metaTags,
+    //   formData
+    // );
 
     try {
       http
         .post("http://localhost:5000/files", formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
           onUploadProgress: (ProgressEvent) => {
             this.setState({
               loaded: (ProgressEvent.loaded / ProgressEvent.total) * 100,
@@ -84,8 +101,8 @@ class FileUpload extends Component {
             });
           },
         })
-        .then((response) => {
-          console.log(response.data);
+        .then((res) => {
+          console.log(res);
         });
 
       // Process selected files in FilePond
@@ -95,52 +112,10 @@ class FileUpload extends Component {
     }
   }
 
-  async handleMetaTags(e) {
-    const allTags = e.currentTarget.value;
-    const tagArray = allTags.split(",");
-    this.setState({ metaTags: tagArray, tagNames: allTags });
-  }
-
   render() {
     const { loaded, filenames } = this.state;
     return (
       <>
-        {/* <Form method="POST">
-          <FilePond
-            ref={(ref) => (this.pond = ref)}
-            allowMultiple={true}
-            allowFileEncode={true}
-            allowFileMetadata={true}
-            instantUpload={false}
-            dropOnPage={true}
-            maxFiles={10}
-            name="file"
-            checkValidity={true}
-            dropValidation={true}
-            chunkUploads={true}
-            onupdatefiles={(fileItems) => {
-              this.setState({
-                selectedFiles: fileItems.map((fileItem) => fileItem.file),
-              });
-            }}
-            server="http://localhost:5000/images"
-          />
-
-          </FormGroup>
-          <div className="text-right">
-            <Button
-              color="link"
-              data-dismiss={this.props.data}
-              type="button"
-              onClick={this.props.onClick}
-            >
-              Cancel
-            </Button>
-            <Button color="primary" onClick={() => this.pond.processFiles()}>
-              Upload
-            </Button>
-          </div>
-        </Form> */}
         <Form onSubmit={this.handleSubmit}>
           <div className="progress-wrapper">
             <div className="progress-info">
@@ -158,8 +133,8 @@ class FileUpload extends Component {
               type="file"
               className="custom-file-input filepond"
               multiple
-              name="mediaFile"
-              id="mediaFile"
+              name="mediaFiles"
+              id="mediaFiles"
               onChange={this.handleFileChange}
             />
             <Label className="custom-file-label" htmlFor="customFile">

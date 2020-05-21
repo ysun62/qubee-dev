@@ -30,53 +30,19 @@ const storage = multer.diskStorage({
   },
 });
 
-//var upload = multer({ storage: storage }).array("file");
-//var cpUpload = upload.fields({ name: "file", maxCount: 10 });
-
 const upload = multer({
   storage: storage,
-}).any();
-
-// app.post("/images", (req, res) => {
-//   if (req.files === null)
-//     return res.status(400).json({ msg: "No file uploaded" });
-
-//   const file = req.files.files;
-
-//   file.mv(`${uploadsPath}/public/uploads/${file.name}`, (err) => {
-//     if (err) {
-//       console.error(err);
-//       return res.status(500).send(err);
-//     }
-
-//     res.json({ fileName: file.name, filePath: `/uploads/${file.name}` });
-//   });
-// });
+});
 
 router.get("/", async (req, res) => {
   const images = await File.find().select("-__v").sort("name");
   res.send(images);
 });
 
-router.post("/", async (req, res) => {
+router.post("/", upload.array("mediaFiles"), async (req, res, next) => {
   //const folder = await Folder.findById(req.body);
   //const mediaTags = req.body.mediaTags;
-
-  //console.log(req.files.mediaFile);
-
-  upload(req, res, (err) => {
-    if (err) {
-      console.error(err);
-      return res.end("Error uploading file.");
-    } else {
-      console.log(req.body);
-      req.files.forEach((f) => {
-        console.log(f);
-      });
-      res.end("File have been uploaded");
-    }
-  });
-
+  console.log(req);
   //const file = req.files.file;
   // const selectedFile = req.files.mediaFile;
   // const fileName = req.files !== null ? selectedFile.name : null;
@@ -89,7 +55,6 @@ router.post("/", async (req, res) => {
   //   dateAdded: moment().format("MMMM D, YYYY"),
   //   fileSize: humanFileSize(selectedFile.size, true),
   // });
-
   // await file
   //   .save()
   //   .then((result) => {
@@ -109,7 +74,6 @@ router.post("/", async (req, res) => {
   //       })
   //     );
   //   });
-
   // selectedFile.mv(`${uploadPath}/${selectedFile.name}`, (err) => {
   //   if (err) {
   //     console.error(err);

@@ -41,13 +41,6 @@ var routes = [
     layout: "/admin",
   },
   {
-    path: "/folder",
-    name: "Folders",
-    icon: "ni ni-folder-17 text-primary",
-    component: Folders,
-    layout: "/admin",
-  },
-  {
     path: "/icons",
     name: "Icons",
     icon: "ni ni-planet text-blue",

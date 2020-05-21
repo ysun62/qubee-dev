@@ -27,7 +27,6 @@ class Files extends Component {
     const { data: files } = await http.get(config.filesEndpoint);
     const { data: folders } = await http.get(config.foldersEndpoint);
     this.setState({ files, folders });
-    console.log(this.state.files);
   }
 
   handleDelete = async (file) => {

@@ -34,12 +34,12 @@ app.use(
     limit: "16mb",
   })
 );
-app.use(cors(corsOptions));
+app.use(cors());
 app.use(cookieParser());
 app.use(fileUpload());
 
 // configuring the upload file routes
-app.use("/public", express.static(path.join(__dirname, "public")));
+app.use("/public", express.static("public"));
 app.use("/files", filesRoute);
 app.use("/folders", foldersRoute);
 

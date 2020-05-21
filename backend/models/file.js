@@ -1,7 +1,8 @@
 const mongoose = require("mongoose");
+const { folderSchema } = require("./folder");
 const fileBasePath = "../../public/uploads";
 
-const imageSchema = new mongoose.Schema({
+const fileSchema = new mongoose.Schema({
   _id: mongoose.Schema.Types.ObjectId,
   fileName: {
     type: String,
@@ -31,10 +32,11 @@ const imageSchema = new mongoose.Schema({
     default: Date.now,
   },
   folder: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "folders",
+    type: mongoose.Types.ObjectId,
+    //ref: folderSchema,
+    //required: true,
   },
 });
 
-module.exports = mongoose.model("images", imageSchema);
+module.exports = mongoose.model("Files", fileSchema);
 module.exports.fileBasePath = fileBasePath;

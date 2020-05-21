@@ -24,6 +24,8 @@ import { Container } from "reactstrap";
 // core components
 import AdminNavbar from "components/Navbars/AdminNavbar";
 import AdminFooter from "components/Footers/AdminFooter";
+import ActionBar from "components/ActionBar/ActionBar";
+import ShareFile from "components/Modals/ShareFile";
 import Sidebar from "components/Sidebar/Sidebar";
 import Folders from "../views/Folders";
 
@@ -72,6 +74,8 @@ class Admin extends React.Component {
     return (
       <>
         <ToastContainer />
+        <ActionBar />
+        <ShareFile />
         <Sidebar
           {...this.props}
           routes={routes}
@@ -87,7 +91,7 @@ class Admin extends React.Component {
             brandText={this.getBrandText(this.props.location.pathname)}
           />
           <Switch>
-            <Route path="/folders/:id" component={Folders} />
+            <Route path="/admin/folder/:id" component={Folders} />
             {this.getRoutes(routes)}
             <Redirect from="*" to="/admin/index" />
           </Switch>

@@ -58,6 +58,7 @@ class Files extends Component {
                 <CardHeader className="border-0">
                   <Row className="align-items-center">
                     <div className="col">
+                      <h3>ID - {this.props.match.params.id}</h3>
                       <h3 className="mb-0">All 3</h3>
                     </div>
                     <div className="col text-right">
