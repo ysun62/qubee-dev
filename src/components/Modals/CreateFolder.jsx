@@ -40,7 +40,7 @@ const UploadFile = (props) => {
 
   return (
     <div className="file-upload-component">
-      <Button color="secondary" type="button" size="sm" onClick={toggle}>
+      <Button color="secondary" type="button" onClick={toggle}>
         <span className="btn-inner--icon">
           <i className={buttonIconClasses} />
         </span>

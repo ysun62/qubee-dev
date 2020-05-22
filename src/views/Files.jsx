@@ -108,7 +108,6 @@ class Files extends Component {
                       <th scope="col" width="50%">
                         File Name
                       </th>
-                      {/* <th scope="col">Meta Tags</th> */}
                       <th scope="col">Date Added</th>
                       <th scope="col">Size</th>
                     </tr>
@@ -132,25 +131,18 @@ class Files extends Component {
                         <td>
                           <Media className="align-items-center">
                             <Link to={`/admin/folder/${folder.folderPath}`}>
-                              <i className="ni ni-folder-17 mr-3"></i>
+                              <i className="fas fa-folder-open mr-2" />
                               <span className="mb-0 text-sm">
                                 {folder.folderName}
                               </span>
                             </Link>
                           </Media>
-                          {/* <Button
-                            color="danger"
-                            onClick={() => this.handleDelete(file)}
-                          >
-                            Delete
-                          </Button> */}
                         </td>
-                        <td></td>
                         <td>{folder.dateAdded}</td>
                         <td></td>
                       </tr>
                     ))}
-                    {/* {this.state.files.map((file) => (
+                    {this.state.files.map((file) => (
                       <tr key={file._id}>
                         <th scope="row">
                           <div className="custom-control custom-checkbox mb-4">
@@ -168,7 +160,7 @@ class Files extends Component {
                         <td>
                           <Media className="align-items-center mb-2">
                             <a href={file.filePath} target="blank">
-                              <i className="ni ni-image mr-3"></i>
+                              <i class="fas fa-file-image mr-2" />
                               <span className="mb-0 text-sm">
                                 {file.fileName}
                               </span>
@@ -183,17 +175,13 @@ class Files extends Component {
                               <a href="#pablo">{tag}</a>
                             </Badge>
                           ))}
-                          <Button
-                            color="danger"
-                            onClick={() => this.handleDelete(file)}
-                          >
-                            Delete
-                          </Button>
                         </td>
                         <td>{file.dateAdded}</td>
-                        <td>{file.fileSize}</td>
+                        <td>
+                          {this.handleFileSizeConversion(file.fileSize, true)}
+                        </td>
                       </tr>
-                    ))} */}
+                    ))}
                   </tbody>
                 </Table>
               </Card>

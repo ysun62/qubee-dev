@@ -24,8 +24,7 @@ import { Container } from "reactstrap";
 // core components
 import AdminNavbar from "components/Navbars/AdminNavbar";
 import AdminFooter from "components/Footers/AdminFooter";
-import ActionBar from "components/ActionBar/ActionBar";
-import ShareFile from "components/Modals/ShareFile";
+import ActionBarHeader from "components/Headers/ActionBarHeader";
 import Sidebar from "components/Sidebar/Sidebar";
 import Folders from "../views/Folders";
 
@@ -33,10 +32,10 @@ import routes from "routes.js";
 
 class Admin extends React.Component {
   componentDidMount() {
-    document.body.classList.add("bg-charcoal");
+    document.body.classList.add("bg-default");
   }
   componentWillUnmount() {
-    document.body.classList.remove("bg-charcoal");
+    document.body.classList.remove("bg-default");
   }
   componentDidUpdate(e) {
     document.documentElement.scrollTop = 0;
@@ -74,8 +73,7 @@ class Admin extends React.Component {
     return (
       <>
         <ToastContainer />
-        <ActionBar />
-        <ShareFile />
+        <ActionBarHeader />
         <Sidebar
           {...this.props}
           routes={routes}

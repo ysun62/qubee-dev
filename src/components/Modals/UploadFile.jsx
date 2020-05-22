@@ -5,7 +5,7 @@ import { Button, Modal } from "reactstrap";
 const UploadFile = (props) => {
   const { buttonLabel, buttonIcon, modalClassName } = props;
 
-  let buttonIconClasses = "ni ni-";
+  let buttonIconClasses = "fas fa-";
 
   if (buttonIcon) buttonIconClasses += buttonIcon;
 

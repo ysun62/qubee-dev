@@ -50,14 +50,14 @@ import {
   Table,
   Container,
   Row,
-  Col
+  Col,
 } from "reactstrap";
 
 var ps;
 
 class Sidebar extends React.Component {
   state = {
-    collapseOpen: false
+    collapseOpen: false,
   };
   constructor(props) {
     super(props);
@@ -70,17 +70,17 @@ class Sidebar extends React.Component {
   // toggles collapse between opened and closed (true/false)
   toggleCollapse = () => {
     this.setState({
-      collapseOpen: !this.state.collapseOpen
+      collapseOpen: !this.state.collapseOpen,
     });
   };
   // closes the collapse
   closeCollapse = () => {
     this.setState({
-      collapseOpen: false
+      collapseOpen: false,
     });
   };
   // creates the links that appear in the left menu / Sidebar
-  createLinks = routes => {
+  createLinks = (routes) => {
     return routes.map((prop, key) => {
       return (
         <NavItem key={key}>
@@ -103,12 +103,12 @@ class Sidebar extends React.Component {
     if (logo && logo.innerLink) {
       navbarBrandProps = {
         to: logo.innerLink,
-        tag: Link
+        tag: Link,
       };
     } else if (logo && logo.outterLink) {
       navbarBrandProps = {
         href: logo.outterLink,
-        target: "_blank"
+        target: "_blank",
       };
     }
     return (
@@ -129,12 +129,11 @@ class Sidebar extends React.Component {
           {/* Brand */}
           {logo ? (
             <NavbarBrand className="pt-0" {...navbarBrandProps}>
-              {/* <img
+              <img
                 alt={logo.imgAlt}
                 className="navbar-brand-img"
                 src={logo.imgSrc}
-              /> */}
-              <i className="ni ni-box-2" /> qubee
+              />
             </NavbarBrand>
           ) : null}
           {/* User */}
@@ -186,7 +185,7 @@ class Sidebar extends React.Component {
                   <span>Support</span>
                 </DropdownItem>
                 <DropdownItem divider />
-                <DropdownItem href="#pablo" onClick={e => e.preventDefault()}>
+                <DropdownItem href="#pablo" onClick={(e) => e.preventDefault()}>
                   <i className="ni ni-user-run" />
                   <span>Logout</span>
                 </DropdownItem>
@@ -202,13 +201,11 @@ class Sidebar extends React.Component {
                   <Col className="collapse-brand" xs="6">
                     {logo.innerLink ? (
                       <Link to={logo.innerLink}>
-                        {/* <img alt={logo.imgAlt} src={logo.imgSrc} /> */}
-                        <i className="ni ni-box-2" /> qubee
+                        <img alt={logo.imgAlt} src={logo.imgSrc} />
                       </Link>
                     ) : (
                       <a href={logo.outterLink}>
-                        {/* <img alt={logo.imgAlt} src={logo.imgSrc} /> */}
-                        <i className="ni ni-box-2" /> qubee
+                        <img alt={logo.imgAlt} src={logo.imgSrc} />
                       </a>
                     )}
                   </Col>
@@ -244,7 +241,7 @@ class Sidebar extends React.Component {
             {/* Navigation */}
             <UploadFile
               buttonLabel="Upload"
-              buttonIcon="cloud-upload-96"
+              buttonIcon="cloud-upload-alt"
               modalClassName="modal-dialog"
             />
             <Nav navbar>{this.createLinks(routes)}</Nav>
@@ -289,7 +286,7 @@ class Sidebar extends React.Component {
 }
 
 Sidebar.defaultProps = {
-  routes: [{}]
+  routes: [{}],
 };
 
 Sidebar.propTypes = {
@@ -305,8 +302,8 @@ Sidebar.propTypes = {
     // the image src of the logo
     imgSrc: PropTypes.string.isRequired,
     // the alt for the img
-    imgAlt: PropTypes.string.isRequired
-  })
+    imgAlt: PropTypes.string.isRequired,
+  }),
 };
 
 export default Sidebar;
