@@ -5,7 +5,7 @@ import { Button, Modal } from "reactstrap";
 const UploadFile = (props) => {
   const { buttonLabel, buttonIcon, modalClassName } = props;
 
-  let buttonIconClasses = "ni ni-";
+  let buttonIconClasses = "fas fa-";
 
   if (buttonIcon) buttonIconClasses += buttonIcon;
 
@@ -17,8 +17,8 @@ const UploadFile = (props) => {
     <div className="file-upload-component">
       <Button
         block
-        className="mb-3"
-        color="primary"
+        className="mb-3 bg-gradient-cyan"
+        color="default"
         type="button"
         onClick={toggle}
       >

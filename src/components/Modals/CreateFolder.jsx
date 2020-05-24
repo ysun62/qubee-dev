@@ -24,7 +24,7 @@ const UploadFile = (props) => {
         .post("http://localhost:5000/folders", formData, {})
         .then((response) => {
           console.log(response);
-          this.props.history.push("/folder")
+          //this.props.history.push("/folder")
         });
       console.log(res);
     } catch (err) {
@@ -40,7 +40,7 @@ const UploadFile = (props) => {
 
   return (
     <div className="file-upload-component">
-      <Button color="secondary" type="button" size="sm" onClick={toggle}>
+      <Button color="secondary" type="button" onClick={toggle}>
         <span className="btn-inner--icon">
           <i className={buttonIconClasses} />
         </span>

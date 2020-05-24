@@ -7,22 +7,24 @@ import {
   Container,
   Row,
   //Button,
+  Badge,
   Media,
   Table,
   Col,
   Card,
   CardHeader,
 } from "reactstrap";
-import { NavLink } from "react-router-dom";
+import { NavLink, Link } from "react-router-dom";
 
 class Files extends Component {
   state = {
     files: [],
     folders: [],
+    metaTags: [],
   };
 
   async componentDidMount() {
-    const { data: files } = await http.get(config.imagesEndpoint);
+    const { data: files } = await http.get(config.filesEndpoint);
     const { data: folders } = await http.get(config.foldersEndpoint);
     this.setState({ files, folders });
   }
@@ -34,7 +36,7 @@ class Files extends Component {
     this.setState({ files });
 
     try {
-      await http.delete(`${config.apiEndpoint}/${file._id}`);
+      await http.delete(`${config.filesEndpoint}/${file._id}`);
       //throw new Error("Something went wrong!");
     } catch (err) {
       // Expected (404: not found, 400: bad request) - Client Errors
@@ -44,6 +46,22 @@ class Files extends Component {
       this.setState({ files: originalFiles });
     }
   };
+
+  handleFileSizeConversion(bytes, si) {
+    var thresh = si ? 1000 : 1024;
+    if (Math.abs(bytes) < thresh) {
+      return bytes + " B";
+    }
+    var units = si
+      ? ["KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"]
+      : ["KiB", "MiB", "GiB", "TiB", "PiB", "EiB", "ZiB", "YiB"];
+    var u = -1;
+    do {
+      bytes /= thresh;
+      ++u;
+    } while (Math.abs(bytes) >= thresh && u < units.length - 1);
+    return bytes.toFixed(1) + " " + units[u];
+  }
 
   render() {
     return (
@@ -112,22 +130,13 @@ class Files extends Component {
                         </th>
                         <td>
                           <Media className="align-items-center">
-                            <NavLink
-                              className=""
-                              to={`/${folder.folderRelativePath}`}
-                            >
-                              <i className="ni ni-folder-17 mr-3"></i>
+                            <Link to={`/admin/folder/${folder.folderPath}`}>
+                              <i className="fas fa-folder-open mr-2" />
                               <span className="mb-0 text-sm">
-                                {folder.name}
+                                {folder.folderName}
                               </span>
-                            </NavLink>
+                            </Link>
                           </Media>
-                          {/* <Button
-                            color="danger"
-                            onClick={() => this.handleDelete(file)}
-                          >
-                            Delete
-                          </Button> */}
                         </td>
                         <td>{folder.dateAdded}</td>
                         <td></td>
@@ -149,21 +158,28 @@ class Files extends Component {
                           </div>
                         </th>
                         <td>
-                          <Media className="align-items-center">
-                            <a href={file.imageFilePath} target="blank">
-                              <i className="ni ni-image mr-3"></i>
-                              <span className="mb-0 text-sm">{file.name}</span>
+                          <Media className="align-items-center mb-2">
+                            <a href={file.filePath} target="blank">
+                              <i class="fas fa-file-image mr-2" />
+                              <span className="mb-0 text-sm">
+                                {file.fileName}
+                              </span>
                             </a>
                           </Media>
-                          {/* <Button
-                            color="danger"
-                            onClick={() => this.handleDelete(file)}
-                          >
-                            Delete
-                          </Button> */}
+                          {file.metaTags.map((tag, i) => (
+                            <Badge
+                              key={tag + i}
+                              className="badge-default mr-2"
+                              pill
+                            >
+                              <a href="#pablo">{tag}</a>
+                            </Badge>
+                          ))}
                         </td>
                         <td>{file.dateAdded}</td>
-                        <td>{file.fileSize}</td>
+                        <td>
+                          {this.handleFileSizeConversion(file.fileSize, true)}
+                        </td>
                       </tr>
                     ))}
                   </tbody>

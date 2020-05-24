@@ -1,0 +1,39 @@
+.action-bar {
+  border-bottom: 2px solid $cyan;
+
+  .active {
+    display: block;
+  }
+
+  .navbar {
+    padding: 1rem 0;
+  }
+
+  .btn {
+    color: $default;
+    font-weight: 400;
+    padding: 0.625rem 1rem;
+
+    &:hover {
+      color: $cyan;
+    }
+  }
+
+  .item-count {
+    padding: 1rem 0;
+
+    span {
+      display: block;
+      padding: 0.625rem 1rem;
+    }
+  }
+}
+
+.share-tab {
+  .btn-secondary:not(:disabled):not(.disabled):active,
+  .btn-secondary:not(:disabled):not(.disabled).active {
+    color: $white;
+    background-color: $cyan;
+    border-color: $cyan;
+  }
+}

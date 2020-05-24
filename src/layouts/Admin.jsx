@@ -17,22 +17,32 @@
 */
 import React from "react";
 import { Route, Switch, Redirect } from "react-router-dom";
+// toastify component
+import { ToastContainer } from "react-toastify";
 // reactstrap components
 import { Container } from "reactstrap";
 // core components
 import AdminNavbar from "components/Navbars/AdminNavbar";
 import AdminFooter from "components/Footers/AdminFooter";
+import ActionBarHeader from "components/Headers/ActionBarHeader";
 import Sidebar from "components/Sidebar/Sidebar";
+import Folders from "../views/Folders";
 
 import routes from "routes.js";
 
 class Admin extends React.Component {
+  componentDidMount() {
+    document.body.classList.add("bg-default");
+  }
+  componentWillUnmount() {
+    document.body.classList.remove("bg-default");
+  }
   componentDidUpdate(e) {
     document.documentElement.scrollTop = 0;
     document.scrollingElement.scrollTop = 0;
     this.refs.mainContent.scrollTop = 0;
   }
-  getRoutes = routes => {
+  getRoutes = (routes) => {
     return routes.map((prop, key) => {
       if (prop.layout === "/admin") {
         return (
@@ -47,7 +57,7 @@ class Admin extends React.Component {
       }
     });
   };
-  getBrandText = path => {
+  getBrandText = (path) => {
     for (let i = 0; i < routes.length; i++) {
       if (
         this.props.location.pathname.indexOf(
@@ -62,13 +72,15 @@ class Admin extends React.Component {
   render() {
     return (
       <>
+        <ToastContainer />
+        <ActionBarHeader />
         <Sidebar
           {...this.props}
           routes={routes}
           logo={{
             innerLink: "/admin/index",
             imgSrc: require("assets/img/brand/argon-react.png"),
-            imgAlt: "..."
+            imgAlt: "...",
           }}
         />
         <div className="main-content" ref="mainContent">
@@ -77,6 +89,7 @@ class Admin extends React.Component {
             brandText={this.getBrandText(this.props.location.pathname)}
           />
           <Switch>
+            <Route path="/admin/folder/:id" component={Folders} />
             {this.getRoutes(routes)}
             <Redirect from="*" to="/admin/index" />
           </Switch>

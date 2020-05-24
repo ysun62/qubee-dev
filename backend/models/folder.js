@@ -1,17 +1,18 @@
 const mongoose = require("mongoose");
+const folderBasePath = "../../public/uploads";
+
 const folderSchema = new mongoose.Schema({
   _id: mongoose.Schema.Types.ObjectId,
-  name: {
+  folderName: {
     type: String,
     required: true,
   },
-  folderAbsolutePath: {
+  folderPath: {
     type: String,
     required: true,
   },
   folderRelativePath: {
     type: String,
-    required: true,
   },
   dateAdded: {
     type: Date,
@@ -20,4 +21,5 @@ const folderSchema = new mongoose.Schema({
   },
 });
 
-module.exports = mongoose.model("folders", folderSchema);
+module.exports = mongoose.model("Folders", folderSchema);
+module.exports.folderBasePath = folderBasePath;
