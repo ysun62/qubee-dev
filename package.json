@@ -6,7 +6,7 @@
   "main": "index.js",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/creativetimofficial/argon-dashboard-react.git"
+    "url": "git+https://github.com/lvlupstudios/qubee.git"
   },
   "keywords": [
     "ci-studios",
@@ -16,7 +16,7 @@
   "author": "C&I Studios",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/creativetimofficial/argon-dashboard-react/issues"
+    "url": "https://github.com/lvlupstudios/qubee/issues"
   },
   "homepage": "https://qubee.io/",
   "scripts": {
@@ -49,7 +49,7 @@
     "bootstrap": "^4.5.0",
     "chart.js": "2.9.3",
     "classnames": "2.2.6",
-    "filepond": "^4.13.6",
+    "filepond": "^4.13.7",
     "filepond-plugin-file-encode": "^2.1.5",
     "filepond-plugin-file-metadata": "^1.0.6",
     "filepond-plugin-file-rename": "^1.1.4",

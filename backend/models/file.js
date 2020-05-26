@@ -3,7 +3,6 @@ const { folderSchema } = require("./folder");
 const fileBasePath = "../../public/uploads";
 
 const fileSchema = new mongoose.Schema({
-  _id: mongoose.Schema.Types.ObjectId,
   fileName: {
     type: String,
     required: true,
@@ -38,5 +37,5 @@ const fileSchema = new mongoose.Schema({
   },
 });
 
-module.exports = mongoose.model("Files", fileSchema);
+module.exports = mongoose.model("File", fileSchema);
 module.exports.fileBasePath = fileBasePath;

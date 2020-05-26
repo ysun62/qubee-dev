@@ -7,15 +7,6 @@ const { v4: uuidv4 } = require("uuid");
 const router = express.Router();
 const File = require("../models/file");
 const Folder = require("../models/folder");
-// const imageMimeTypes = [
-//   "image/jpeg",
-//   "image/png",
-//   "image/gif",
-//   "image/bmp",
-//   "image/svg+xml",
-//   "image/tiff",
-//   "image/x-icon",
-// ];
 
 const uploadPath = path.join(__dirname, File.fileBasePath);
 
@@ -35,51 +26,49 @@ const upload = multer({
 });
 
 router.get("/", async (req, res) => {
-  const images = await File.find().select("-__v").sort("name");
-  res.send(images);
+  const files = await File.find().select("-__v").sort("name");
+  res.send(files);
 });
 
-router.post("/", upload.array("mediaFiles"), async (req, res, next) => {
-  //const folder = await Folder.findById(req.body);
-  //const mediaTags = req.body.mediaTags;
-  console.log(req);
-  //const file = req.files.file;
-  // const selectedFile = req.files.mediaFile;
-  // const fileName = req.files !== null ? selectedFile.name : null;
-  // //const fileNameSlug = fileName.toLowerCase().split(" ").join("-");
-  // const url = req.protocol + "://" + req.get("host");
-  // const file = new File({
-  //   _id: new mongoose.Types.ObjectId(),
-  //   name: fileName,
-  //   imageFilePath: `${url}/public/uploads/${selectedFile.name}`,
-  //   dateAdded: moment().format("MMMM D, YYYY"),
-  //   fileSize: humanFileSize(selectedFile.size, true),
-  // });
-  // await file
-  //   .save()
-  //   .then((result) => {
-  //     res.status(201).json({
-  //       message: "File uploaded successfully",
-  //       imageFile: {
-  //         _id: result._id,
-  //         imageFilePath: result.imageFilePath,
-  //       },
-  //     });
-  //   })
-  //   .catch((err) => {
-  //     console.log(
-  //       err,
-  //       res.status(500).json({
-  //         error: err,
-  //       })
-  //     );
-  //   });
-  // selectedFile.mv(`${uploadPath}/${selectedFile.name}`, (err) => {
-  //   if (err) {
-  //     console.error(err);
-  //     return res.status(500).send(err);
-  //   }
-  // });
+router.post("/", upload.any(), async (req, res, next) => {
+  const mediaTags = req.body.mediaTags;
+  const files = req.files.file;
+  const selectedFile = req.files.mediaFiles;
+  //const fileName = req.files !== null ? selectedFile.name : null;
+
+  const url = req.protocol + "://" + req.get("host");
+  const file = new File({
+    fileName: req.files.name,
+    filePath: `${url}/public/uploads/${selectedFile.file}`,
+    dateAdded: moment().format("MMMM D, YYYY"),
+    fileSize: selectedFile.size,
+    fileMetaTags: mediaTags,
+  });
+  try {
+    await file.save().then((result) => {
+      res.status(201).json({
+        message: "File uploaded successfully",
+        file: {
+          _id: result._id,
+          fileName: result.fileName,
+          filePath: result.filePath,
+        },
+      });
+    });
+  } catch (err) {
+    console.log(
+      err,
+      res.status(500).json({
+        error: err,
+      })
+    );
+  }
+  selectedFile.mv(`${uploadPath}/${selectedFile.name}`, (err) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).send(err);
+    }
+  });
 });
 
 router.delete("/:id", async (req, res) => {

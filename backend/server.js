@@ -4,7 +4,6 @@ if (process.env.NODE_ENV !== "production") {
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
-const path = require("path");
 const cookieParser = require("cookie-parser");
 const bodyParser = require("body-parser");
 const fileUpload = require("express-fileupload");
@@ -18,14 +17,14 @@ const corsOptions = {
   optionsSuccessStatus: 200,
 };
 
-mongoose.connect(process.env.DATABASE_URL, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-  useFindAndModify: false,
-});
-const db = mongoose.connection;
-db.on("error", (error) => console.error(error));
-db.once("open", () => console.log("Connected to Mongoose"));
+mongoose
+  .connect(process.env.DATABASE_URL, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    useFindAndModify: false,
+  })
+  .then(() => console.log("Connected to MongoDB"))
+  .catch((err) => console.error("Could not connect to MongoDB", err));
 
 app.use(bodyParser.json());
 app.use(
@@ -34,14 +33,14 @@ app.use(
     limit: "16mb",
   })
 );
-app.use(cors());
+app.use(cors(corsOptions));
 app.use(cookieParser());
 app.use(fileUpload());
 
 // configuring the upload file routes
-app.use("/public", express.static("public"));
-app.use("/files", filesRoute);
-app.use("/folders", foldersRoute);
+app.use("/api", express.static("public"));
+app.use("/api/files", filesRoute);
+app.use("/api/folders", foldersRoute);
 
 app.use((req, res, next) => {
   // Error goes via `next()` method
@@ -56,6 +55,4 @@ app.use(function (err, req, res, next) {
   res.status(err.statusCode).send(err.message);
 });
 
-app.listen(port, () => {
-  console.log("Connected to port " + port);
-});
+app.listen(port, () => console.log(`Listening on port ${port}`));

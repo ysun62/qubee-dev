@@ -87,7 +87,7 @@ class FileUpload extends Component {
 
     try {
       http
-        .post("http://localhost:5000/files", formData, {
+        .post("http://localhost:5000/api/files", formData, {
           headers: {
             "Content-Type": "multipart/form-data",
           },
