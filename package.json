@@ -46,6 +46,7 @@
     "@hapi/joi": "^17.1.1",
     "@sentry/browser": "^5.15.5",
     "axios": "^0.19.2",
+    "bluebird": "^3.7.2",
     "bootstrap": "^4.5.0",
     "chart.js": "2.9.3",
     "classnames": "2.2.6",
