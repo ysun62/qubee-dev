@@ -5,7 +5,7 @@ const Folders = require("../models/folder");
 
 router.get("/", async (req, res) => {
   let searchOptions = {};
-  const term = req.query.searchTerm;
+  const term = req.query.q;
 
   if (term !== null && term !== "") {
     searchOptions.searchTerm = `.*${term}.*`;

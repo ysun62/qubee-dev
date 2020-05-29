@@ -38,33 +38,39 @@ import {
 } from "reactstrap";
 
 class AdminNavbar extends React.Component {
-  state = {
-    inputField: "",
-    searchResults: [],
-  };
+  constructor(props) {
+    super(props);
+    this.state = {
+      inputField: "",
+      searchResults: {},
+      loading: false,
+      message: "",
+    };
+
+    this.handleChange = this.handleChange.bind(this);
+    this.handleSubmit = this.handleSubmit.bind(this);
+    this.displaySearch = this.displaySearch.bind(this);
+  }
 
   handleChange = (e) => {
-    this.setState({ inputField: e.currentTarget.value });
+    const term = e.currentTarget.value;
+    this.setState({ inputField: term, message: "" });
   };
 
   handleSubmit = async (e) => {
     e.preventDefault();
 
-    try {
-      const response = await http.get("http://localhost:5000/api/searches", {
-        params: { searchTerm: this.state.inputField },
-      });
-      this.setState({ searchResults: response.data });
-      this.displaySearch();
-    } catch (error) {
-      console.log("There was a error", error);
-    }
-  };
+    this.setState({ redirect: true });
 
-  displaySearchResults = (results) => {
-    if (!results.length) return null;
-
-    results.map((result, index) => {});
+    // try {
+    //   const response = await http.get("http://localhost:5000/api/searches", {
+    //     params: { searchTerm: term},
+    //   });
+    //   this.setState({ searchResults: response.data });
+    //   this.displaySearch();
+    // } catch (error) {
+    //   console.log("There was a error", error);
+    // }
   };
 
   displaySearch = () => {

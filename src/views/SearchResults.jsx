@@ -14,26 +14,31 @@ import {
 import { NavLink } from "react-router-dom";
 
 export class SearchResults extends Component {
-  state = {
-    files: [],
-    folders: [],
-  };
+  constructor(props) {
+    super(props);
+    this.state = {
+      files: [],
+      folders: [],
+    };
+  }
 
   async componentDidMount() {
-    const { data: files } = await http
-      .get(config.imagesEndpoint)
-      .then(() => console.log("Files has been retrieved"))
-      .catch((err) =>
-        console.log("There was an error retrieving the files.", err)
-      );
-    const { data: folders } = await http
-      .get(config.foldersEndpoint)
-      .then(() => console.log("Folders has been retrieved"))
-      .catch((err) =>
-        console.log("There was an error retrieving the folders.", err)
-      );
+    const { data: files } = await http.get(config.imagesEndpoint);
+    const { data: folders } = await http.get(config.foldersEndpoint);
     this.setState({ files, folders });
   }
+
+  handleSearch = async () => {
+    try {
+      const response = await http.get("http://localhost:5000/api/searches", {
+        params: { q: this.state.inputField },
+      });
+      this.setState({ searchResults: response.data });
+      this.displaySearch();
+    } catch (error) {
+      console.log("There was a error", error);
+    }
+  };
 
   handleDelete = async (file) => {
     const originalFiles = this.state.files;
