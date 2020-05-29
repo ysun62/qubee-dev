@@ -46,6 +46,8 @@ const mimeTypes = [
   // Documents
   "postscript",
   "pdf",
+  "octet-stream",
+  "vnd.adobe.photoshop",
   "msword",
   "vnd.openxmlformats-officedocument.wordprocessingml.document",
   "vnd.ms-fontobject",
@@ -109,20 +111,8 @@ function checkFileType(file) {
   return true;
 }
 
-async function saveFiles(fields, files) {
-  for (const file of files) {
-    const selectedFile = new File({
-      fileName: file.name,
-      filePath: `/uploads/${file.fileName}`,
-      fileSize: file.size,
-      fileMetaTags: fields,
-    });
-    await selectedFile.save();
-  }
-}
-
 router.post("/", async (req, res, next) => {
-  const uploadsFolder = join(__dirname, "../public", "uploads");
+  const uploadsFolder = join(__dirname, "../../public", "uploads");
   const form = new IncomingForm({
     multiples: true,
     uploadDir: uploadsFolder,
@@ -142,31 +132,45 @@ router.post("/", async (req, res, next) => {
   form
     .on("field", async (fieldName, value) => {
       value.toLowerCase().split(/[ ,]+/);
-      console.log(value);
-      fields.push(value);
+      console.log({ fieldName, value });
+      fields.push({ fieldName, value });
     })
     .on("file", async (fieldName, file) => {
       const fileName =
         uuidv4() + "-" + file.name.toLowerCase().split(" ").join("-");
       console.log({ file, fileName });
       const isValidFile = checkFileType(file);
+
       if (!isValidFile) {
-        return res.json({
-          ok: false,
-          msg: `The file ${file} is an invalid type.`,
-        });
-      } else {
-        files.push({ file: file, fileName: fileName });
+        try {
+          await fs.unlinkAsync(file.path);
+        } catch (err) {
+          console.log("The file was deleted.", err);
+        }
+      }
+
+      files.push({ fieldName, file });
+
+      try {
         await fs.renameAsync(file.path, join(uploadsFolder, fileName));
+        const selectedFile = new File({
+          fileName: file.name,
+          filePath: `/uploads/${fileName}`,
+          fileSize: file.size,
+        });
+        await selectedFile.save();
+      } catch (err) {
+        console.log(
+          "The file upload failed, trying to remove the temp file..."
+        );
       }
     })
     .on("end", () => {
-      saveFiles(fields, files);
       console.log("-> upload done");
-      res.writeHead(200, { "content-type": "text/plain" });
-      res.write(`received fields:\n\n${util.inspect(fields)}`);
-      res.write("\n\n");
-      res.end(`received files:\n\n${util.inspect(files)}`);
+      // res.writeHead(200, { "content-type": "text/plain" });
+      // res.write(`received fields:\n\n${util.inspect(fields)}`);
+      // res.write("\n\n");
+      // res.end(`received files:\n\n${util.inspect(files)}`);
     });
 
   form.parse(req);
@@ -218,6 +222,7 @@ router.post("/", async (req, res, next) => {
   //       const file = files.mediaFiles[i];
   //       const isValidFile = checkFileType(file);
   //       const fileName = encodeURIComponent(file.name.replace(/&. *;+/g, "-"));
+
   //       if (!isValidFile) {
   //         return res.json({
   //           ok: false,
@@ -242,12 +247,11 @@ router.post("/", async (req, res, next) => {
   //       myUploadedFiles.push(fileName);
   //     }
   //   }
-  //   // return res.json({
-  //   //   ok: true,
-  //   //   msg: "The files was uploaded successfully.",
-  //   //   files: myUploadedFiles,
-  //   // });
-  //   res.json({ fields, files });
+  //   return res.json({
+  //     ok: true,
+  //     msg: "The files was uploaded successfully.",
+  //     files: myUploadedFiles,
+  //   });
   // });
 });
 

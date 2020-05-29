@@ -17,6 +17,8 @@
 */
 import React from "react";
 import { Link } from "react-router-dom";
+import http from "../../services/httpService";
+
 // reactstrap components
 import {
   DropdownMenu,
@@ -32,10 +34,43 @@ import {
   Navbar,
   Nav,
   Container,
-  Media
+  Media,
 } from "reactstrap";
 
 class AdminNavbar extends React.Component {
+  state = {
+    inputField: "",
+    searchResults: [],
+  };
+
+  handleChange = (e) => {
+    this.setState({ inputField: e.currentTarget.value });
+  };
+
+  handleSubmit = async (e) => {
+    e.preventDefault();
+
+    try {
+      const response = await http.get("http://localhost:5000/api/searches", {
+        params: { searchTerm: this.state.inputField },
+      });
+      this.setState({ searchResults: response.data });
+      this.displaySearch();
+    } catch (error) {
+      console.log("There was a error", error);
+    }
+  };
+
+  displaySearchResults = (results) => {
+    if (!results.length) return null;
+
+    results.map((result, index) => {});
+  };
+
+  displaySearch = () => {
+    console.log(this.state.searchResults);
+  };
+
   render() {
     return (
       <>
@@ -47,7 +82,10 @@ class AdminNavbar extends React.Component {
             >
               {this.props.brandText}
             </Link>
-            <Form className="navbar-search navbar-search-dark form-inline mr-3 d-none d-md-flex ml-lg-auto">
+            <Form
+              className="navbar-search navbar-search-dark form-inline mr-3 d-none d-md-flex ml-lg-auto"
+              onSubmit={this.handleSubmit}
+            >
               <FormGroup className="mb-0">
                 <InputGroup className="input-group-alternative">
                   <InputGroupAddon addonType="prepend">
@@ -55,7 +93,14 @@ class AdminNavbar extends React.Component {
                       <i className="fas fa-search" />
                     </InputGroupText>
                   </InputGroupAddon>
-                  <Input placeholder="Search" type="text" />
+                  <Input
+                    placeholder="Search"
+                    name="search"
+                    id="search"
+                    type="search"
+                    value={this.state.inputField}
+                    onChange={this.handleChange}
+                  />
                 </InputGroup>
               </FormGroup>
             </Form>
@@ -97,7 +142,10 @@ class AdminNavbar extends React.Component {
                     <span>Support</span>
                   </DropdownItem>
                   <DropdownItem divider />
-                  <DropdownItem href="#pablo" onClick={e => e.preventDefault()}>
+                  <DropdownItem
+                    href="#pablo"
+                    onClick={(e) => e.preventDefault()}
+                  >
                     <i className="ni ni-user-run" />
                     <span>Logout</span>
                   </DropdownItem>

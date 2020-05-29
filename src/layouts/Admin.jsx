@@ -15,7 +15,7 @@
 * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
 */
-import React from "react";
+import React, { Component } from "react";
 import { Route, Switch, Redirect } from "react-router-dom";
 // toastify component
 import { ToastContainer } from "react-toastify";
@@ -27,21 +27,29 @@ import AdminFooter from "components/Footers/AdminFooter";
 import ActionBarHeader from "components/Headers/ActionBarHeader";
 import Sidebar from "components/Sidebar/Sidebar";
 import Folders from "../views/Folders";
+import SearchResults from "../views/SearchResults";
 
 import routes from "routes.js";
 
-class Admin extends React.Component {
+class Admin extends Component {
+  state = {
+    display: false,
+  };
+
   componentDidMount() {
     document.body.classList.add("bg-default");
   }
+
   componentWillUnmount() {
     document.body.classList.remove("bg-default");
   }
+
   componentDidUpdate(e) {
     document.documentElement.scrollTop = 0;
     document.scrollingElement.scrollTop = 0;
     this.refs.mainContent.scrollTop = 0;
   }
+
   getRoutes = (routes) => {
     return routes.map((prop, key) => {
       if (prop.layout === "/admin") {
@@ -57,6 +65,7 @@ class Admin extends React.Component {
       }
     });
   };
+
   getBrandText = (path) => {
     for (let i = 0; i < routes.length; i++) {
       if (
@@ -69,17 +78,26 @@ class Admin extends React.Component {
     }
     return "Brand";
   };
+
+  showHideComponent() {
+    const { display } = this.state;
+    this.setState({
+      display: !display,
+    });
+  }
+
   render() {
+    const { display } = this.props;
     return (
       <>
         <ToastContainer />
-        <ActionBarHeader />
+        {display && <ActionBarHeader />}
         <Sidebar
           {...this.props}
           routes={routes}
           logo={{
             innerLink: "/admin/index",
-            imgSrc: require("assets/img/brand/argon-react.png"),
+            imgSrc: require("assets/img/brand/qubee_logo.png"),
             imgAlt: "...",
           }}
         />
@@ -90,6 +108,7 @@ class Admin extends React.Component {
           />
           <Switch>
             <Route path="/admin/folder/:id" component={Folders} />
+            <Route path="/admin/search/:term" component={SearchResults} />
             {this.getRoutes(routes)}
             <Redirect from="*" to="/admin/index" />
           </Switch>

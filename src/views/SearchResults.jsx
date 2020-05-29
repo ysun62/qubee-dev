@@ -2,37 +2,38 @@ import React, { Component } from "react";
 import http from "../services/httpService";
 import CreateFolder from "../components/Modals/CreateFolder";
 import config from "../config";
-//import Header from "components/Headers/Header";
 import {
   Container,
   Row,
-  //Button,
-  Badge,
   Media,
   Table,
   Col,
   Card,
   CardHeader,
 } from "reactstrap";
-import { NavLink, Link } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 
-class Files extends Component {
+export class SearchResults extends Component {
   state = {
     files: [],
     folders: [],
-    metaTags: [],
-    checkedItems: new Map(),
   };
 
   async componentDidMount() {
-    this.getFiles();
-  }
-
-  getFiles = async () => {
-    const { data: files } = await http.get(config.filesEndpoint);
-    const { data: folders } = await http.get(config.foldersEndpoint);
+    const { data: files } = await http
+      .get(config.imagesEndpoint)
+      .then(() => console.log("Files has been retrieved"))
+      .catch((err) =>
+        console.log("There was an error retrieving the files.", err)
+      );
+    const { data: folders } = await http
+      .get(config.foldersEndpoint)
+      .then(() => console.log("Folders has been retrieved"))
+      .catch((err) =>
+        console.log("There was an error retrieving the folders.", err)
+      );
     this.setState({ files, folders });
-  };
+  }
 
   handleDelete = async (file) => {
     const originalFiles = this.state.files;
@@ -41,7 +42,7 @@ class Files extends Component {
     this.setState({ files });
 
     try {
-      await http.delete(`${config.filesEndpoint}/${file._id}`);
+      await http.delete(`${config.apiEndpoint}/${file._id}`);
       //throw new Error("Something went wrong!");
     } catch (err) {
       // Expected (404: not found, 400: bad request) - Client Errors
@@ -50,31 +51,6 @@ class Files extends Component {
         alert("This file has already been deleted.");
       this.setState({ files: originalFiles });
     }
-  };
-
-  handleFileSizeConversion = (bytes, si) => {
-    var thresh = si ? 1000 : 1024;
-    if (Math.abs(bytes) < thresh) {
-      return bytes + " B";
-    }
-    var units = si
-      ? ["KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"]
-      : ["KiB", "MiB", "GiB", "TiB", "PiB", "EiB", "ZiB", "YiB"];
-    var u = -1;
-    do {
-      bytes /= thresh;
-      ++u;
-    } while (Math.abs(bytes) >= thresh && u < units.length - 1);
-    return bytes.toFixed(1) + " " + units[u];
-  };
-
-  handleChange = (e) => {
-    const item = e.target.id;
-    const isChecked = e.target.checked;
-    this.setState((prevState) => ({
-      checkedItems: prevState.checkedItems.set(item, isChecked),
-    }));
-    console.log(e.target.id);
   };
 
   render() {
@@ -88,7 +64,8 @@ class Files extends Component {
                 <CardHeader className="border-0">
                   <Row className="align-items-center">
                     <div className="col">
-                      <h3 className="mb-0">All 3 {this.state.checked}</h3>
+                      <h3>ID - {this.props.match.params.id}</h3>
+                      <h3 className="mb-0">All 3</h3>
                     </div>
                     <div className="col text-right">
                       <CreateFolder
@@ -135,8 +112,6 @@ class Files extends Component {
                               className="custom-control-input"
                               id={folder._id}
                               type="checkbox"
-                              checked={this.state.checkedItems.get(folder._id)}
-                              onChange={this.handleChange}
                             />
                             <label
                               className="custom-control-label"
@@ -146,13 +121,22 @@ class Files extends Component {
                         </th>
                         <td>
                           <Media className="align-items-center">
-                            <Link to={`/admin/folder/${folder.folderPath}`}>
-                              <i className="fas fa-folder-open mr-2" />
+                            <NavLink
+                              className=""
+                              to={`/${folder.folderRelativePath}`}
+                            >
+                              <i className="ni ni-folder-17 mr-3"></i>
                               <span className="mb-0 text-sm">
-                                {folder.folderName}
+                                {folder.name}
                               </span>
-                            </Link>
+                            </NavLink>
                           </Media>
+                          {/* <Button
+                            color="danger"
+                            onClick={() => this.handleDelete(file)}
+                          >
+                            Delete
+                          </Button> */}
                         </td>
                         <td>{folder.dateAdded}</td>
                         <td></td>
@@ -174,28 +158,21 @@ class Files extends Component {
                           </div>
                         </th>
                         <td>
-                          <Media className="align-items-center mb-2">
-                            <a href={file.filePath} target="blank">
-                              <i className="fas fa-file-image mr-2" />
-                              <span className="mb-0 text-sm">
-                                {file.fileName}
-                              </span>
+                          <Media className="align-items-center">
+                            <a href={file.fileUrl} target="blank">
+                              <i className="ni ni-image mr-3"></i>
+                              <span className="mb-0 text-sm">{file.name}</span>
                             </a>
                           </Media>
-                          {file.fileMetaTags.map((tag, i) => (
-                            <Badge
-                              key={tag + i}
-                              className="badge-default mr-2"
-                              pill
-                            >
-                              <a href="#pablo">{tag}</a>
-                            </Badge>
-                          ))}
+                          {/* <Button
+                            color="danger"
+                            onClick={() => this.handleDelete(file)}
+                          >
+                            Delete
+                          </Button> */}
                         </td>
                         <td>{file.dateAdded}</td>
-                        <td>
-                          {this.handleFileSizeConversion(file.fileSize, true)}
-                        </td>
+                        <td>{file.fileSize}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -209,4 +186,4 @@ class Files extends Component {
   }
 }
 
-export default Files;
+export default SearchResults;

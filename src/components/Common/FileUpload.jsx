@@ -7,17 +7,15 @@ class FileUpload extends Component {
     super(props);
 
     this.state = {
-      selectedFiles: [],
+      selectedFiles: null,
       filenames: "Choose file",
       loaded: 0,
-      metaTags: [],
       tagNames: "",
       taskCompleted: "Waiting to upload",
     };
 
     this.handleFileChange = this.handleFileChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
-    this.handleMetaTags = this.handleMetaTags.bind(this);
     this.maxSelectFile = this.maxSelectFile.bind(this);
   }
 
@@ -43,50 +41,36 @@ class FileUpload extends Component {
     });
   }
 
-  handleMetaTags(e) {
-    const allTags = e.currentTarget.value;
-    const tagArray = allTags.split(",");
-    this.setState({ metaTags: tagArray, tagNames: allTags });
-  }
-
   async handleSubmit(e) {
     e.preventDefault();
 
     const files = this.state.selectedFiles;
-    const tags = this.state.metaTags;
     const formData = new FormData();
 
     for (let i = 0; i < files.length; i++) {
-      formData.append("mediaFiles", files[i], files[i].name);
+      formData.append("mediaFiles", files[i]);
     }
 
-    for (let i = 0; i < tags.length; i++) {
-      formData.append("metaTags", tags[i]);
+    try {
+      const response = await http
+        .post("http://localhost:5000/api/files", formData, {
+          onUploadProgress: (ProgressEvent) => {
+            this.setState({
+              loaded: (ProgressEvent.loaded / ProgressEvent.total) * 100,
+              taskCompleted:
+                this.state.loaded === 100
+                  ? "Uploaded Successfully"
+                  : "Waiting to upload",
+            });
+          },
+        })
+        .then(() => {
+          this.props.getFiles();
+        });
+      console.log(response);
+    } catch (err) {
+      console.log(err);
     }
-
-    // for (const file of files) {
-    //   formData.append("mediaFiles", file);
-    // }
-
-    // for (const tag of this.state.metaTags) {
-    //   formData.append("metaTags", tag);
-    // }
-
-    await http
-      .post("http://localhost:5000/api/files", formData, {
-        onUploadProgress: (ProgressEvent) => {
-          this.setState({
-            loaded: (ProgressEvent.loaded / ProgressEvent.total) * 100,
-            taskCompleted:
-              this.state.loaded === 100
-                ? "Uploaded Successfully"
-                : "Waiting to upload",
-          });
-        },
-      })
-      .then((res) => {
-        console.log(res);
-      });
   }
 
   render() {
@@ -94,11 +78,11 @@ class FileUpload extends Component {
     return (
       <>
         <Form onSubmit={this.handleSubmit}>
-          <div className="progress-wrapper">
+          <div className="progress-wrapper" style={{ paddingTop: 0 }}>
             <div className="progress-info">
-              <div className="progress-label">
-                {/* <span>{this.state.taskCompleted}</span> */}
-              </div>
+              {/* <div className="progress-label">
+                <span>{this.state.taskCompleted}</span>
+              </div> */}
               <div className="progress-percentage">
                 <span>{Math.round(loaded, 2)}%</span>
               </div>
@@ -118,17 +102,11 @@ class FileUpload extends Component {
               {filenames}
             </Label>
           </div>
-          <FormGroup>
-            <Input
-              name="metaTags"
-              id="metaTags"
-              placeholder="Add tags seperated by a comma (,)"
-              type="text"
-              value={this.state.tagNames}
-              onChange={this.handleMetaTags}
-            />
-          </FormGroup>
-          <Button color="primary" type="submit">
+          <Button
+            color="primary"
+            type="submit"
+            disabled={!this.state.selectedFiles}
+          >
             Upload
           </Button>
         </Form>

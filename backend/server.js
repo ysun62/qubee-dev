@@ -8,6 +8,7 @@ const cookieParser = require("cookie-parser");
 const bodyParser = require("body-parser");
 const filesRoute = require("./routes/files");
 const foldersRoute = require("./routes/folders");
+const searchesRoute = require("./routes/searches");
 
 const app = express();
 const port = process.env.PORT || 5000;
@@ -38,6 +39,7 @@ app.use(cookieParser());
 app.use(express.static("public"));
 app.use("/api/files", filesRoute);
 app.use("/api/folders", foldersRoute);
+app.use("/api/searches", searchesRoute);
 
 app.use((req, res, next) => {
   setImmediate(() => {
