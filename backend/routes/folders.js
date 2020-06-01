@@ -1,54 +1,68 @@
+const Promise = require("bluebird");
 const express = require("express");
-const fs = require("fs");
-const path = require("path");
+const fs = Promise.promisifyAll(require("fs"));
+const { join } = require("path");
 const mongoose = require("mongoose");
-const moment = require("moment");
-const { v4: uuidv4 } = require("uuid");
 const router = express.Router();
-const Folder = require("../models/folder");
+const { Folder, folderBasePath } = require("../models/folder");
 
-const DIR = path.join(__dirname, Folder.folderBasePath);
+// Returns true or false if it was successfull or not
+async function checkCreateUploadsFolder(uploadsFolder) {
+  try {
+    await fs.statAsync(uploadsFolder);
+  } catch (err) {
+    if (err && err.code === "ENOENT") {
+      try {
+        await fs.mkdirAsync(uploadsFolder);
+      } catch (err) {
+        console.error("Error creating the uploads folder", err);
+        return false;
+      }
+    } else {
+      console.log("Error reading the uploads folder");
+      return false;
+    }
+  }
+  return true;
+}
 
 router.post("/", async (req, res) => {
-  const url = req.protocol + "://" + req.get("host");
-  console.log(url);
+  const uploadsFolder = join(__dirname, folderBasePath);
+  const folderExists = await checkCreateUploadsFolder(uploadsFolder);
+
+  if (!folderExists) {
+    return res
+      .status(500)
+      .send("There was an error creating the uploads folder.");
+  }
 
   const objectId = new mongoose.Types.ObjectId();
-  const folder = new Folder({
+  let folder = new Folder({
     _id: objectId,
-    folderName: req.body.folderName,
-    folderPath: objectId,
-    dateAdded: moment().format("MMMM D, YYYY"),
+    name: req.body.folderName,
+    path: `/uploads/${objectId}`,
   });
 
-  await folder
-    .save()
-    .then((result) => {
-      res.status(201).json({
-        message: "Folder created successfully",
-        folder: {
-          _id: result._id,
-          folderAbsolutePath: result.folderAbsolutePath,
-        },
-      });
-    })
-    .catch((err) => {
-      console.log(
-        err,
-        res.status(500).json({
-          error: err,
-        })
-      );
+  try {
+    fs.mkdirAsync(`${uploadsFolder}/${objectId}`, (err) => {
+      if (err) {
+        console.error(err);
+      }
     });
 
-  // Create folder
-  fs.mkdir(`${DIR}/${objectId}`, (err) => {
-    if (err) {
-      console.error(err);
+    try {
+      folder = await folder.save();
+      console.log("Folder saved to MongoDB successfully");
+    } catch (err) {
+      res.status(500).send("There was an error saving the folder to MongoDB.");
+      console.log(err);
     }
-  });
+  } catch (err) {
+    res.status(500).send("There was an error creating the folder.");
+    console.log(err);
+  }
 
-  //res.send(req.body.folderName);
+  res.send(folder);
 });
 
 router.delete("/:id", async (req, res) => {

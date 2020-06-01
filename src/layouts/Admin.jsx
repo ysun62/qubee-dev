@@ -109,6 +109,7 @@ class Admin extends Component {
           <Switch>
             <Route path="/admin/folder/:id" component={Folders} />
             <Route path="/admin/search/:term" component={SearchResults} />
+            <Route path="/admin/search/" component={SearchResults} />
             {this.getRoutes(routes)}
             <Redirect from="*" to="/admin/index" />
           </Switch>

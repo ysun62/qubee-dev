@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import http from "../services/httpService";
 import CreateFolder from "../components/Modals/CreateFolder";
 import config from "../config";
+import fileSizeConversion from "../utils/fileSizeConversion";
 import {
   Container,
   Row,
@@ -10,37 +11,37 @@ import {
   Col,
   Card,
   CardHeader,
+  Badge,
 } from "reactstrap";
 import { NavLink } from "react-router-dom";
 
-export class SearchResults extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      files: [],
-      folders: [],
-    };
-  }
-
-  async componentDidMount() {
-    const { data: files } = await http.get(config.imagesEndpoint);
-    const { data: folders } = await http.get(config.foldersEndpoint);
-    this.setState({ files, folders });
-  }
-
-  handleSearch = async () => {
-    try {
-      const response = await http.get("http://localhost:5000/api/searches", {
-        params: { q: this.state.inputField },
-      });
-      this.setState({ searchResults: response.data });
-      this.displaySearch();
-    } catch (error) {
-      console.log("There was a error", error);
-    }
+class SearchResults extends Component {
+  state = {
+    results: [],
   };
 
-  handleDelete = async (file) => {
+  componentDidMount() {
+    this.displayResults();
+  }
+
+  componentDidUpdate(prevProps) {
+    if (
+      this.props.location.state.results !== prevProps.location.state.results
+    ) {
+      this.displayResults();
+    }
+  }
+
+  displayResults() {
+    const props = this.props.location.state.results;
+    if (props) {
+      this.setState({ results: props });
+    } else {
+      this.setState({ results: [] });
+    }
+  }
+
+  async handleDelete(file) {
     const originalFiles = this.state.files;
 
     const files = this.state.files.filter((p) => p._id !== file._id);
@@ -56,7 +57,7 @@ export class SearchResults extends Component {
         alert("This file has already been deleted.");
       this.setState({ files: originalFiles });
     }
-  };
+  }
 
   render() {
     return (
@@ -109,75 +110,42 @@ export class SearchResults extends Component {
                     </tr>
                   </thead>
                   <tbody>
-                    {this.state.folders.map((folder) => (
-                      <tr key={folder._id}>
+                    {this.state.results.map((result) => (
+                      <tr key={result._id}>
                         <th scope="row">
                           <div className="custom-control custom-checkbox mb-4">
                             <input
                               className="custom-control-input"
-                              id={folder._id}
+                              id={result._id}
                               type="checkbox"
                             />
                             <label
                               className="custom-control-label"
-                              htmlFor={folder._id}
+                              htmlFor={result._id}
                             ></label>
                           </div>
                         </th>
                         <td>
-                          <Media className="align-items-center">
-                            <NavLink
-                              className=""
-                              to={`/${folder.folderRelativePath}`}
-                            >
-                              <i className="ni ni-folder-17 mr-3"></i>
+                          <Media className="align-items-center mb-2">
+                            <a href={result.path} target="blank">
+                              <i className="fas fa-file-image mr-2" />
                               <span className="mb-0 text-sm">
-                                {folder.name}
+                                {result.name}
                               </span>
-                            </NavLink>
-                          </Media>
-                          {/* <Button
-                            color="danger"
-                            onClick={() => this.handleDelete(file)}
-                          >
-                            Delete
-                          </Button> */}
-                        </td>
-                        <td>{folder.dateAdded}</td>
-                        <td></td>
-                      </tr>
-                    ))}
-                    {this.state.files.map((file) => (
-                      <tr key={file._id}>
-                        <th scope="row">
-                          <div className="custom-control custom-checkbox mb-4">
-                            <input
-                              className="custom-control-input"
-                              id={file._id}
-                              type="checkbox"
-                            />
-                            <label
-                              className="custom-control-label"
-                              htmlFor={file._id}
-                            ></label>
-                          </div>
-                        </th>
-                        <td>
-                          <Media className="align-items-center">
-                            <a href={file.fileUrl} target="blank">
-                              <i className="ni ni-image mr-3"></i>
-                              <span className="mb-0 text-sm">{file.name}</span>
                             </a>
                           </Media>
-                          {/* <Button
-                            color="danger"
-                            onClick={() => this.handleDelete(file)}
-                          >
-                            Delete
-                          </Button> */}
+                          {result.metaTags.map((tag, i) => (
+                            <Badge
+                              key={tag + i}
+                              className="badge-default mr-2"
+                              pill
+                            >
+                              <a href="#pablo">{tag}</a>
+                            </Badge>
+                          ))}
                         </td>
-                        <td>{file.dateAdded}</td>
-                        <td>{file.fileSize}</td>
+                        <td>{result.dateAdded}</td>
+                        <td>{fileSizeConversion(result.size, true)}</td>
                       </tr>
                     ))}
                   </tbody>

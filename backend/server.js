@@ -2,6 +2,9 @@ if (process.env.NODE_ENV !== "production") {
   require("dotenv").config();
 }
 const express = require("express");
+const debug = require("debug")("app:startup");
+const helmet = require("helmet");
+const morgan = require("morgan");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
@@ -26,20 +29,27 @@ mongoose
   .then(() => console.log("Connected to MongoDB..."))
   .catch((err) => console.log("Could not connect to MongoDB...", err));
 
+app.use(helmet());
 app.use(bodyParser.json());
 app.use(
   bodyParser.urlencoded({
     extended: false,
+    limit: "5000mb",
   })
 );
-app.use(cors(corsOptions));
 app.use(cookieParser());
+app.use(cors(corsOptions));
 
 // configuring the upload file routes
 app.use(express.static("public"));
 app.use("/api/files", filesRoute);
 app.use("/api/folders", foldersRoute);
 app.use("/api/searches", searchesRoute);
+
+if (app.get("env") === "development") {
+  app.use(morgan("tiny"));
+  debug("Moregan enabled...");
+}
 
 app.use((req, res, next) => {
   setImmediate(() => {

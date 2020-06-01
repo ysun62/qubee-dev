@@ -1,18 +1,21 @@
+const Joi = require("@hapi/joi");
 const mongoose = require("mongoose");
 const folderBasePath = "../../public/uploads";
 
 const folderSchema = new mongoose.Schema({
-  _id: mongoose.Schema.Types.ObjectId,
-  folderName: {
+  _id: {
+    type: mongoose.Schema.Types.ObjectId,
+    require: true,
+  },
+  name: {
     type: String,
     required: true,
+    min: 1,
+    max: 50,
   },
-  folderPath: {
+  path: {
     type: String,
     required: true,
-  },
-  folderRelativePath: {
-    type: String,
   },
   dateAdded: {
     type: Date,
@@ -21,5 +24,20 @@ const folderSchema = new mongoose.Schema({
   },
 });
 
-module.exports = mongoose.model("Folders", folderSchema);
-module.exports.folderBasePath = folderBasePath;
+const Folder = mongoose.model("Folder", folderSchema);
+
+function validateFolder(folder) {
+  const schema = Joi.object({
+    _id: Joi.alphanum().required(),
+    name: Joi.string().min(5).max(50).required(),
+    path: Joi.string().required(),
+    dateAdded: Joi.date().required(),
+  });
+
+  return schema.validate(folder);
+}
+
+exports.Folder = Folder;
+exports.folderSchema = folderSchema;
+exports.folderBasePath = folderBasePath;
+exports.validate = validateFolder;

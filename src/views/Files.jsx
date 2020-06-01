@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import http from "../services/httpService";
 import CreateFolder from "../components/Modals/CreateFolder";
 import config from "../config";
+import fileSizeConversion from "../utils/fileSizeConversion";
 //import Header from "components/Headers/Header";
 import {
   Container,
@@ -50,22 +51,6 @@ class Files extends Component {
         alert("This file has already been deleted.");
       this.setState({ files: originalFiles });
     }
-  };
-
-  handleFileSizeConversion = (bytes, si) => {
-    var thresh = si ? 1000 : 1024;
-    if (Math.abs(bytes) < thresh) {
-      return bytes + " B";
-    }
-    var units = si
-      ? ["KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"]
-      : ["KiB", "MiB", "GiB", "TiB", "PiB", "EiB", "ZiB", "YiB"];
-    var u = -1;
-    do {
-      bytes /= thresh;
-      ++u;
-    } while (Math.abs(bytes) >= thresh && u < units.length - 1);
-    return bytes.toFixed(1) + " " + units[u];
   };
 
   handleChange = (e) => {
@@ -146,10 +131,10 @@ class Files extends Component {
                         </th>
                         <td>
                           <Media className="align-items-center">
-                            <Link to={`/admin/folder/${folder.folderPath}`}>
+                            <Link to={`/admin/folder/${folder.path}`}>
                               <i className="fas fa-folder-open mr-2" />
                               <span className="mb-0 text-sm">
-                                {folder.folderName}
+                                {folder.name}
                               </span>
                             </Link>
                           </Media>
@@ -175,14 +160,12 @@ class Files extends Component {
                         </th>
                         <td>
                           <Media className="align-items-center mb-2">
-                            <a href={file.filePath} target="blank">
+                            <a href={file.path} target="blank">
                               <i className="fas fa-file-image mr-2" />
-                              <span className="mb-0 text-sm">
-                                {file.fileName}
-                              </span>
+                              <span className="mb-0 text-sm">{file.name}</span>
                             </a>
                           </Media>
-                          {file.fileMetaTags.map((tag, i) => (
+                          {file.metaTags.map((tag, i) => (
                             <Badge
                               key={tag + i}
                               className="badge-default mr-2"
@@ -193,9 +176,7 @@ class Files extends Component {
                           ))}
                         </td>
                         <td>{file.dateAdded}</td>
-                        <td>
-                          {this.handleFileSizeConversion(file.fileSize, true)}
-                        </td>
+                        <td>{fileSizeConversion(file.size, true)}</td>
                       </tr>
                     ))}
                   </tbody>

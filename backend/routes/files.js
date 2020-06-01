@@ -5,81 +5,10 @@ const fs = Promise.promisifyAll(require("fs"));
 const util = require("util");
 const { join } = require("path");
 const mongoose = require("mongoose");
-const moment = require("moment");
-const { v4: uuidv4 } = require("uuid");
+const mimeTypes = require("../utils/mimetypes");
 const router = express.Router();
-const File = require("../models/file");
-const Folder = require("../models/folder");
-const mimeTypes = [
-  // Images
-  "png",
-  "jpeg",
-  "gif",
-  "bmp",
-  "x-windows-bmp",
-  "tiff",
-  "x-icon",
-  "svg+xml",
-  "webp",
-  // Videos
-  "3gpp",
-  "3gpp2",
-  "mov",
-  "mp4",
-  "x-troff-msvideo",
-  "avi",
-  "msvideo",
-  "x-msvideo",
-  "quicktime",
-  "mpeg",
-  "x-mpeg",
-  "webm",
-  // Audio
-  "aac",
-  "aiff",
-  "x-aiff",
-  "x-midi",
-  "ogg",
-  "mpeg3",
-  "x-mpeg-3",
-  "wav",
-  // Documents
-  "postscript",
-  "pdf",
-  "octet-stream",
-  "vnd.adobe.photoshop",
-  "msword",
-  "vnd.openxmlformats-officedocument.wordprocessingml.document",
-  "vnd.ms-fontobject",
-  "vnd.openxmlformats-officedocument.presentationml.presentation",
-  "vnd.ms-powerpoint",
-  "vnd.visio",
-  "rtf",
-  "x-rtf",
-  "richtext",
-  "plain",
-  "vnd.ms-excel",
-  "vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-  "xml",
-  "html",
-  "css",
-  "csv",
-  "json",
-  "epub+zip",
-  "otf",
-  "ttf",
-  "woff",
-  "woff2",
-  // Compresses
-  "zip",
-  "x-tar",
-  "x-zip",
-  "x-gzip",
-  "x-bzip",
-  "x-bzip2",
-  "x-rar-compressed",
-  "x-7z-compressed",
-];
+const { File, fileBasePath, validate } = require("../models/file");
+const { Folder } = require("../models/folder");
 
 // Returns true or false if it was successfull or not
 async function checkCreateUploadsFolder(uploadsFolder) {
@@ -103,7 +32,8 @@ async function checkCreateUploadsFolder(uploadsFolder) {
 
 // Returns true or false in case it was successful
 function checkFileType(file) {
-  const type = file.type.split("/").pop();
+  const type = file.type;
+
   if (mimeTypes.indexOf(type) === -1) {
     console.log("The file type is invalid.");
     return false;
@@ -111,16 +41,16 @@ function checkFileType(file) {
   return true;
 }
 
-router.post("/", async (req, res, next) => {
-  const uploadsFolder = join(__dirname, "../../public", "uploads");
+router.post("/", async (req, res) => {
+  const uploadsFolder = join(__dirname, fileBasePath);
+  const tempDir = join(__dirname, "../tmp");
   const form = new IncomingForm({
     multiples: true,
-    uploadDir: uploadsFolder,
-    keepExtensions: true,
+    uploadDir: tempDir,
+    maxFileSize: 5000 * 1024 * 1024,
   });
   const folderExists = await checkCreateUploadsFolder(uploadsFolder);
   const files = [];
-  const fields = [];
 
   if (!folderExists) {
     return res.json({
@@ -130,15 +60,12 @@ router.post("/", async (req, res, next) => {
   }
 
   form
-    .on("field", async (fieldName, value) => {
-      value.toLowerCase().split(/[ ,]+/);
-      console.log({ fieldName, value });
-      fields.push({ fieldName, value });
-    })
     .on("file", async (fieldName, file) => {
+      console.log({ file });
+      console.log(req);
+      const objectId = new mongoose.Types.ObjectId();
       const fileName =
-        uuidv4() + "-" + file.name.toLowerCase().split(" ").join("-");
-      console.log({ file, fileName });
+        objectId + "-" + file.name.toLowerCase().split(" ").join("-");
       const isValidFile = checkFileType(file);
 
       if (!isValidFile) {
@@ -151,18 +78,29 @@ router.post("/", async (req, res, next) => {
 
       files.push({ fieldName, file });
 
+      const folder = await Folder.findById(req.body.folderId);
+
+      const selectedFile = new File({
+        name: file.name,
+        path: `/uploads/${fileName}`,
+        size: file.size,
+        inFolders: {
+          _id: folder._id,
+          name: folder.name,
+          path: folder.path,
+        },
+      });
+
       try {
         await fs.renameAsync(file.path, join(uploadsFolder, fileName));
-        const selectedFile = new File({
-          fileName: file.name,
-          filePath: `/uploads/${fileName}`,
-          fileSize: file.size,
-        });
-        await selectedFile.save();
+
+        try {
+          await selectedFile.save();
+        } catch (err) {
+          console.log("Couldn't save to MondoDB...", err);
+        }
       } catch (err) {
-        console.log(
-          "The file upload failed, trying to remove the temp file..."
-        );
+        console.log("The file upload failed...", err);
       }
     })
     .on("end", () => {
@@ -170,7 +108,7 @@ router.post("/", async (req, res, next) => {
       // res.writeHead(200, { "content-type": "text/plain" });
       // res.write(`received fields:\n\n${util.inspect(fields)}`);
       // res.write("\n\n");
-      // res.end(`received files:\n\n${util.inspect(files)}`);
+      res.end(`received files:\n\n${util.inspect(files)}`);
     });
 
   form.parse(req);
@@ -193,10 +131,11 @@ router.post("/", async (req, res, next) => {
   //     const fileName = encodeURIComponent(file.name.replace(/&. *;+/g, "-"));
 
   //     if (!isValidFile) {
-  //       return res.json({
-  //         ok: false,
-  //         msg: "The file received is an invalid type.",
-  //       });
+  //       // return res.json({
+  //       //   ok: false,
+  //       //   msg: "The file received is an invalid type.",
+  //       // });
+  //       console.log("The file received is an invalid type.");
   //     }
 
   //     try {
@@ -210,12 +149,13 @@ router.post("/", async (req, res, next) => {
   //       } catch (err) {
   //         console.log("The file was deleted.", err);
   //       }
-  //       return res.json({
-  //         ok: false,
-  //         msg: "The file was not uploaded.",
-  //       });
+  //       // return res.json({
+  //       //   ok: false,
+  //       //   msg: "The file was not uploaded.",
+  //       // });
+  //       console.log("The file was not uploaded.");
   //     }
-  //     myUploadedFiles.push(fileName);
+  //     //myUploadedFiles.push(fileName);
   //   } else {
   //     // There are multiple files
   //     for (let i = 0; i < files.mediaFiles.length; i++) {
@@ -224,10 +164,11 @@ router.post("/", async (req, res, next) => {
   //       const fileName = encodeURIComponent(file.name.replace(/&. *;+/g, "-"));
 
   //       if (!isValidFile) {
-  //         return res.json({
-  //           ok: false,
-  //           msg: "The file received is an invalid type.",
-  //         });
+  //         // return res.json({
+  //         //   ok: false,
+  //         //   msg: "The file received is an invalid type.",
+  //         // });
+  //         console.log("The file received is an invalid type.");
   //       }
 
   //       try {
@@ -239,19 +180,18 @@ router.post("/", async (req, res, next) => {
   //         try {
   //           await fs.unlinkAsync(file.path);
   //         } catch (err) {}
-  //         return res.json({
-  //           ok: false,
-  //           msg: "The file was not uploaded.",
-  //         });
+  //         console.log("The file was not uploaded.");
   //       }
-  //       myUploadedFiles.push(fileName);
+  //       //myUploadedFiles.push(fileName);
   //     }
   //   }
-  //   return res.json({
-  //     ok: true,
-  //     msg: "The files was uploaded successfully.",
-  //     files: myUploadedFiles,
-  //   });
+  //   console.log("The files was uploaded successfully.");
+
+  // return res.json({
+  //   ok: true,
+  //   msg: "The files was uploaded successfully.",
+  //   files: myUploadedFiles,
+  // });
   // });
 });
 
