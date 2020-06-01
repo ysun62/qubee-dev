@@ -41,6 +41,11 @@ function checkFileType(file) {
   return true;
 }
 
+router.get("/", async (req, res) => {
+  const files = await File.find().select("-__v").sort("name");
+  res.send(files);
+});
+
 router.post("/", async (req, res) => {
   const uploadsFolder = join(__dirname, fileBasePath);
   const tempDir = join(__dirname, "../tmp");
@@ -195,9 +200,36 @@ router.post("/", async (req, res) => {
   // });
 });
 
-router.get("/", async (req, res) => {
-  const files = await File.find().select("-__v").sort("name");
-  res.send(files);
+router.put("/:id", async (req, res) => {
+  // const { error } = validate(req.body);
+  // if (error) return res.status(400).send(error.details[0].message);
+
+  console.log(req.body.metaTags);
+
+  // const folder = await Folder.findById(req.body.folderId);
+  // if (!folder) return res.status(400).send("Invalid folder.");
+
+  const file = await File.findByIdAndUpdate(
+    req.params.id,
+    {
+      $set: req.body,
+    },
+    { new: true }
+  );
+
+  if (!file)
+    return res.status(404).send("The movie with the given ID was not found");
+
+  res.send(file);
+});
+
+router.get("/:id", async (req, res) => {
+  const file = await File.findById(req.params.id);
+
+  if (!file)
+    return res.status(404).send("The movie with the given ID was not found.");
+
+  res.send(file);
 });
 
 router.delete("/:id", async (req, res) => {

@@ -34,16 +34,16 @@ const fileSchema = mongoose.model(
 
 function validateFile(file) {
   const schema = Joi.object({
-    name: Joi.string().min(5).max(255).required(),
-    path: Joi.string().required(),
-    metaTags: Joi.array().items(Joi.string()),
-    size: Joi.number().min(0).required(),
-    dateAdded: Joi.number().min(0).required(),
-    inFolders: Joi.array().items(
-      Joi.object().keys({
-        _id: Joi.alphanum().required(),
-      })
-    ),
+    // name: Joi.string().min(5).max(255).required(),
+    // path: Joi.string().required(),
+    // metaTags: Joi.array().items(Joi.string()),
+    // size: Joi.number().min(0).required(),
+    // dateAdded: Joi.number().min(0).required(),
+    // inFolders: Joi.array().items(
+    //   Joi.object().keys({
+    //     _id: Joi.string().required(),
+    //   })
+    // ),
   });
 
   return schema.validate(file);

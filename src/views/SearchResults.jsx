@@ -81,75 +81,77 @@ class SearchResults extends Component {
                     </div>
                   </Row>
                 </CardHeader>
-                <Table
-                  className="align-items-center table-flush"
-                  hover
-                  responsive
-                  size="sm"
-                >
-                  <thead className="thead-light">
-                    <tr>
-                      <th scope="col" width="76">
-                        <div className="custom-control custom-checkbox mb-3">
-                          <input
-                            className="custom-control-input"
-                            id="check-all"
-                            type="checkbox"
-                          />
-                          <label
-                            className="custom-control-label"
-                            htmlFor="check-all"
-                          ></label>
-                        </div>
-                      </th>
-                      <th scope="col" width="50%">
-                        File Name
-                      </th>
-                      <th scope="col">Date Added</th>
-                      <th scope="col">Size</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {this.state.results.map((result) => (
-                      <tr key={result._id}>
-                        <th scope="row">
-                          <div className="custom-control custom-checkbox mb-4">
+                {this.state.results.length > 0 && (
+                  <Table
+                    className="align-items-center table-flush"
+                    hover
+                    responsive
+                    size="sm"
+                  >
+                    <thead className="thead-light">
+                      <tr>
+                        <th scope="col" width="76">
+                          <div className="custom-control custom-checkbox mb-3">
                             <input
                               className="custom-control-input"
-                              id={result._id}
+                              id="check-all"
                               type="checkbox"
                             />
                             <label
                               className="custom-control-label"
-                              htmlFor={result._id}
+                              htmlFor="check-all"
                             ></label>
                           </div>
                         </th>
-                        <td>
-                          <Media className="align-items-center mb-2">
-                            <a href={result.path} target="blank">
-                              <i className="fas fa-file-image mr-2" />
-                              <span className="mb-0 text-sm">
-                                {result.name}
-                              </span>
-                            </a>
-                          </Media>
-                          {result.metaTags.map((tag, i) => (
-                            <Badge
-                              key={tag + i}
-                              className="badge-default mr-2"
-                              pill
-                            >
-                              <a href="#pablo">{tag}</a>
-                            </Badge>
-                          ))}
-                        </td>
-                        <td>{result.dateAdded}</td>
-                        <td>{fileSizeConversion(result.size, true)}</td>
+                        <th scope="col" width="50%">
+                          File Name
+                        </th>
+                        <th scope="col">Date Added</th>
+                        <th scope="col">Size</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </Table>
+                    </thead>
+                    <tbody>
+                      {this.state.results.map((result) => (
+                        <tr key={result._id}>
+                          <th scope="row">
+                            <div className="custom-control custom-checkbox mb-4">
+                              <input
+                                className="custom-control-input"
+                                id={result._id}
+                                type="checkbox"
+                              />
+                              <label
+                                className="custom-control-label"
+                                htmlFor={result._id}
+                              ></label>
+                            </div>
+                          </th>
+                          <td>
+                            <Media className="align-items-center mb-2">
+                              <a href={result.path} target="blank">
+                                <i className="fas fa-file-image mr-2" />
+                                <span className="mb-0 text-sm">
+                                  {result.name}
+                                </span>
+                              </a>
+                            </Media>
+                            {result.metaTags.map((tag, i) => (
+                              <Badge
+                                key={tag + i}
+                                className="badge-default mr-2"
+                                pill
+                              >
+                                <a href="#pablo">{tag}</a>
+                              </Badge>
+                            ))}
+                          </td>
+                          <td>{result.dateAdded}</td>
+                          <td>{fileSizeConversion(result.size, true)}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </Table>
+                )}
               </Card>
             </Col>
           </Row>

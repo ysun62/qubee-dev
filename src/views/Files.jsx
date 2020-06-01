@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import http from "../services/httpService";
 import CreateFolder from "../components/Modals/CreateFolder";
+import MetaTags from "../components/Modals/MetaTags";
 import config from "../config";
 import fileSizeConversion from "../utils/fileSizeConversion";
 //import Header from "components/Headers/Header";
@@ -18,12 +19,15 @@ import {
 import { NavLink, Link } from "react-router-dom";
 
 class Files extends Component {
-  state = {
-    files: [],
-    folders: [],
-    metaTags: [],
-    checkedItems: new Map(),
-  };
+  constructor(props) {
+    super(props);
+    this.state = {
+      files: [],
+      folders: [],
+      metaTags: [],
+      checkedItems: new Map(),
+    };
+  }
 
   async componentDidMount() {
     this.getFiles();
@@ -32,6 +36,7 @@ class Files extends Component {
   getFiles = async () => {
     const { data: files } = await http.get(config.filesEndpoint);
     const { data: folders } = await http.get(config.foldersEndpoint);
+    //const tags = this.props
     this.setState({ files, folders });
   };
 
@@ -143,7 +148,7 @@ class Files extends Component {
                         <td></td>
                       </tr>
                     ))}
-                    {this.state.files.map((file) => (
+                    {this.state.files.map((file, i) => (
                       <tr key={file._id}>
                         <th scope="row">
                           <div className="custom-control custom-checkbox mb-4">
@@ -165,15 +170,25 @@ class Files extends Component {
                               <span className="mb-0 text-sm">{file.name}</span>
                             </a>
                           </Media>
-                          {file.metaTags.map((tag, i) => (
-                            <Badge
-                              key={tag + i}
-                              className="badge-default mr-2"
-                              pill
-                            >
-                              <a href="#pablo">{tag}</a>
-                            </Badge>
-                          ))}
+                          <div className="tags-container">
+                            {file.metaTags.map((tag, i) => (
+                              <Badge
+                                key={tag + i}
+                                className="mr-2"
+                                color="primary"
+                                pill
+                                href="#pablo"
+                                onClick={this.handleMetaTags}
+                              >
+                                {tag}
+                              </Badge>
+                            ))}
+                            <MetaTags
+                              buttonLabel="add +"
+                              fileId={file._id}
+                              getNewData={this.getFiles}
+                            />
+                          </div>
                         </td>
                         <td>{file.dateAdded}</td>
                         <td>{fileSizeConversion(file.size, true)}</td>

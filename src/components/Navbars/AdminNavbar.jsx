@@ -39,6 +39,7 @@ import {
 
 class AdminNavbar extends React.Component {
   state = {
+    inputField: "",
     term: "",
     results: [],
     loading: false,
@@ -46,9 +47,7 @@ class AdminNavbar extends React.Component {
   };
 
   handleChange = (e) => {
-    const searchTerm = e.target.value;
-    this.setState({ term: searchTerm });
-    console.log(this.state.term);
+    this.setState({ term: e.target.value });
   };
 
   handleSubmit = async (e) => {
@@ -58,13 +57,12 @@ class AdminNavbar extends React.Component {
       this.state.term
     )}`;
 
+    console.log(url);
+
     await http
       .get(url)
       .then((response) => {
-        let data = {
-          results: response.data,
-        };
-        this.setState(data);
+        this.setState({ results: response.data });
         console.log(response.data);
       })
       .catch((error) => {
