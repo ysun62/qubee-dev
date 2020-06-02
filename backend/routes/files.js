@@ -52,7 +52,6 @@ router.post("/", async (req, res) => {
   const form = new IncomingForm({
     multiples: true,
     uploadDir: tempDir,
-    maxFileSize: 5000 * 1024 * 1024,
   });
   const folderExists = await checkCreateUploadsFolder(uploadsFolder);
   const files = [];
@@ -98,7 +97,6 @@ router.post("/", async (req, res) => {
 
       try {
         await fs.renameAsync(file.path, join(uploadsFolder, fileName));
-
         try {
           await selectedFile.save();
         } catch (err) {
@@ -110,10 +108,11 @@ router.post("/", async (req, res) => {
     })
     .on("end", () => {
       console.log("-> upload done");
+      res.send(files);
       // res.writeHead(200, { "content-type": "text/plain" });
       // res.write(`received fields:\n\n${util.inspect(fields)}`);
       // res.write("\n\n");
-      res.end(`received files:\n\n${util.inspect(files)}`);
+      //res.end(`received files:\n\n${util.inspect(files)}`);
     });
 
   form.parse(req);

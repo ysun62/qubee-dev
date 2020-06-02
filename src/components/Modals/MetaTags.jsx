@@ -1,48 +1,64 @@
 import React, { useState, useEffect } from "react";
 import http from "../../services/httpService";
 import config from "../../config";
-import { Button, Modal, Form, Input, Badge } from "reactstrap";
+import { toast } from "react-toastify";
+import { Button, Modal, Form, Input, Badge, Label } from "reactstrap";
 
 const MetaTag = (props) => {
   const { buttonLabel, modalClassName, fileId, getNewData } = props;
   const [modal, setModal] = useState(false);
-  const [inputField, setInputField] = useState("");
-  const [file, setFile] = useState([]);
-  const [unmountOnClose, setUnmountOnClose] = useState(true);
+  const [originalValue, setOriginalValue] = useState("");
+  const [inputField, setInputField] = useState(null);
+  const [fileName, setFileName] = useState({});
 
   useEffect(() => {
-    async function fetchData() {
+    async function getFileById() {
       const { data } = await http.get(config.filesEndpoint + "/" + fileId);
-      setFile(data);
+      setFileName(data.name);
 
-      const tags = data.metaTags.join(", ");
-      setInputField(tags);
+      // Break the array of tags into a list
+      const metaTags = data.metaTags.join("\n");
+      setOriginalValue(metaTags);
+      setInputField(metaTags);
     }
-    fetchData();
+    getFileById();
   }, [fileId]);
-
-  const changeUnmountOnClose = (e) => {
-    let value = e.target.value;
-    setUnmountOnClose(JSON.parse(value));
-  };
 
   const toggle = () => setModal(!modal);
 
-  const handleOnChange = (e) => setInputField(e.currentTarget.value);
+  const handleOnChange = (e) => {
+    setInputField(e.currentTarget.value);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    const tagArray = inputField.replace(/[^0-9a-zA-Z-_ \n]/g, "").split(/\s+/);
+
+    // If duplicate meta tags, prevent saving.
+    if (checkDuplicate(tagArray))
+      return toast.error("There are duplicate tags.");
+
+    const tags = {
+      metaTags: inputField ? tagArray : [],
+    };
+
     await http
-      .put(`http://localhost:5000/api/files/${fileId}`, {
-        metaTags: inputField.split(/,?\s+/),
-      })
+      .put(config.filesEndpoint + "/" + fileId, tags)
       .then((response) => {
         getNewData(); // Update parent component view
         toggle(e);
-        console.log(response);
+        //console.log(response.data);
       })
       .catch((error) => console.error("Something went wrong: ", error));
+  };
+
+  // Check for duplicate meta tags
+  const checkDuplicate = (array) => {
+    // compare the size of array and Set
+    if (array.length !== new Set(array).size) return true;
+
+    return false;
   };
 
   return (
@@ -58,15 +74,10 @@ const MetaTag = (props) => {
       >
         {buttonLabel}
       </Badge>
-      <Modal
-        className={modalClassName}
-        isOpen={modal}
-        unmountOnClose={unmountOnClose}
-        toggle={toggle}
-      >
+      <Modal className={modalClassName} isOpen={modal} toggle={toggle}>
         <div className="modal-header">
           <h5 className="modal-title" id="modal-title-default">
-            Edit tags for {file.name}
+            Edit tags for {fileName}
           </h5>
           <button
             aria-label="Close"
@@ -80,11 +91,15 @@ const MetaTag = (props) => {
         </div>
         <Form method="POST" onSubmit={handleSubmit}>
           <div className="modal-body">
+            <Label for="metaTags">
+              Add or remove your tags. (one tag per line)
+            </Label>
             <Input
-              type="text"
               name="metaTags"
               id="metaTags"
-              placeholder="Add tags seperated by a comma (,)"
+              placeholder="Add one tag per line."
+              rows="5"
+              type="textarea"
               value={inputField}
               onChange={handleOnChange}
             />
@@ -94,8 +109,8 @@ const MetaTag = (props) => {
               <Button data-dismiss="modal" color="link" onClick={toggle}>
                 Cancel
               </Button>
-              <Button color="primary" disabled={!inputField} type="submit">
-                Add
+              <Button color="primary" type="submit">
+                {inputField ? "Update" : "Add"}
               </Button>
             </div>
           </div>

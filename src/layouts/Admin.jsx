@@ -90,7 +90,7 @@ class Admin extends Component {
     const { display } = this.props;
     return (
       <>
-        <ToastContainer />
+        <ToastContainer draggable={false} position="bottom-left" />
         {display && <ActionBarHeader />}
         <Sidebar
           {...this.props}

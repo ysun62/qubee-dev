@@ -26,6 +26,7 @@ class Files extends Component {
       folders: [],
       metaTags: [],
       checkedItems: new Map(),
+      count: 0,
     };
   }
 
@@ -37,7 +38,7 @@ class Files extends Component {
     const { data: files } = await http.get(config.filesEndpoint);
     const { data: folders } = await http.get(config.foldersEndpoint);
     //const tags = this.props
-    this.setState({ files, folders });
+    this.setState({ files, folders, count: files.length + folders.length });
   };
 
   handleDelete = async (file) => {
@@ -78,7 +79,7 @@ class Files extends Component {
                 <CardHeader className="border-0">
                   <Row className="align-items-center">
                     <div className="col">
-                      <h3 className="mb-0">All 3 {this.state.checked}</h3>
+                      <h3 className="mb-0">All {this.state.count}</h3>
                     </div>
                     <div className="col text-right">
                       <CreateFolder

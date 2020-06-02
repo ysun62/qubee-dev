@@ -16,16 +16,27 @@ import {
 import { NavLink } from "react-router-dom";
 
 class Files extends Component {
-  state = {
-    files: [],
-    folders: [],
-  };
+  constructor(props) {
+    super(props);
+    this.state = {
+      files: [],
+      folders: [],
+      metaTags: [],
+      checkedItems: new Map(),
+      count: 0,
+    };
+  }
 
   async componentDidMount() {
-    const { data: files } = await http.get(config.imagesEndpoint);
-    const { data: folders } = await http.get(config.foldersEndpoint);
-    this.setState({ files, folders });
+    this.getFiles();
   }
+
+  getFiles = async () => {
+    const { data: files } = await http.get(config.filesEndpoint);
+    const { data: folders } = await http.get(config.foldersEndpoint);
+    //const tags = this.props
+    this.setState({ files, folders, count: files.length + folders.length });
+  };
 
   handleDelete = async (file) => {
     const originalFiles = this.state.files;
@@ -46,8 +57,6 @@ class Files extends Component {
   };
 
   render() {
-    console.log(this.state.files);
-
     return (
       <>
         {/* Page content */}
@@ -59,7 +68,7 @@ class Files extends Component {
                   <Row className="align-items-center">
                     <div className="col">
                       <h3>ID - {this.props.match.params.id}</h3>
-                      <h3 className="mb-0">All 3</h3>
+                      <h3 className="mb-0">All {this.state.count}</h3>
                     </div>
                     <div className="col text-right">
                       <CreateFolder
