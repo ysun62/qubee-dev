@@ -55,6 +55,7 @@
     "filepond-plugin-file-encode": "^2.1.5",
     "filepond-plugin-file-metadata": "^1.0.6",
     "filepond-plugin-file-rename": "^1.1.4",
+    "filepond-plugin-file-validate-size": "^2.2.1",
     "filepond-plugin-file-validate-type": "^1.2.5",
     "filepond-plugin-image-exif-orientation": "^1.0.9",
     "filepond-plugin-image-resize": "^2.0.7",

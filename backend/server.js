@@ -1,8 +1,5 @@
-if (process.env.NODE_ENV !== "production") {
-  require("dotenv").config();
-}
 const express = require("express");
-const debug = require("debug")("app:startup");
+const startupDebug = require("debug")("app:startup"); // In terminal: export DEBUG=app:startup
 const helmet = require("helmet");
 const morgan = require("morgan");
 const mongoose = require("mongoose");
@@ -14,11 +11,16 @@ const foldersRoute = require("./routes/folders");
 const searchesRoute = require("./routes/searches");
 
 const app = express();
+
 const port = process.env.PORT || 5000;
 const corsOptions = {
   origin: "*",
   optionsSuccessStatus: 200,
 };
+
+if (app.get("env") === "development") {
+  require("dotenv").config();
+}
 
 mongoose
   .connect(process.env.DATABASE_URL, {
@@ -30,25 +32,24 @@ mongoose
   .catch((err) => console.log("Could not connect to MongoDB...", err));
 
 app.use(helmet());
-app.use(bodyParser.json());
 app.use(
   bodyParser.urlencoded({
-    extended: false,
-    limit: "5000mb",
+    extended: true,
   })
 );
+app.use(bodyParser.json());
 app.use(cookieParser());
 app.use(cors(corsOptions));
 
 // configuring the upload file routes
-app.use(express.static("public"));
+app.use(express.static(__dirname + "/public"));
 app.use("/api/files", filesRoute);
 app.use("/api/folders", foldersRoute);
 app.use("/api/searches", searchesRoute);
 
 if (app.get("env") === "development") {
   app.use(morgan("tiny"));
-  debug("Moregan enabled...");
+  startupDebug("Moregan enabled...");
 }
 
 app.use((req, res, next) => {

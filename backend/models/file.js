@@ -28,7 +28,7 @@ const fileSchema = mongoose.model(
       required: true,
       default: Date.now,
     },
-    inFolders: [folderSchema],
+    folders: [folderSchema],
   })
 );
 
@@ -39,7 +39,7 @@ function validateFile(file) {
     metaTags: Joi.array().items(Joi.string()),
     size: Joi.number().min(0).required(),
     dateAdded: Joi.number().min(0).required(),
-    inFolders: Joi.array().items(
+    folders: Joi.array().items(
       Joi.object().keys({
         _id: Joi.string().required(),
       })

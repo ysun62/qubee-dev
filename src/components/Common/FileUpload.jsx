@@ -3,8 +3,12 @@ import http from "../../services/httpService";
 import { toast } from "react-toastify";
 import { FilePond, registerPlugin } from "react-filepond";
 import { Form, Button, Input, Progress, Label } from "reactstrap";
+import config from "../../config";
 import "react-toastify/dist/ReactToastify.css";
 import "filepond/dist/filepond.min.css";
+import FilePondPluginFileValidateSize from "filepond-plugin-file-validate-size";
+
+registerPlugin(FilePondPluginFileValidateSize);
 
 class FileUpload extends Component {
   constructor(props) {
@@ -17,13 +21,9 @@ class FileUpload extends Component {
       taskCompleted: "Pending",
       isEnabled: false,
     };
-
-    this.handleFileChange = this.handleFileChange.bind(this);
-    this.handleSubmit = this.handleSubmit.bind(this);
-    this.maxSelectFile = this.maxSelectFile.bind(this);
   }
 
-  maxSelectFile(files) {
+  maxSelectFile = (files) => {
     //let files = e.target.files; // create file object
 
     if (files.length > 10) {
@@ -33,9 +33,9 @@ class FileUpload extends Component {
       return false;
     }
     return true;
-  }
+  };
 
-  handleFileChange(e) {
+  handleFileChange = (e) => {
     let files = e.target.files;
 
     if (this.maxSelectFile(files)) {
@@ -46,9 +46,9 @@ class FileUpload extends Component {
         isEnabled: true,
       });
     }
-  }
+  };
 
-  async handleSubmit(e) {
+  handleSubmit = async (e) => {
     e.preventDefault();
 
     const files = this.state.selectedFiles;
@@ -61,10 +61,7 @@ class FileUpload extends Component {
     }
 
     await http
-      .post("http://localhost:5000/api/files", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
+      .post(config.filesEndpoint, formData, {
         onUploadProgress: (ProgressEvent) => {
           this.setState({
             loaded: (ProgressEvent.loaded / ProgressEvent.total) * 100,
@@ -77,11 +74,15 @@ class FileUpload extends Component {
       })
       .then((response) => console.log(response))
       .catch((err) => console.log(err));
-  }
+  };
 
-  handleError(err, file) {
+  handleError = (err, file) => {
     console.log(err, file);
-  }
+  };
+
+  handleOnError = (error, file, status) => {
+    console.log(error, file, status);
+  };
 
   render() {
     const { loaded, filenames, isEnabled } = this.state;
@@ -91,10 +92,16 @@ class FileUpload extends Component {
           ref={(ref) => (this.pond = ref)}
           allowMultiple={true}
           chunkUploads={true}
-          name={"files"}
-          onprocessfile={(err, file) => this.handleError(err, file)}
+          chunkForce={true}
+          chunkSize={10000000}
+          maxFileSize={21474825484}
+          name={"mediaFiles"}
+          //onprocessfile={(err, file) => this.handleError(err, file)}
+          onerror={(error, file, status) =>
+            this.handleOnError(error, file, status)
+          }
           maxFiles={10}
-          server="http://localhost:5000/api/files"
+          server={config.filesEndpoint}
         ></FilePond>
         <Form onSubmit={this.handleSubmit}>
           <div className="progress-wrapper" style={{ paddingTop: 0 }}>

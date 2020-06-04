@@ -1,6 +1,7 @@
 const Promise = require("bluebird");
 const express = require("express");
 const { IncomingForm } = require("formidable");
+const multer = require("multer");
 const fs = Promise.promisifyAll(require("fs"));
 const util = require("util");
 const { join } = require("path");
@@ -9,6 +10,19 @@ const mimeTypes = require("../utils/mimetypes");
 const router = express.Router();
 const { File, fileBasePath, validate } = require("../models/file");
 const { Folder } = require("../models/folder");
+
+const uploadsFolder = join(__dirname, "../public", "uploads");
+
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, uploadsFolder);
+  },
+  filename: function (req, file, cb) {
+    cb(null, file.fieldname + "-" + Date.now());
+  },
+});
+
+const upload = multer({ storage: storage });
 
 // Returns true or false if it was successfull or not
 async function checkCreateUploadsFolder(uploadsFolder) {
@@ -41,12 +55,17 @@ function checkFileType(file) {
   return true;
 }
 
+// function extendTimeout (req, res, next) {
+//   res.setTimeout(480000, function () { /* Handle timeout */ })
+//   next()
+// }
+
 router.get("/", async (req, res) => {
   const files = await File.find().select("-__v").sort("name");
   res.send(files);
 });
 
-router.post("/", async (req, res) => {
+router.post("/", upload.array("mediaFiles", 10), async (req, res, next) => {
   const uploadsFolder = join(__dirname, fileBasePath);
   const tempDir = join(__dirname, "../tmp");
   const form = new IncomingForm({
@@ -56,147 +75,73 @@ router.post("/", async (req, res) => {
   const folderExists = await checkCreateUploadsFolder(uploadsFolder);
   const files = [];
 
-  if (!folderExists) {
-    return res.json({
-      ok: false,
-      msg: "There was an error creating the uploads folder.",
-    });
-  }
+  /* Multer */
+  const selectedFiles = req.files;
 
-  form
-    .on("file", async (fieldName, file) => {
-      console.log({ file });
-      console.log(req);
-      const objectId = new mongoose.Types.ObjectId();
-      const fileName =
-        objectId + "-" + file.name.toLowerCase().split(" ").join("-");
-      const isValidFile = checkFileType(file);
-
-      if (!isValidFile) {
-        try {
-          await fs.unlinkAsync(file.path);
-        } catch (err) {
-          console.log("The file was deleted.", err);
-        }
-      }
-
-      files.push({ fieldName, file });
-
-      const folder = await Folder.findById(req.body.folderId);
-
-      const selectedFile = new File({
-        name: file.name,
-        path: `/uploads/${fileName}`,
-        size: file.size,
-        inFolders: {
-          _id: folder._id,
-          name: folder.name,
-          path: folder.path,
-        },
-      });
-
-      try {
-        await fs.renameAsync(file.path, join(uploadsFolder, fileName));
-        try {
-          await selectedFile.save();
-        } catch (err) {
-          console.log("Couldn't save to MondoDB...", err);
-        }
-      } catch (err) {
-        console.log("The file upload failed...", err);
-      }
-    })
-    .on("end", () => {
-      console.log("-> upload done");
-      res.send(files);
-      // res.writeHead(200, { "content-type": "text/plain" });
-      // res.write(`received fields:\n\n${util.inspect(fields)}`);
-      // res.write("\n\n");
-      //res.end(`received files:\n\n${util.inspect(files)}`);
-    });
-
-  form.parse(req);
-
-  // form.parse(req, async (err, fields, files) => {
-  //   let myUploadedFiles = [];
-
-  //   if (err) {
-  //     console.log("Error parsing the files", err);
+  //   if (!folderExists) {
   //     return res.json({
   //       ok: false,
-  //       msg: "Error parsing the files.",
+  //       msg: "There was an error creating the uploads folder.",
   //     });
   //   }
 
-  //   if (!files.mediaFiles.length) {
-  //     // There's only one file
-  //     const file = files.mediaFiles;
-  //     const isValidFile = checkFileType(file);
-  //     const fileName = encodeURIComponent(file.name.replace(/&. *;+/g, "-"));
+  //   if (!selectedFiles) {
+  //     const error = new Error("Please choose files");
+  //     return res.status(400).send(error);
+  //   }
 
-  //     if (!isValidFile) {
-  //       // return res.json({
-  //       //   ok: false,
-  //       //   msg: "The file received is an invalid type.",
-  //       // });
-  //       console.log("The file received is an invalid type.");
-  //     }
+  console.log(selectedFiles);
+  res.send(selectedFiles);
 
-  //     try {
-  //       await fs.renameAsync(file.path, join(uploadsFolder, fileName));
-  //     } catch (err) {
-  //       console.log(
-  //         "The file upload failed, trying to remove the temp file..."
-  //       );
-  //       try {
-  //         await fs.unlinkAsync(file.path);
-  //       } catch (err) {
-  //         console.log("The file was deleted.", err);
-  //       }
-  //       // return res.json({
-  //       //   ok: false,
-  //       //   msg: "The file was not uploaded.",
-  //       // });
-  //       console.log("The file was not uploaded.");
-  //     }
-  //     //myUploadedFiles.push(fileName);
-  //   } else {
-  //     // There are multiple files
-  //     for (let i = 0; i < files.mediaFiles.length; i++) {
-  //       const file = files.mediaFiles[i];
+  //   form
+  //     .on("file", async (fieldName, file) => {
+  //       console.log({ file });
+  //       console.log(req);
+  //       const objectId = new mongoose.Types.ObjectId();
+  //       const fileName =
+  //         objectId + "-" + file.name.toLowerCase().split(" ").join("-");
   //       const isValidFile = checkFileType(file);
-  //       const fileName = encodeURIComponent(file.name.replace(/&. *;+/g, "-"));
 
   //       if (!isValidFile) {
-  //         // return res.json({
-  //         //   ok: false,
-  //         //   msg: "The file received is an invalid type.",
-  //         // });
-  //         console.log("The file received is an invalid type.");
+  //         try {
+  //           await fs.unlinkAsync(file.path);
+  //         } catch (err) {
+  //           console.log("The file was deleted.", err);
+  //         }
   //       }
+
+  //       files.push({ fieldName, file });
+
+  //       const folder = await Folder.findById(req.body.folderId);
+
+  //       const selectedFile = new File({
+  //         name: file.name,
+  //         path: `/uploads/${fileName}`,
+  //         size: file.size,
+  //         inFolders: {
+  //           _id: folder._id,
+  //           name: folder.name,
+  //           path: folder.path,
+  //         },
+  //       });
 
   //       try {
   //         await fs.renameAsync(file.path, join(uploadsFolder, fileName));
-  //       } catch (err) {
-  //         console.log(
-  //           "The file upload failed, trying to remove the temp file..."
-  //         );
   //         try {
-  //           await fs.unlinkAsync(file.path);
-  //         } catch (err) {}
-  //         console.log("The file was not uploaded.");
+  //           await selectedFile.save();
+  //         } catch (err) {
+  //           console.log("Couldn't save to MondoDB...", err);
+  //         }
+  //       } catch (err) {
+  //         console.log("The file upload failed...", err);
   //       }
-  //       //myUploadedFiles.push(fileName);
-  //     }
-  //   }
-  //   console.log("The files was uploaded successfully.");
+  //     })
+  //     .on("end", () => {
+  //       console.log("-> upload done");
+  //       res.send(files);
+  //     });
 
-  // return res.json({
-  //   ok: true,
-  //   msg: "The files was uploaded successfully.",
-  //   files: myUploadedFiles,
-  // });
-  // });
+  //   form.parse(req);
 });
 
 router.put("/:id", async (req, res) => {
