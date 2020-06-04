@@ -4,18 +4,18 @@ const fs = Promise.promisifyAll(require("fs"));
 const { join } = require("path");
 const mongoose = require("mongoose");
 const router = express.Router();
-const { Folder, folderBasePath } = require("../models/folder");
+const { Folder, folderBasePath, validateFolder } = require("../models/folder");
 
 // Returns true or false if it was successfull or not
 async function checkCreateUploadsFolder(uploadsFolder) {
   try {
     await fs.statAsync(uploadsFolder);
-  } catch (err) {
-    if (err && err.code === "ENOENT") {
+  } catch (ex) {
+    if (ex && ex.code === "ENOENT") {
       try {
         await fs.mkdirAsync(uploadsFolder);
-      } catch (err) {
-        console.error("Error creating the uploads folder", err);
+      } catch (ex) {
+        console.error("Error creating the uploads folder", ex);
         return false;
       }
     } else {
@@ -37,21 +37,16 @@ router.post("/", async (req, res) => {
   }
 
   const objectId = new mongoose.Types.ObjectId();
-  let folder = new Folder({
+
+  const folder = new Folder({
     _id: objectId,
-    name: req.body.folderName,
-    path: `/uploads/${objectId}`,
+    name: req.body.name,
   });
 
   try {
-    fs.mkdirAsync(`${uploadsFolder}/${objectId}`, (err) => {
-      if (err) {
-        console.error(err);
-      }
-    });
-
+    await fs.mkdirAsync(`${uploadsFolder}/${objectId}`);
     try {
-      folder = await folder.save();
+      await folder.save();
       console.log("Folder saved to MongoDB successfully");
     } catch (err) {
       res.status(500).send("There was an error saving the folder to MongoDB.");
@@ -62,6 +57,7 @@ router.post("/", async (req, res) => {
     console.log(err);
   }
 
+  console.log(req.body);
   res.send(folder);
 });
 

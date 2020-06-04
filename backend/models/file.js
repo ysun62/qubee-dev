@@ -28,7 +28,7 @@ const fileSchema = mongoose.model(
       required: true,
       default: Date.now,
     },
-    folders: [folderSchema],
+    folders: folderSchema,
   })
 );
 

@@ -1,10 +1,10 @@
 import React, { Component } from "react";
 import http from "../services/httpService";
-import CreateFolder from "../components/Modals/CreateFolder";
-import FilesTable from "../components/Common/FilesTable";
+import FilesHeader from "../components/Common/FilesHeader";
+import FilesBody from "../components/Common/FilesBody";
 import config from "../config";
 //import Header from "components/Headers/Header";
-import { Container, Row, Col, Card, CardHeader } from "reactstrap";
+import { Container, Row, Col, Card } from "reactstrap";
 
 class Files extends Component {
   constructor(props) {
@@ -69,20 +69,12 @@ class Files extends Component {
           <Row className="">
             <Col className="mb-5 mb-xl-0" xl="12">
               <Card className="shadow file-manager">
-                <CardHeader className="border-0">
-                  <Row className="align-items-center">
-                    <div className="col">
-                      <h3 className="mb-0">All {count}</h3>
-                    </div>
-                    <div className="col text-right">
-                      <CreateFolder
-                        buttonLabel="Create new folder"
-                        modalClassName="modal-dialog"
-                      />
-                    </div>
-                  </Row>
-                </CardHeader>
-                <FilesTable
+                <FilesHeader
+                  count={count}
+                  createFolderButton={true}
+                  getNewData={this.getFiles}
+                />
+                <FilesBody
                   folders={folders}
                   files={files}
                   onChange={this.handleChange}

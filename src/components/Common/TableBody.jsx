@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import Tags from "./Tags";
 import fileSizeConversion from "../../utils/fileSizeConversion";
-import { Media, Button } from "reactstrap";
+import { Media } from "reactstrap";
 import { Link } from "react-router-dom";
 
 class TableBody extends Component {
@@ -27,12 +27,6 @@ class TableBody extends Component {
     });
     this.forceUpdate();
   };
-
-  //   handleChange = (event) => {
-  //     //event.item.checked = !event.item.checked;
-  //     console.log(event.target.checked);
-  //     this.forceUpdate();
-  //   };
 
   handleChange = (e) => {
     const item = e.target.id;
@@ -78,7 +72,7 @@ class TableBody extends Component {
             </th>
             <td>
               <Media className="align-items-center">
-                <Link to={`/admin/folder/${folder.path}`}>
+                <Link to={`/admin/folder/${folder._id}`}>
                   <i className="fas fa-folder-open mr-2" />
                   <span className="mb-0 text-sm">{folder.name}</span>
                 </Link>

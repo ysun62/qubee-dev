@@ -4,36 +4,55 @@ const { IncomingForm } = require("formidable");
 const multer = require("multer");
 const fs = Promise.promisifyAll(require("fs"));
 const util = require("util");
-const { join } = require("path");
+const path = require("path");
 const mongoose = require("mongoose");
 const mimeTypes = require("../utils/mimetypes");
+const { v4: uuidv4 } = require("uuid");
 const router = express.Router();
 const { File, fileBasePath, validate } = require("../models/file");
 const { Folder } = require("../models/folder");
 
-const uploadsFolder = join(__dirname, "../public", "uploads");
+const tempDir = path.join(__dirname, "../public", "uploads");
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, uploadsFolder);
+    cb(null, tempDir);
   },
   filename: function (req, file, cb) {
-    cb(null, file.fieldname + "-" + Date.now());
+    cb(
+      null,
+      Date.now() + "-" + file.originalname.toLowerCase().split(" ").join("-")
+    );
   },
 });
 
-const upload = multer({ storage: storage });
+const fileFilter = (req, file, cb) => {
+  if (mimeTypes.indexOf(file.mimetype) !== -1) {
+    cb(null, true);
+  } else {
+    req.fileValidationError = "The file type is invalid.";
+    return cb(new Error("The file type is invalid."), false);
+  }
+};
+
+const upload = multer({
+  storage,
+  fileFilter,
+  limits: {
+    fileSize: 1024 * 1024 * 5120,
+  },
+});
 
 // Returns true or false if it was successfull or not
 async function checkCreateUploadsFolder(uploadsFolder) {
   try {
     await fs.statAsync(uploadsFolder);
-  } catch (err) {
-    if (err && err.code === "ENOENT") {
+  } catch (ex) {
+    if (ex && ex.code === "ENOENT") {
       try {
         await fs.mkdirAsync(uploadsFolder);
-      } catch (err) {
-        console.error("Error creating the uploads folder", err);
+      } catch (ex) {
+        console.error("Error creating the uploads folder", ex);
         return false;
       }
     } else {
@@ -43,105 +62,61 @@ async function checkCreateUploadsFolder(uploadsFolder) {
   }
   return true;
 }
-
-// Returns true or false in case it was successful
-function checkFileType(file) {
-  const type = file.type;
-
-  if (mimeTypes.indexOf(type) === -1) {
-    console.log("The file type is invalid.");
-    return false;
-  }
-  return true;
-}
-
-// function extendTimeout (req, res, next) {
-//   res.setTimeout(480000, function () { /* Handle timeout */ })
-//   next()
-// }
-
 router.get("/", async (req, res) => {
   const files = await File.find().select("-__v").sort("name");
   res.send(files);
 });
 
 router.post("/", upload.array("mediaFiles", 10), async (req, res, next) => {
-  const uploadsFolder = join(__dirname, fileBasePath);
-  const tempDir = join(__dirname, "../tmp");
-  const form = new IncomingForm({
-    multiples: true,
-    uploadDir: tempDir,
-  });
-  const folderExists = await checkCreateUploadsFolder(uploadsFolder);
-  const files = [];
-
-  /* Multer */
+  const uploadsFolder = path.join(__dirname, fileBasePath);
   const selectedFiles = req.files;
+  const folderExists = await checkCreateUploadsFolder(uploadsFolder);
 
-  //   if (!folderExists) {
-  //     return res.json({
-  //       ok: false,
-  //       msg: "There was an error creating the uploads folder.",
-  //     });
-  //   }
+  if (!selectedFiles) {
+    const error = new Error("Please choose files.");
+    return res.status(400).send(error);
+  }
 
-  //   if (!selectedFiles) {
-  //     const error = new Error("Please choose files");
-  //     return res.status(400).send(error);
-  //   }
+  if (!folderExists) {
+    const error = new Error("There was an error creating the uploads folder.");
+    return res.status(400).send(error);
+  }
 
-  console.log(selectedFiles);
-  res.send(selectedFiles);
+  console.log(selectedFiles, req.body);
 
-  //   form
-  //     .on("file", async (fieldName, file) => {
-  //       console.log({ file });
-  //       console.log(req);
-  //       const objectId = new mongoose.Types.ObjectId();
-  //       const fileName =
-  //         objectId + "-" + file.name.toLowerCase().split(" ").join("-");
-  //       const isValidFile = checkFileType(file);
+  for (let selectedFile of selectedFiles) {
+    // const folder = await Folder.findById(req.body.folderId);
+    // if (!folder) {
+    //   //return res.status(400).send("Invalid folder.");
+    // }
 
-  //       if (!isValidFile) {
-  //         try {
-  //           await fs.unlinkAsync(file.path);
-  //         } catch (err) {
-  //           console.log("The file was deleted.", err);
-  //         }
-  //       }
+    const file = new File({
+      name: selectedFile.originalname,
+      path: `/uploads/${selectedFile.filename}`,
+      size: selectedFile.size,
+      // folders: {
+      //   _id: folder._id,
+      //   name: folder.name,
+      // },
+    });
 
-  //       files.push({ fieldName, file });
+    try {
+      await fs.renameAsync(
+        selectedFile.path,
+        path.join(uploadsFolder, selectedFile.filename)
+      );
+      try {
+        await file.save();
+      } catch (ex) {
+        console.log("Couldn't save to MondoDB...", ex);
+      }
+    } catch (ex) {
+      console.log("The file upload failed...", ex);
+    }
 
-  //       const folder = await Folder.findById(req.body.folderId);
-
-  //       const selectedFile = new File({
-  //         name: file.name,
-  //         path: `/uploads/${fileName}`,
-  //         size: file.size,
-  //         inFolders: {
-  //           _id: folder._id,
-  //           name: folder.name,
-  //           path: folder.path,
-  //         },
-  //       });
-
-  //       try {
-  //         await fs.renameAsync(file.path, join(uploadsFolder, fileName));
-  //         try {
-  //           await selectedFile.save();
-  //         } catch (err) {
-  //           console.log("Couldn't save to MondoDB...", err);
-  //         }
-  //       } catch (err) {
-  //         console.log("The file upload failed...", err);
-  //       }
-  //     })
-  //     .on("end", () => {
-  //       console.log("-> upload done");
-  //       res.send(files);
-  //     });
-
-  //   form.parse(req);
+    console.log(file);
+    res.send(file);
+  }
 });
 
 router.put("/:id", async (req, res) => {

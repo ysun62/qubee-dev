@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import TableHeader from "./TableHeader";
 import TableBody from "./TableBody";
 import { Table } from "reactstrap";

@@ -6,9 +6,8 @@ import { Form, Button, Input, Progress, Label } from "reactstrap";
 import config from "../../config";
 import "react-toastify/dist/ReactToastify.css";
 import "filepond/dist/filepond.min.css";
-import FilePondPluginFileValidateSize from "filepond-plugin-file-validate-size";
 
-registerPlugin(FilePondPluginFileValidateSize);
+registerPlugin();
 
 class FileUpload extends Component {
   constructor(props) {
@@ -73,7 +72,7 @@ class FileUpload extends Component {
         },
       })
       .then((response) => console.log(response))
-      .catch((err) => console.log(err));
+      .catch((ex) => console.log(ex));
   };
 
   handleError = (err, file) => {
@@ -91,10 +90,6 @@ class FileUpload extends Component {
         <FilePond
           ref={(ref) => (this.pond = ref)}
           allowMultiple={true}
-          chunkUploads={true}
-          chunkForce={true}
-          chunkSize={10000000}
-          maxFileSize={21474825484}
           name={"mediaFiles"}
           //onprocessfile={(err, file) => this.handleError(err, file)}
           onerror={(error, file, status) =>

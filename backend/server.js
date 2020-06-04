@@ -1,5 +1,7 @@
+const Joi = require("@hapi/joi");
+Joi.objectId = require("joi-objectid")(Joi);
 const express = require("express");
-const startupDebug = require("debug")("app:startup"); // In terminal: export DEBUG=app:startup
+const debug = require("debug")("app:debug"); // In terminal: export DEBUG=app:debug OR DEBUG=app:debug node/nodemon index.js
 const helmet = require("helmet");
 const morgan = require("morgan");
 const mongoose = require("mongoose");
@@ -9,6 +11,19 @@ const bodyParser = require("body-parser");
 const filesRoute = require("./routes/files");
 const foldersRoute = require("./routes/folders");
 const searchesRoute = require("./routes/searches");
+const supportsColor = require("supports-color");
+
+if (supportsColor.stdout) {
+  console.log("Terminal stdout supports color");
+}
+
+if (supportsColor.stdout.has256) {
+  console.log("Terminal stdout supports 256 colors");
+}
+
+if (supportsColor.stderr.has16m) {
+  console.log("Terminal stderr supports 16 million colors (truecolor)");
+}
 
 const app = express();
 
@@ -28,8 +43,8 @@ mongoose
     useUnifiedTopology: true,
     useFindAndModify: false,
   })
-  .then(() => console.log("Connected to MongoDB..."))
-  .catch((err) => console.log("Could not connect to MongoDB...", err));
+  .then(() => debug("Connected to MongoDB..."))
+  .catch((err) => debug("Could not connect to MongoDB...", err));
 
 app.use(helmet());
 app.use(
@@ -42,14 +57,14 @@ app.use(cookieParser());
 app.use(cors(corsOptions));
 
 // configuring the upload file routes
-app.use(express.static(__dirname + "/public"));
+app.use(express.static("public"));
 app.use("/api/files", filesRoute);
 app.use("/api/folders", foldersRoute);
 app.use("/api/searches", searchesRoute);
 
 if (app.get("env") === "development") {
   app.use(morgan("tiny"));
-  startupDebug("Moregan enabled...");
+  debug("Moregan enabled...");
 }
 
 app.use((req, res, next) => {
@@ -59,9 +74,9 @@ app.use((req, res, next) => {
 });
 
 app.use(function (err, req, res, next) {
-  console.error(err.message);
+  debug(err.message);
   if (!err.statusCode) err.statusCode = 500;
   res.status(err.statusCode).send(err.message);
 });
 
-app.listen(port, () => console.log(`Listening on port ${port}`));
+app.listen(port, () => debug(`Listening on port ${port}`));
