@@ -35,12 +35,15 @@ import config from "../config";
 import routes from "routes.js";
 
 class Admin extends Component {
-  state = {
-    display: false,
-    files: [],
-    folders: [],
-    count: 0,
-  };
+  constructor(props) {
+    super(props);
+    this.state = {
+      display: false,
+      files: [],
+      folders: [],
+      count: 0,
+    };
+  }
 
   componentDidMount() {
     document.body.classList.add("bg-default");
@@ -110,23 +113,25 @@ class Admin extends Component {
     }
   };
 
-  showHideComponent() {
-    const { display } = this.state;
-    this.setState({
-      display: !display,
-    });
+  showHideComponent(value) {
+    if (value) {
+      this.setState({
+        display: true,
+      });
+    } else {
+      this.setState({
+        display: false,
+      });
+    }
   }
-
-  isFileChecked = (value) => {
-    console.log("CHECKED", value);
-  };
 
   render() {
     const { display, files, folders, count } = this.state;
+
     return (
       <>
         <ToastContainer draggable={false} position="bottom-left" />
-        {display && <ActionBarHeader />}
+        {display && <ActionBarHeader handleDelete={this.handleDelete} />}
         <Sidebar
           {...this.props}
           routes={routes}
@@ -135,7 +140,7 @@ class Admin extends Component {
             imgSrc: require("assets/img/brand/qubee_logo.png"),
             imgAlt: "...",
           }}
-          getNewData={this.getFiles}
+          getFiles={this.getFiles}
         />
         <div className="main-content" ref="mainContent">
           <AdminNavbar
@@ -145,37 +150,28 @@ class Admin extends Component {
           <Switch>
             <Route
               path="/admin/folder/:id"
-              render={() => (
+              render={(props) => (
                 <Folders
+                  {...props}
                   files={files}
                   folders={folders}
                   count={count}
                   getFiles={this.getFiles}
-                  isFileChecked={this.isFileChecked}
                 />
               )}
             />
-            <Route
-              path="/admin/search/:term"
-              render={() => (
-                <SearchResults
-                  files={files}
-                  folders={folders}
-                  count={count}
-                  getFiles={this.getFiles}
-                  isFileChecked={this.isFileChecked}
-                />
-              )}
-            />
+            <Route path="/admin/search/:term" component={SearchResults} />
+            <Route path="/admin/search" component={SearchResults} />
             <Route
               path="/admin/files"
-              render={() => (
+              render={(props) => (
                 <Files
+                  {...props}
                   files={files}
                   folders={folders}
                   count={count}
                   getFiles={this.getFiles}
-                  isFileChecked={this.isFileChecked}
+                  isChecked={this.showHideComponent}
                 />
               )}
             />

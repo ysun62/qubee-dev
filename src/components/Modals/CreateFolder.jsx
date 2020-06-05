@@ -4,7 +4,7 @@ import confid from "../../config";
 import { Button, Modal, Form, Input } from "reactstrap";
 
 const CreateFolder = (props) => {
-  const { buttonLabel, buttonIcon, modalClassName, getNewData } = props;
+  const { buttonLabel, buttonIcon, modalClassName, getFiles } = props;
   let buttonIconClasses = "ni ni-";
   if (buttonIcon) buttonIconClasses += buttonIcon;
 
@@ -23,7 +23,7 @@ const CreateFolder = (props) => {
         name: inputField,
       })
       .then((response) => {
-        getNewData(); // Update parent component view
+        getFiles(); // Update parent component view
         toggle(e);
         console.log(response);
       })

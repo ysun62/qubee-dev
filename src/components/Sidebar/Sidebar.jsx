@@ -63,6 +63,7 @@ class Sidebar extends React.Component {
     super(props);
     this.activeRoute.bind(this);
   }
+
   // verifies if routeName is the one active (in browser input)
   activeRoute(routeName) {
     return this.props.location.pathname.indexOf(routeName) > -1 ? "active" : "";
@@ -97,8 +98,9 @@ class Sidebar extends React.Component {
       );
     });
   };
+
   render() {
-    const { bgColor, routes, logo } = this.props;
+    const { bgColor, routes, logo, getFiles } = this.props;
     let navbarBrandProps;
     if (logo && logo.innerLink) {
       navbarBrandProps = {
@@ -243,7 +245,7 @@ class Sidebar extends React.Component {
               buttonLabel="Upload"
               buttonIcon="cloud-upload-alt"
               modalClassName="modal-dialog"
-              getNewData={this.props.getNewData}
+              getFiles={getFiles}
             />
             <Nav navbar>{this.createLinks(routes)}</Nav>
             {/* Divider */}

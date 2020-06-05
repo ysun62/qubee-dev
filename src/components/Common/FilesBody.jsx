@@ -3,7 +3,7 @@ import TableHeader from "./TableHeader";
 import TableBody from "./TableBody";
 import { Table } from "reactstrap";
 
-function FilesTable({ files, folders, getNewData, ...rest }) {
+function FilesTable({ files, folders, getFiles, isChecked, ...rest }) {
   return (
     <Table
       className="align-items-center table-flush"
@@ -15,8 +15,8 @@ function FilesTable({ files, folders, getNewData, ...rest }) {
       <TableBody
         files={files}
         folders={folders}
-        getNewData={getNewData}
-        {...rest}
+        getFiles={getFiles}
+        isChecked={isChecked}
       />
     </Table>
   );

@@ -12,21 +12,21 @@ class TableBody extends Component {
     };
   }
 
-  checkAll = () => {
-    this.state.data.forEach((item) => {
-      item.checked = true;
-      item.items.forEach((child) => (child.checked = true));
-    });
-    this.forceUpdate();
-  };
+  // checkAll = () => {
+  //   this.state.data.forEach((item) => {
+  //     item.checked = true;
+  //     item.items.forEach((child) => (child.checked = true));
+  //   });
+  //   this.forceUpdate();
+  // };
 
-  uncheckAll = () => {
-    this.state.data.forEach((item) => {
-      item.checked = false;
-      item.items.forEach((child) => (child.checked = false));
-    });
-    this.forceUpdate();
-  };
+  // uncheckAll = () => {
+  //   this.state.data.forEach((item) => {
+  //     item.checked = false;
+  //     item.items.forEach((child) => (child.checked = false));
+  //   });
+  //   this.forceUpdate();
+  // };
 
   handleChange = (e) => {
     const item = e.target.id;
@@ -34,19 +34,28 @@ class TableBody extends Component {
     this.setState((prevState) => ({
       checkboxes: prevState.checkboxes.set(item, isChecked),
     }));
-    this.props.isFileChecked(this.state.checkboxes);
+    // let checkboxMap = this.state.checkboxes;
+
+    // console.log(checkboxMap);
   };
 
-  clearAllCheckboxes = () => {
-    const clearCheckedItems = new Map();
-    this.setState({ checkboxes: clearCheckedItems });
-  };
+  findInMap = (map) => {
+    for (let v of map.values()) {
+      console.log(v);
 
-  checkAllCheckboxes = () => {};
+      if (v === true) {
+        return true;
+      }
+    }
+    return false;
+  };
 
   render() {
-    const { files, folders, getNewData, isFileChecked, ...rest } = this.props;
-    console.log(this.state.checkboxes);
+    const { files, folders, getFiles, isChecked } = this.props;
+
+    // for (let checkbox of this.state.checkboxes.values()) {
+    //   console.log(checkbox);
+    // }
 
     return (
       <tbody>
@@ -60,7 +69,6 @@ class TableBody extends Component {
                 <input
                   className="custom-control-input"
                   id={folder._id}
-                  value={folder._id}
                   type="checkbox"
                   checked={!!this.state.checkboxes.get(folder._id)}
                   onChange={this.handleChange}
@@ -111,7 +119,7 @@ class TableBody extends Component {
                   <span className="mb-0 text-sm">{file.name}</span>
                 </Link>
               </Media>
-              <Tags file={file} getNewData={getNewData} />
+              <Tags file={file} getFiles={getFiles} />
             </td>
             <td>{file.dateAdded}</td>
             <td>{fileSizeConversion(file.size, true)}</td>

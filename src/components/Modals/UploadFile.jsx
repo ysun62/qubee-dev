@@ -1,13 +1,14 @@
 import React, { useState } from "react";
-import FileUpload from "../Common/FileUpload";
+import { toast } from "react-toastify";
+import { FilePond, registerPlugin } from "react-filepond";
 import { Button, Modal } from "reactstrap";
+import config from "../../config";
+import "react-toastify/dist/ReactToastify.css";
+import "filepond/dist/filepond.min.css";
 
-const UploadFile = ({
-  buttonLabel,
-  buttonIcon,
-  modalClassName,
-  getNewData,
-}) => {
+registerPlugin();
+
+const UploadFile = ({ buttonLabel, buttonIcon, modalClassName, getFiles }) => {
   let buttonIconClasses = "fas fa-";
 
   if (buttonIcon) buttonIconClasses += buttonIcon;
@@ -15,6 +16,15 @@ const UploadFile = ({
   const [modal, setModal] = useState(false);
 
   const toggle = () => setModal(!modal);
+
+  const handleOnError = (error, file, status) => {
+    console.log(error, file, status);
+  };
+
+  const handleProcessedFiles = () => {
+    getFiles();
+    toggle();
+  };
 
   return (
     <div className="file-upload-component">
@@ -34,7 +44,6 @@ const UploadFile = ({
         className={modalClassName}
         isOpen={modal}
         toggle={toggle}
-        getNewData={getNewData}
         backdrop="static"
       >
         <div className="modal-header">
@@ -52,7 +61,17 @@ const UploadFile = ({
           </button>
         </div>
         <div className="modal-body">
-          <FileUpload onClick={toggle} data="modal" />
+          <FilePond
+            //ref={(ref) => (pond = ref)}
+            allowMultiple={true}
+            name={"mediaFiles"}
+            onerror={(error, file, status) =>
+              handleOnError(error, file, status)
+            }
+            onprocessfiles={handleProcessedFiles}
+            maxFiles={10}
+            server={config.filesEndpoint}
+          ></FilePond>
         </div>
       </Modal>
     </div>

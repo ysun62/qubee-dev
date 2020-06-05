@@ -1,19 +1,20 @@
 import React from "react";
 import classnames from "classnames";
-import ShareFile from "components/Modals/ShareFile";
+import ShareFiles from "components/Modals/ShareFiles";
+import DeleteFiles from "components/Modals/DeleteFiles";
 import { Container, NavItem, NavLink, Nav, Button, Row, Col } from "reactstrap";
 
-function FileEditActions(pros) {
+function FileEditActions({ handleDelete }) {
   return (
     <Nav className="justify-content-end navbar" role="tablist">
       <NavItem>
-        <ShareFile
+        <ShareFiles
           buttonLabel="Share"
           buttonIcon="share-alt"
           modalClassName="modal-dialog-centered"
         />
       </NavItem>
-      <NavItem>
+      {/* <NavItem>
         <Button color="link">
           <span className="btn-inner--icon mr-md-1 mr-0">
             <i className="fas fa-file-download" />
@@ -28,7 +29,7 @@ function FileEditActions(pros) {
           </span>
           <span className="btn-inner--text d-md-inline d-none">Rename</span>
         </Button>
-      </NavItem>
+      </NavItem> */}
       <NavItem>
         <Button color="link">
           <span className="btn-inner--icon mr-md-1 mr-0">
@@ -38,12 +39,12 @@ function FileEditActions(pros) {
         </Button>
       </NavItem>
       <NavItem>
-        <Button color="link">
-          <span className="btn-inner--icon mr-md-1 mr-0">
-            <i className="fas fa-trash-alt" />
-          </span>
-          <span className="btn-inner--text d-md-inline d-none">Delete</span>
-        </Button>
+        <DeleteFiles
+          buttonLabel="Delete"
+          buttonIcon="trash-alt"
+          modalClassName="modal-dialog"
+          handleDelete={handleDelete}
+        />
       </NavItem>
       <NavItem>
         <Button color="secondary">

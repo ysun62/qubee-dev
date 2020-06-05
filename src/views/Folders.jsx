@@ -15,7 +15,7 @@ import {
 } from "reactstrap";
 import { NavLink } from "react-router-dom";
 
-class Files extends Component {
+class Folders extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -31,10 +31,9 @@ class Files extends Component {
     this.getFiles();
   }
 
-  getFiles = async () => {
-    const { data: files } = await http.get(config.filesEndpoint);
-    const { data: folders } = await http.get(config.foldersEndpoint);
-    //const tags = this.props
+  getFiles = async (id = "5edab535988b0dc144aee8fe") => {
+    const { data: files } = await http.get(config.filesEndpoint + "/" + id);
+    const { data: folders } = await http.get(config.foldersEndpoint + "/" + id);
     this.setState({ files, folders, count: files.length + folders.length });
   };
 
@@ -189,4 +188,4 @@ class Files extends Component {
   }
 }
 
-export default Files;
+export default Folders;

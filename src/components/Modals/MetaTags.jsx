@@ -5,7 +5,7 @@ import { toast } from "react-toastify";
 import { Button, Modal, Form, Input, Badge, Label } from "reactstrap";
 
 const MetaTag = (props) => {
-  const { buttonLabel, modalClassName, fileId, getNewData } = props;
+  const { buttonLabel, modalClassName, fileId, getFiles } = props;
   const [modal, setModal] = useState(false);
   const [originalValue, setOriginalValue] = useState("");
   const [inputField, setInputField] = useState(null);
@@ -33,6 +33,8 @@ const MetaTag = (props) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    console.log(props);
+
     const tagArray = inputField.replace(/[^0-9a-zA-Z-_ \n]/g, "").split(/\s+/);
 
     // If duplicate meta tags, prevent saving.
@@ -46,7 +48,7 @@ const MetaTag = (props) => {
     await http
       .put(config.filesEndpoint + "/" + fileId, tags)
       .then((response) => {
-        getNewData(); // Update parent component view
+        getFiles(); // Update parent component view
         toggle(e);
         //console.log(response.data);
       })

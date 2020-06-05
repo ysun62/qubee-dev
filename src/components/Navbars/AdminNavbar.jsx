@@ -17,6 +17,7 @@
 */
 import React from "react";
 import { Link, Redirect } from "react-router-dom";
+import { toast } from "react-toastify";
 import http from "../../services/httpService";
 
 // reactstrap components
@@ -44,30 +45,35 @@ class AdminNavbar extends React.Component {
     results: [],
     loading: false,
     message: "",
+    redirect: false,
   };
 
   handleChange = (e) => {
-    this.setState({ term: e.target.value });
+    this.setState({ redirect: false, term: e.target.value });
   };
 
   handleSubmit = async (e) => {
     e.preventDefault();
 
+    const numberOfChar = [...this.state.term];
+
     let url = `http://localhost:5000/api/searches?s=${encodeURI(
       this.state.term
     )}`;
 
-    console.log(url);
-
-    await http
-      .get(url)
-      .then((response) => {
-        this.setState({ results: response.data });
-        console.log(response.data);
-      })
-      .catch((error) => {
-        console.error("There was an error:", error);
-      });
+    if (numberOfChar.length >= 3) {
+      await http
+        .get(url)
+        .then((response) => {
+          this.setState({ redirect: true, results: response.data });
+          console.log(response.data);
+        })
+        .catch((error) => {
+          console.error("There was an error:", error);
+        });
+    } else {
+      toast.warn("At least 3 charaters required to search.");
+    }
   };
 
   render() {
@@ -103,7 +109,7 @@ class AdminNavbar extends React.Component {
                 </InputGroup>
               </FormGroup>
             </Form>
-            {this.state.results.length > 0 && (
+            {this.state.redirect && (
               <Redirect
                 to={{
                   pathname: `/admin/search/${this.state.term}`,

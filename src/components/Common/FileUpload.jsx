@@ -9,7 +9,7 @@ import "filepond/dist/filepond.min.css";
 
 registerPlugin();
 
-function FileUpload({ getNewData, toggle }) {
+function FileUpload({ getFiles, toggle }) {
   // const [selectedFiles, setSelectedFiles] = useState([]);
   // const [filenames, setFilenames] = useState("Choose file");
   // const [loaded, setLoaded] = useState(0);
@@ -78,7 +78,7 @@ function FileUpload({ getNewData, toggle }) {
   };
 
   const handleProcessedFiles = () => {
-    getNewData();
+    getFiles();
     toggle();
   };
 

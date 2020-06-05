@@ -2,7 +2,7 @@ import React from "react";
 import CreateFolder from "../Modals/CreateFolder";
 import { Row, CardHeader } from "reactstrap";
 
-function FilesHeader({ count, createFolderButton, getNewData }) {
+function FilesHeader({ count, createFolderButton, getFiles }) {
   return (
     <CardHeader className="border-0">
       <Row className="align-items-center">
@@ -14,7 +14,7 @@ function FilesHeader({ count, createFolderButton, getNewData }) {
             <CreateFolder
               buttonLabel="Create new folder"
               modalClassName="modal-dialog"
-              getNewData={getNewData}
+              getFiles={getFiles}
             />
           </div>
         )}
