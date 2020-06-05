@@ -1,5 +1,8 @@
 const Promise = require("bluebird");
 const express = require("express");
+const fsDebug = require("debug")("app:fs");
+const dbDebug = require("debug")("app:db");
+const debug = require("debug")("app:debug");
 const multer = require("multer");
 const MyCustomStorage = require("../utils/customStorage");
 const fs = Promise.promisifyAll(require("fs"));
@@ -56,15 +59,18 @@ const upload = multer({
 
 // Returns true or false if it was successfull or not
 async function checkCreateUploadsFolder(uploadsFolder) {
-  fs.access(uploadsFolder, fs.constants.F_OK, async (error) => {
-    if (error) {
+  try {
+    await fs.accessAsync(uploadsFolder);
+    return true;
+  } catch (ex) {
+    try {
       await fs.mkdirAsync(uploadsFolder);
-      return false;
-    } else {
-      console.log("The Folder exists.");
       return true;
+    } catch (ex) {
+      fsDebug("Cannot create folder", ex);
+      return false;
     }
-  });
+  }
 }
 router.get("/", async (req, res) => {
   const files = await File.find().select("-__v").sort("name");
@@ -76,59 +82,60 @@ router.post("/", upload.array("mediaFiles", 10), async (req, res, next) => {
   const selectedFiles = req.files;
   const folderExists = await checkCreateUploadsFolder(uploadsFolder);
 
-  if (!selectedFiles) {
-    const error = new Error("Please choose files.");
-    return res.status(400).send(error);
-  }
+  debug(folderExists);
 
   if (!folderExists) {
     const error = new Error("There was an error creating the uploads folder.");
     return res.status(400).send(error);
   }
 
-  console.log(selectedFiles, req.body);
+  debug(selectedFiles);
 
   for (let selectedFile of selectedFiles) {
-    // const filename =
-    //   Date.now() +
-    //   "-" +
-    //   selectedFile.originalname.toLowerCase().split(" ").join("-");
-    // const folder = await Folder.findById(req.body.folderId);
-    // if (!folder) {
-    //   //return res.status(400).send("Invalid folder.");
-    // }
+    const filename = selectedFile.originalname
+      .toLowerCase()
+      .split(" ")
+      .join("-");
+    const folder = await Folder.findById(req.body.folderId);
+
+    if (!folder) {
+      return res.status(400).send("Invalid folder.");
+    }
 
     const file = new File({
       name: selectedFile.originalname,
       path: new mongoose.Types.ObjectId(),
       size: selectedFile.size,
-      // folders: {
-      //   _id: folder._id,
-      //   name: folder.name,
-      // },
+      folders: {
+        _id: folder._id,
+        name: folder.name,
+      },
     });
 
-    fs.access(
-      path.join(uploadsFolder, selectedFile.originalname),
-      fs.constants.F_OK,
-      async (error) => {
-        if (error) {
-          await fs
-            .renameAsync(
-              selectedFile.path,
-              path.join(uploadsFolder, selectedFile.originalname)
-            )
-            .then(async () => {
-              await file.save();
-              res.send(file);
-            })
-            .catch((error) => console.log("Rename Error:", error));
-        } else {
-          console.log("The file exists.");
-          res.status(400).send("The file exists.");
+    try {
+      await fs.accessAsync(path.join(uploadsFolder, filename));
+      fsDebug("The file already exist.");
+      res.status(400).send("The file already exist.");
+    } catch (ex) {
+      try {
+        await fs.renameAsync(
+          selectedFile.path,
+          path.join(uploadsFolder, filename)
+        );
+        fsDebug("The file moved successfully.");
+        try {
+          await file.save();
+          dbDebug("Document saved successfully in MongoDB.", file);
+          res.send(file);
+        } catch (ex) {
+          dbDebug("Could not save document to MongoDB.", ex);
+          res.status(500).send("Could not save document to MongoDB.");
         }
+      } catch (ex) {
+        fsDebug("Could not move file to location.", ex);
+        res.status(500).send("Could not move file to location.");
       }
-    );
+    }
   }
 });
 

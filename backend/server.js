@@ -1,3 +1,7 @@
+if (process.env.NODE_ENV !== "production") {
+  require("dotenv").config();
+}
+
 const Joi = require("@hapi/joi");
 Joi.objectId = require("joi-objectid")(Joi);
 const express = require("express");
@@ -19,10 +23,6 @@ const corsOptions = {
   origin: "*",
   optionsSuccessStatus: 200,
 };
-
-if (app.get("env") === "development") {
-  require("dotenv").config();
-}
 
 mongoose
   .connect(process.env.DATABASE_URL, {
