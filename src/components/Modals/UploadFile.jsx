@@ -2,9 +2,12 @@ import React, { useState } from "react";
 import FileUpload from "../Common/FileUpload";
 import { Button, Modal } from "reactstrap";
 
-const UploadFile = (props) => {
-  const { buttonLabel, buttonIcon, modalClassName } = props;
-
+const UploadFile = ({
+  buttonLabel,
+  buttonIcon,
+  modalClassName,
+  getNewData,
+}) => {
   let buttonIconClasses = "fas fa-";
 
   if (buttonIcon) buttonIconClasses += buttonIcon;
@@ -31,6 +34,7 @@ const UploadFile = (props) => {
         className={modalClassName}
         isOpen={modal}
         toggle={toggle}
+        getNewData={getNewData}
         backdrop="static"
       >
         <div className="modal-header">

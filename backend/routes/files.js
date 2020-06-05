@@ -1,9 +1,8 @@
 const Promise = require("bluebird");
 const express = require("express");
-const { IncomingForm } = require("formidable");
 const multer = require("multer");
+const MyCustomStorage = require("../utils/customStorage");
 const fs = Promise.promisifyAll(require("fs"));
-const util = require("util");
 const path = require("path");
 const mongoose = require("mongoose");
 const mimeTypes = require("../utils/mimetypes");
@@ -12,16 +11,28 @@ const router = express.Router();
 const { File, fileBasePath, validate } = require("../models/file");
 const { Folder } = require("../models/folder");
 
-const tempDir = path.join(__dirname, "../public", "uploads");
+const tempDir = path.join(__dirname, "../public", "uploads/");
 
-const storage = multer.diskStorage({
+// const storage = multer.diskStorage({
+//   destination: function (req, file, cb) {
+//     cb(null, tempDir);
+//   },
+//   filename: function (req, file, cb) {
+//     cb(
+//       null,
+//       Date.now() + "-" + file.originalname.toLowerCase().split(" ").join("-")
+//     );
+//   },
+// });
+
+const storage = MyCustomStorage({
   destination: function (req, file, cb) {
-    cb(null, tempDir);
-  },
-  filename: function (req, file, cb) {
     cb(
       null,
-      Date.now() + "-" + file.originalname.toLowerCase().split(" ").join("-")
+      tempDir +
+        Date.now() +
+        "-" +
+        file.originalname.toLowerCase().split(" ").join("-")
     );
   },
 });
@@ -45,22 +56,15 @@ const upload = multer({
 
 // Returns true or false if it was successfull or not
 async function checkCreateUploadsFolder(uploadsFolder) {
-  try {
-    await fs.statAsync(uploadsFolder);
-  } catch (ex) {
-    if (ex && ex.code === "ENOENT") {
-      try {
-        await fs.mkdirAsync(uploadsFolder);
-      } catch (ex) {
-        console.error("Error creating the uploads folder", ex);
-        return false;
-      }
-    } else {
-      console.log("Error reading the uploads folder");
+  fs.access(uploadsFolder, fs.constants.F_OK, async (error) => {
+    if (error) {
+      await fs.mkdirAsync(uploadsFolder);
       return false;
+    } else {
+      console.log("The Folder exists.");
+      return true;
     }
-  }
-  return true;
+  });
 }
 router.get("/", async (req, res) => {
   const files = await File.find().select("-__v").sort("name");
@@ -85,6 +89,10 @@ router.post("/", upload.array("mediaFiles", 10), async (req, res, next) => {
   console.log(selectedFiles, req.body);
 
   for (let selectedFile of selectedFiles) {
+    // const filename =
+    //   Date.now() +
+    //   "-" +
+    //   selectedFile.originalname.toLowerCase().split(" ").join("-");
     // const folder = await Folder.findById(req.body.folderId);
     // if (!folder) {
     //   //return res.status(400).send("Invalid folder.");
@@ -92,7 +100,7 @@ router.post("/", upload.array("mediaFiles", 10), async (req, res, next) => {
 
     const file = new File({
       name: selectedFile.originalname,
-      path: `/uploads/${selectedFile.filename}`,
+      path: new mongoose.Types.ObjectId(),
       size: selectedFile.size,
       // folders: {
       //   _id: folder._id,
@@ -100,22 +108,27 @@ router.post("/", upload.array("mediaFiles", 10), async (req, res, next) => {
       // },
     });
 
-    try {
-      await fs.renameAsync(
-        selectedFile.path,
-        path.join(uploadsFolder, selectedFile.filename)
-      );
-      try {
-        await file.save();
-      } catch (ex) {
-        console.log("Couldn't save to MondoDB...", ex);
+    fs.access(
+      path.join(uploadsFolder, selectedFile.originalname),
+      fs.constants.F_OK,
+      async (error) => {
+        if (error) {
+          await fs
+            .renameAsync(
+              selectedFile.path,
+              path.join(uploadsFolder, selectedFile.originalname)
+            )
+            .then(async () => {
+              await file.save();
+              res.send(file);
+            })
+            .catch((error) => console.log("Rename Error:", error));
+        } else {
+          console.log("The file exists.");
+          res.status(400).send("The file exists.");
+        }
       }
-    } catch (ex) {
-      console.log("The file upload failed...", ex);
-    }
-
-    console.log(file);
-    res.send(file);
+    );
   }
 });
 
@@ -152,13 +165,15 @@ router.get("/:id", async (req, res) => {
 });
 
 router.delete("/:id", async (req, res) => {
-  const file = await File.findByIdAndRemove(req.params.id);
+  console.log(req);
+
+  //const file = await File.findByIdAndRemove(req.params.id);
   //const file = await File.deleteOne({ params: req.params.id });
 
-  if (!file)
-    return res.status(404).send("The movie with the given ID was not found.");
+  // if (!file)
+  //   return res.status(404).send("The movie with the given ID was not found.");
 
-  res.send(file);
+  // res.send(file);
 });
 
 module.exports = router;

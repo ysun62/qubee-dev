@@ -1,104 +1,99 @@
-import React, { Component } from "react";
+import React, { useState } from "react";
 import http from "../../services/httpService";
 import { toast } from "react-toastify";
 import { FilePond, registerPlugin } from "react-filepond";
-import { Form, Button, Input, Progress, Label } from "reactstrap";
+// import { Form, Button, Input, Progress, Label } from "reactstrap";
 import config from "../../config";
 import "react-toastify/dist/ReactToastify.css";
 import "filepond/dist/filepond.min.css";
 
 registerPlugin();
 
-class FileUpload extends Component {
-  constructor(props) {
-    super(props);
+function FileUpload({ getNewData, toggle }) {
+  // const [selectedFiles, setSelectedFiles] = useState([]);
+  // const [filenames, setFilenames] = useState("Choose file");
+  // const [loaded, setLoaded] = useState(0);
+  // const [taskCompleted, setTaskCompleted] = useState("Pending");
+  // const [isEnabled, setEnabled] = useState(false);
 
-    this.state = {
-      selectedFiles: [],
-      filenames: "Choose file",
-      loaded: 0,
-      taskCompleted: "Pending",
-      isEnabled: false,
-    };
-  }
+  // maxSelectFile = (files) => {
+  //   //let files = e.target.files; // create file object
 
-  maxSelectFile = (files) => {
-    //let files = e.target.files; // create file object
+  //   if (files.length > 10) {
+  //     const msg = "Only 10 files can be uploaded at a time";
+  //     //e.target.value = null; // discard selected file
+  //     toast.error(msg);
+  //     return false;
+  //   }
+  //   return true;
+  // };
 
-    if (files.length > 10) {
-      const msg = "Only 10 files can be uploaded at a time";
-      //e.target.value = null; // discard selected file
-      toast.error(msg);
-      return false;
-    }
-    return true;
-  };
+  // const handleFileChange = (e) => {
+  //   let files = e.target.files;
 
-  handleFileChange = (e) => {
-    let files = e.target.files;
+  //   if (this.maxSelectFile(files)) {
+  //     this.setState({
+  //       selectedFiles: files,
+  //       filenames: files.length + " files selected",
+  //       loaded: 0,
+  //       isEnabled: true,
+  //     });
+  //   }
+  // };
 
-    if (this.maxSelectFile(files)) {
-      this.setState({
-        selectedFiles: files,
-        filenames: files.length + " files selected",
-        loaded: 0,
-        isEnabled: true,
-      });
-    }
-  };
+  // const handleSubmit = async (e) => {
+  //   e.preventDefault();
 
-  handleSubmit = async (e) => {
-    e.preventDefault();
+  //   const files = this.state.selectedFiles;
+  //   const formData = new FormData();
 
-    const files = this.state.selectedFiles;
-    const formData = new FormData();
+  //   console.log(files);
 
-    console.log(files);
+  //   for (let i = 0; i < files.length; i++) {
+  //     formData.append("mediaFiles", files[i]);
+  //   }
 
-    for (let i = 0; i < files.length; i++) {
-      formData.append("mediaFiles", files[i]);
-    }
+  //   await http
+  //     .post(config.filesEndpoint, formData, {
+  //       onUploadProgress: (ProgressEvent) => {
+  //         this.setState({
+  //           loaded: (ProgressEvent.loaded / ProgressEvent.total) * 100,
+  //           taskCompleted:
+  //             this.state.loaded === 100
+  //               ? "Uploaded Successfully"
+  //               : "Waiting to upload",
+  //         });
+  //       },
+  //     })
+  //     .then((response) => {
+  //       this.getNewData();
+  //       this.toggle();
+  //       console.log(response);
+  //     })
+  //     .catch((ex) => console.log(ex));
+  // };
 
-    await http
-      .post(config.filesEndpoint, formData, {
-        onUploadProgress: (ProgressEvent) => {
-          this.setState({
-            loaded: (ProgressEvent.loaded / ProgressEvent.total) * 100,
-            taskCompleted:
-              this.state.loaded === 100
-                ? "Uploaded Successfully"
-                : "Waiting to upload",
-          });
-        },
-      })
-      .then((response) => console.log(response))
-      .catch((ex) => console.log(ex));
-  };
-
-  handleError = (err, file) => {
-    console.log(err, file);
-  };
-
-  handleOnError = (error, file, status) => {
+  const handleOnError = (error, file, status) => {
     console.log(error, file, status);
   };
 
-  render() {
-    const { loaded, filenames, isEnabled } = this.state;
-    return (
-      <>
-        <FilePond
-          ref={(ref) => (this.pond = ref)}
-          allowMultiple={true}
-          name={"mediaFiles"}
-          //onprocessfile={(err, file) => this.handleError(err, file)}
-          onerror={(error, file, status) =>
-            this.handleOnError(error, file, status)
-          }
-          maxFiles={10}
-          server={config.filesEndpoint}
-        ></FilePond>
-        <Form onSubmit={this.handleSubmit}>
+  const handleProcessedFiles = () => {
+    getNewData();
+    toggle();
+  };
+
+  return (
+    <>
+      <FilePond
+        //ref={(ref) => (pond = ref)}
+        allowMultiple={true}
+        name={"mediaFiles"}
+        onerror={(error, file, status) => handleOnError(error, file, status)}
+        onprocessfiles={handleProcessedFiles}
+        maxFiles={10}
+        server={config.filesEndpoint}
+      ></FilePond>
+      {/* <Form onSubmit={this.handleSubmit}>
           <div className="progress-wrapper" style={{ paddingTop: 0 }}>
             <div className="progress-info">
               <div className="progress-label">
@@ -126,10 +121,9 @@ class FileUpload extends Component {
           <Button color="primary" type="submit" disabled={!isEnabled}>
             Upload
           </Button>
-        </Form>
-      </>
-    );
-  }
+        </Form> */}
+    </>
+  );
 }
 
 export default FileUpload;

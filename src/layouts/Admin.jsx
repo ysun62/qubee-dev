@@ -28,16 +28,23 @@ import ActionBarHeader from "components/Headers/ActionBarHeader";
 import Sidebar from "components/Sidebar/Sidebar";
 import Folders from "../views/Folders";
 import SearchResults from "../views/SearchResults";
+import Files from "../views/Files";
 
+import http from "../services/httpService";
+import config from "../config";
 import routes from "routes.js";
 
 class Admin extends Component {
   state = {
     display: false,
+    files: [],
+    folders: [],
+    count: 0,
   };
 
   componentDidMount() {
     document.body.classList.add("bg-default");
+    this.getFiles();
   }
 
   componentWillUnmount() {
@@ -79,6 +86,30 @@ class Admin extends Component {
     return "Brand";
   };
 
+  getFiles = async () => {
+    const { data: files } = await http.get(config.filesEndpoint);
+    const { data: folders } = await http.get(config.foldersEndpoint);
+    this.setState({ files, folders, count: files.length + folders.length });
+  };
+
+  handleDelete = async (file) => {
+    const originalFiles = this.state.files;
+
+    const files = this.state.files.filter((p) => p._id !== file._id);
+    this.setState({ files });
+
+    try {
+      await http.delete(`${config.filesEndpoint}/${file._id}`);
+      //throw new Error("Something went wrong!");
+    } catch (err) {
+      // Expected (404: not found, 400: bad request) - Client Errors
+      // - Display a specific error message
+      if (err.response && err.response.status === 404)
+        alert("This file has already been deleted.");
+      this.setState({ files: originalFiles });
+    }
+  };
+
   showHideComponent() {
     const { display } = this.state;
     this.setState({
@@ -86,8 +117,12 @@ class Admin extends Component {
     });
   }
 
+  isFileChecked = (value) => {
+    console.log("CHECKED", value);
+  };
+
   render() {
-    const { display } = this.props;
+    const { display, files, folders, count } = this.state;
     return (
       <>
         <ToastContainer draggable={false} position="bottom-left" />
@@ -100,6 +135,7 @@ class Admin extends Component {
             imgSrc: require("assets/img/brand/qubee_logo.png"),
             imgAlt: "...",
           }}
+          getNewData={this.getFiles}
         />
         <div className="main-content" ref="mainContent">
           <AdminNavbar
@@ -107,8 +143,42 @@ class Admin extends Component {
             brandText={this.getBrandText(this.props.location.pathname)}
           />
           <Switch>
-            <Route path="/admin/folder/:id" component={Folders} />
-            <Route path="/admin/search/:term" component={SearchResults} />
+            <Route
+              path="/admin/folder/:id"
+              render={() => (
+                <Folders
+                  files={files}
+                  folders={folders}
+                  count={count}
+                  getFiles={this.getFiles}
+                  isFileChecked={this.isFileChecked}
+                />
+              )}
+            />
+            <Route
+              path="/admin/search/:term"
+              render={() => (
+                <SearchResults
+                  files={files}
+                  folders={folders}
+                  count={count}
+                  getFiles={this.getFiles}
+                  isFileChecked={this.isFileChecked}
+                />
+              )}
+            />
+            <Route
+              path="/admin/files"
+              render={() => (
+                <Files
+                  files={files}
+                  folders={folders}
+                  count={count}
+                  getFiles={this.getFiles}
+                  isFileChecked={this.isFileChecked}
+                />
+              )}
+            />
             {this.getRoutes(routes)}
             <Redirect from="*" to="/admin/files" />
           </Switch>

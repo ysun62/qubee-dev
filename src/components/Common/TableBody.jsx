@@ -34,6 +34,7 @@ class TableBody extends Component {
     this.setState((prevState) => ({
       checkboxes: prevState.checkboxes.set(item, isChecked),
     }));
+    this.props.isFileChecked(this.state.checkboxes);
   };
 
   clearAllCheckboxes = () => {
@@ -44,7 +45,7 @@ class TableBody extends Component {
   checkAllCheckboxes = () => {};
 
   render() {
-    const { files, folders, getNewData, ...rest } = this.props;
+    const { files, folders, getNewData, isFileChecked, ...rest } = this.props;
     console.log(this.state.checkboxes);
 
     return (
@@ -105,10 +106,10 @@ class TableBody extends Component {
             </th>
             <td>
               <Media className="align-items-center mb-2">
-                <a href={file.path} target="blank">
+                <Link to={`/admin/folder/${file.path}`}>
                   <i className="fas fa-file-image mr-2" />
                   <span className="mb-0 text-sm">{file.name}</span>
-                </a>
+                </Link>
               </Media>
               <Tags file={file} getNewData={getNewData} />
             </td>

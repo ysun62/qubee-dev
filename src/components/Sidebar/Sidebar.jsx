@@ -243,6 +243,7 @@ class Sidebar extends React.Component {
               buttonLabel="Upload"
               buttonIcon="cloud-upload-alt"
               modalClassName="modal-dialog"
+              getNewData={this.props.getNewData}
             />
             <Nav navbar>{this.createLinks(routes)}</Nav>
             {/* Divider */}
