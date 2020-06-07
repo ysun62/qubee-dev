@@ -39,6 +39,11 @@ class TableBody extends Component {
     // console.log(checkboxMap);
   };
 
+  /**
+   * Look into array filter: (https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/filter)
+   * and array includes: (https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/includes)
+   */
+
   findInMap = (map) => {
     for (let v of map.values()) {
       console.log(v);
