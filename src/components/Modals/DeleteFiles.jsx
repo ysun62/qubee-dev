@@ -19,7 +19,7 @@ const DeleteFiles = ({
   const onHandleDelete = () => handleDelete();
 
   return (
-    <div className="file-upload-component">
+    <>
       <Button color="link" type="button" onClick={toggle}>
         <span className="btn-inner--icon">
           <i className={buttonIconClasses} />
@@ -56,7 +56,7 @@ const DeleteFiles = ({
           </div>
         </div>
       </Modal>
-    </div>
+    </>
   );
 };
 

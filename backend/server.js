@@ -12,6 +12,7 @@ const bodyParser = require("body-parser");
 const filesRoute = require("./routes/files");
 const foldersRoute = require("./routes/folders");
 const searchesRoute = require("./routes/searches");
+const settingsRoute = require("./routes/settings");
 
 const app = express();
 const db_dev = config.get("db_dev");
@@ -45,6 +46,7 @@ app.use(express.static("public"));
 app.use("/api/files", filesRoute);
 app.use("/api/folders", foldersRoute);
 app.use("/api/searches", searchesRoute);
+app.use("/api/settings", settingsRoute);
 
 if (app.get("env") === "development") {
   app.use(morgan("tiny"));

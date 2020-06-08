@@ -2,9 +2,15 @@ import React from "react";
 import classnames from "classnames";
 import ShareFiles from "components/Modals/ShareFiles";
 import DeleteFiles from "components/Modals/DeleteFiles";
+import MoveFiles from "../Modals/MoveFiles";
 import { Container, NavItem, NavLink, Nav, Button, Row, Col } from "reactstrap";
 
-function FileEditActions({ handleDelete }) {
+function FileEditActions({
+  handleDelete,
+  handleMove,
+  handleFolderSelection,
+  ...rest // files and folders props
+}) {
   return (
     <Nav className="justify-content-end navbar" role="tablist">
       <NavItem>
@@ -12,6 +18,7 @@ function FileEditActions({ handleDelete }) {
           buttonLabel="Share"
           buttonIcon="share-alt"
           modalClassName="modal-dialog-centered"
+          {...rest}
         />
       </NavItem>
       {/* <NavItem>
@@ -31,12 +38,14 @@ function FileEditActions({ handleDelete }) {
         </Button>
       </NavItem> */}
       <NavItem>
-        <Button color="link">
-          <span className="btn-inner--icon mr-md-1 mr-0">
-            <i className="fas fa-file-export" />
-          </span>
-          <span className="btn-inner--text d-md-inline d-none">Move</span>
-        </Button>
+        <MoveFiles
+          buttonLabel="Move"
+          buttonIcon="file-export"
+          modalClassName="modal-dialog"
+          handleMove={handleMove}
+          handleFolderSelection={handleFolderSelection}
+          {...rest}
+        />
       </NavItem>
       <NavItem>
         <DeleteFiles
@@ -44,6 +53,7 @@ function FileEditActions({ handleDelete }) {
           buttonIcon="trash-alt"
           modalClassName="modal-dialog"
           handleDelete={handleDelete}
+          {...rest}
         />
       </NavItem>
       <NavItem>

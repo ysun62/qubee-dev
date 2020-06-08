@@ -27,7 +27,7 @@ import "assets/scss/argon-dashboard-react.scss";
 import AdminLayout from "layouts/Admin";
 import AuthLayout from "layouts/Auth";
 
-logger.init();
+//logger.init();
 
 ReactDOM.render(
   <BrowserRouter>

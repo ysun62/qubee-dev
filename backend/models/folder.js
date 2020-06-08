@@ -10,22 +10,31 @@ const folderSchema = new mongoose.Schema({
     maxlength: 50,
     trim: true,
   },
-  slug: {
-    type: String,
-    required: true,
-    lowercase: true,
-  },
-  dateAdded: {
+  createdDate: {
     type: Date,
     required: true,
     default: Date.now,
   },
-  folder: this,
-  rootDir: Boolean,
-  accessLevel: {
+  parents: [String],
+  isRoot: {
+    type: Boolean,
+    required: true,
+    default: false,
+  },
+  isShared: {
+    type: Boolean,
+    required: true,
+    default: false,
+  },
+  kind: {
     type: String,
     required: true,
-    default: "standard",
+    default: "FOLDER",
+  },
+  accessRuleIds: {
+    type: [Number],
+    required: true,
+    default: [1, 2, 3],
   },
 });
 

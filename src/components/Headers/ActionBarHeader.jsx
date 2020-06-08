@@ -1,8 +1,14 @@
 import React from "react";
-import FileEditActions from "components/ActionBars/FileEditActions";
+import FileEditActions from "components/Common/FileEditActions";
 import { Container, NavItem, NavLink, Nav, Button, Row, Col } from "reactstrap";
 
-function ActionBar({ handleDelete }) {
+function ActionBarHeader({
+  handleDelete,
+  handleMove,
+  handleFolderSelection,
+  files,
+  folders,
+}) {
   return (
     <header className="action-bar fixed-top bg-secondary">
       <Container fluid>
@@ -13,7 +19,13 @@ function ActionBar({ handleDelete }) {
             </div>
           </Col>
           <Col md="9">
-            <FileEditActions handleDelete={handleDelete} />
+            <FileEditActions
+              handleDelete={handleDelete}
+              handleMove={handleMove}
+              handleFolderSelection={handleFolderSelection}
+              files={files}
+              folders={folders}
+            />
           </Col>
         </Row>
       </Container>
@@ -21,4 +33,4 @@ function ActionBar({ handleDelete }) {
   );
 }
 
-export default ActionBar;
+export default ActionBarHeader;

@@ -35,10 +35,12 @@ import routes from "routes.js";
 
 class Admin extends Component {
   state = {
-    display: false,
+    display: true,
     files: [],
     folders: [],
     count: 0,
+    selection: {},
+    selectMode: false,
   };
 
   componentDidMount() {
@@ -109,6 +111,14 @@ class Admin extends Component {
     }
   };
 
+  handleMove = (files) => {
+    console.log(files);
+  };
+
+  handleFolderSelection = (folder) => {
+    console.log(folder);
+  };
+
   showHideComponent(value) {
     if (value) {
       this.setState({
@@ -127,7 +137,16 @@ class Admin extends Component {
     return (
       <>
         <ToastContainer draggable={false} position="bottom-left" />
-        {display && <ActionBarHeader handleDelete={this.handleDelete} />}
+        {display && (
+          <ActionBarHeader
+            {...this.props}
+            handleDelete={this.handleDelete}
+            handleMove={this.handleMove}
+            handleFolderSelection={this.handleFolderSelection}
+            files={files}
+            folders={folders}
+          />
+        )}
         <Sidebar
           {...this.props}
           routes={routes}
