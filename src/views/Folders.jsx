@@ -1,7 +1,7 @@
 import React, { Component } from "react";
-import http from "../services/httpService";
 import CreateFolder from "../components/Modals/CreateFolder";
-import config from "../config";
+import { getFolders } from "../services/folderService";
+import { getFiles } from "../services/fileService";
 //import Header from "components/Headers/Header";
 import {
   Container,
@@ -16,44 +16,52 @@ import {
 import { NavLink } from "react-router-dom";
 
 class Folders extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      files: [],
-      folders: [],
-      metaTags: [],
-      checkedItems: new Map(),
-      count: 0,
-    };
-  }
+  state = {
+    files: [],
+    folders: [],
+    metaTags: [],
+    checkedItems: new Map(),
+    count: 0,
+  };
 
-  async componentDidMount() {
+  componentDidMount() {
     this.getFiles();
   }
 
-  getFiles = async (id = "5edab535988b0dc144aee8fe") => {
-    const { data: files } = await http.get(config.filesEndpoint + "/" + id);
-    const { data: folders } = await http.get(config.foldersEndpoint + "/" + id);
-    this.setState({ files, folders, count: files.length + folders.length });
+  getFiles = async () => {
+    const { data: files } = await getFiles();
+    const { data: folders } = await getFolders();
+    const folderId = this.props.match.params.id;
+
+    const dirFiles = files.filter((file) => file.folder._id === folderId);
+    const dirFolders = folders.filter(
+      (folder) => folder.folder._id === folderId
+    );
+
+    this.setState({
+      files: dirFiles,
+      folders: dirFolders,
+      count: dirFiles.length + dirFolders.length,
+    });
   };
 
-  handleDelete = async (file) => {
-    const originalFiles = this.state.files;
+  // handleDelete = async (file) => {
+  //   const originalFiles = this.state.files;
 
-    const files = this.state.files.filter((p) => p._id !== file._id);
-    this.setState({ files });
+  //   const files = this.state.files.filter((p) => p._id !== file._id);
+  //   this.setState({ files });
 
-    try {
-      await http.delete(`${config.apiEndpoint}/${file._id}`);
-      //throw new Error("Something went wrong!");
-    } catch (err) {
-      // Expected (404: not found, 400: bad request) - Client Errors
-      // - Display a specific error message
-      if (err.response && err.response.status === 404)
-        alert("This file has already been deleted.");
-      this.setState({ files: originalFiles });
-    }
-  };
+  //   try {
+  //     await http.delete(`${config.apiEndpoint}/${file._id}`);
+  //     //throw new Error("Something went wrong!");
+  //   } catch (err) {
+  //     // Expected (404: not found, 400: bad request) - Client Errors
+  //     // - Display a specific error message
+  //     if (err.response && err.response.status === 404)
+  //       alert("This file has already been deleted.");
+  //     this.setState({ files: originalFiles });
+  //   }
+  // };
 
   render() {
     return (
@@ -133,12 +141,6 @@ class Folders extends Component {
                               </span>
                             </NavLink>
                           </Media>
-                          {/* <Button
-                            color="danger"
-                            onClick={() => this.handleDelete(file)}
-                          >
-                            Delete
-                          </Button> */}
                         </td>
                         <td>{folder.dateAdded}</td>
                         <td></td>
@@ -166,12 +168,6 @@ class Folders extends Component {
                               <span className="mb-0 text-sm">{file.name}</span>
                             </a>
                           </Media>
-                          {/* <Button
-                            color="danger"
-                            onClick={() => this.handleDelete(file)}
-                          >
-                            Delete
-                          </Button> */}
                         </td>
                         <td>{file.dateAdded}</td>
                         <td>{file.fileSize}</td>

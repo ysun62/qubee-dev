@@ -28,7 +28,12 @@ const fileSchema = mongoose.model(
       required: true,
       default: Date.now,
     },
-    folders: folderSchema,
+    folder: folderSchema,
+    accessLevel: {
+      type: String,
+      required: true,
+      default: "standard",
+    },
   })
 );
 

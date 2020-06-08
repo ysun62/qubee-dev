@@ -1,7 +1,4 @@
-if (process.env.NODE_ENV !== "production") {
-  require("dotenv").config();
-}
-
+const config = require("config");
 const Joi = require("@hapi/joi");
 Joi.objectId = require("joi-objectid")(Joi);
 const express = require("express");
@@ -17,21 +14,21 @@ const foldersRoute = require("./routes/folders");
 const searchesRoute = require("./routes/searches");
 
 const app = express();
-
-const port = process.env.PORT || 5000;
+const db_dev = config.get("db_dev");
+const port = process.env.PORT || config.get("port");
 const corsOptions = {
   origin: "*",
   optionsSuccessStatus: 200,
 };
 
 mongoose
-  .connect(process.env.DATABASE_URL, {
+  .connect(db_dev, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
     useFindAndModify: false,
   })
-  .then(() => debug("Connected to MongoDB..."))
-  .catch((err) => debug("Could not connect to MongoDB...", err));
+  .then(() => debug(`Connected to MongoDB -> ${db_dev}`))
+  .catch((ex) => debug("Could not connect to MongoDB...", ex.response));
 
 app.use(helmet());
 app.use(

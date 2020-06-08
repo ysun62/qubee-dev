@@ -4,6 +4,7 @@ const fsDebug = require("debug")("app:fs");
 const dbDebug = require("debug")("app:db");
 const debug = require("debug")("app:debug");
 const multer = require("multer");
+const moment = require("moment");
 const MyCustomStorage = require("../utils/customStorage");
 const fs = Promise.promisifyAll(require("fs"));
 const path = require("path");
@@ -59,12 +60,29 @@ const upload = multer({
 
 // Returns true or false if it was successfull or not
 async function checkCreateUploadsFolder(uploadsFolder) {
+  const rootDirectory = Boolean(await Folder.findOne({ name: "Files" }));
+  const folder = new Folder({
+    name: "Files",
+    slug: "files",
+    rootDirectory: true,
+  });
+
+  dbDebug("Root dir exist:", rootDirectory);
+
   try {
     await fs.accessAsync(uploadsFolder);
+    if (!rootDirectory) {
+      await folder.save();
+      return true;
+    }
     return true;
   } catch (ex) {
     try {
       await fs.mkdirAsync(uploadsFolder);
+      if (!rootDirectory) {
+        await folder.save();
+        return true;
+      }
       return true;
     } catch (ex) {
       fsDebug("Cannot create folder", ex);
@@ -72,10 +90,6 @@ async function checkCreateUploadsFolder(uploadsFolder) {
     }
   }
 }
-router.get("/", async (req, res) => {
-  const files = await File.find().select("-__v").sort("name");
-  res.send(files);
-});
 
 router.post("/", upload.array("mediaFiles", 10), async (req, res, next) => {
   const uploadsFolder = path.join(__dirname, fileBasePath);
@@ -96,19 +110,25 @@ router.post("/", upload.array("mediaFiles", 10), async (req, res, next) => {
       .toLowerCase()
       .split(" ")
       .join("-");
-    const folder = await Folder.findById(req.body.folderId);
+    const parentDirectory =
+      (await Folder.findById(req.body.folderId)) ||
+      (await Folder.findOne({ name: "Files" }).select("_id name slug"));
 
-    if (!folder) {
+    debug(parentDirectory);
+
+    if (!parentDirectory) {
       return res.status(400).send("Invalid folder.");
     }
 
     const file = new File({
       name: selectedFile.originalname,
+      slug: selectedFile.originalname.replace(/\s+/g, "-").toLowerCase(),
       path: new mongoose.Types.ObjectId(),
       size: selectedFile.size,
-      folders: {
-        _id: folder._id,
-        name: folder.name,
+      folder: {
+        _id: parentDirectory._id,
+        name: parentDirectory.name,
+        slug: parentDirectory.slug,
       },
     });
 
@@ -160,6 +180,11 @@ router.put("/:id", async (req, res) => {
     return res.status(404).send("The movie with the given ID was not found");
 
   res.send(file);
+});
+
+router.get("/", async (req, res) => {
+  const files = await File.find().select("-__v").sort("name");
+  res.send(files);
 });
 
 router.get("/:id", async (req, res) => {

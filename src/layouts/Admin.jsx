@@ -17,11 +17,10 @@
 */
 import React, { Component } from "react";
 import { Route, Switch, Redirect } from "react-router-dom";
-// toastify component
 import { ToastContainer } from "react-toastify";
-// reactstrap components
 import { Container } from "reactstrap";
-// core components
+import { getFolders } from "../services/folderService";
+import { getFiles } from "../services/fileService";
 import AdminNavbar from "components/Navbars/AdminNavbar";
 import AdminFooter from "components/Footers/AdminFooter";
 import ActionBarHeader from "components/Headers/ActionBarHeader";
@@ -35,15 +34,12 @@ import config from "../config";
 import routes from "routes.js";
 
 class Admin extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      display: false,
-      files: [],
-      folders: [],
-      count: 0,
-    };
-  }
+  state = {
+    display: false,
+    files: [],
+    folders: [],
+    count: 0,
+  };
 
   componentDidMount() {
     document.body.classList.add("bg-default");
@@ -59,6 +55,12 @@ class Admin extends Component {
     document.scrollingElement.scrollTop = 0;
     this.refs.mainContent.scrollTop = 0;
   }
+
+  getFiles = async () => {
+    const { data: files } = await getFiles();
+    const { data: folders } = await getFolders();
+    this.setState({ files, folders, count: files.length + folders.length });
+  };
 
   getRoutes = (routes) => {
     return routes.map((prop, key) => {
@@ -87,12 +89,6 @@ class Admin extends Component {
       }
     }
     return "Brand";
-  };
-
-  getFiles = async () => {
-    const { data: files } = await http.get(config.filesEndpoint);
-    const { data: folders } = await http.get(config.foldersEndpoint);
-    this.setState({ files, folders, count: files.length + folders.length });
   };
 
   handleDelete = async (file) => {
