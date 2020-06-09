@@ -35,10 +35,14 @@ import routes from "routes.js";
 
 class Admin extends Component {
   state = {
-    display: true,
-    files: [],
-    folders: [],
-    count: 0,
+    display: false,
+    collection: {
+      files: [],
+      folders: [],
+      count: 0,
+      rootFolder: {},
+      sharedFolder: {},
+    },
     selection: {},
     selectMode: false,
   };
@@ -61,7 +65,15 @@ class Admin extends Component {
   getFiles = async () => {
     const { data: files } = await getFiles();
     const { data: folders } = await getFolders();
-    this.setState({ files, folders, count: files.length + folders.length });
+    this.setState({
+      collection: {
+        files,
+        folders,
+        count: files.length + folders.length,
+        rootFolder: folders.find(({ name }) => name === "All"),
+        sharedFolder: folders.find(({ name }) => name === "Shared"),
+      },
+    });
   };
 
   getRoutes = (routes) => {
@@ -132,7 +144,7 @@ class Admin extends Component {
   }
 
   render() {
-    const { display, files, folders, count } = this.state;
+    const { display, collection, rootFolder, sharedFolder } = this.state;
 
     return (
       <>
@@ -143,8 +155,7 @@ class Admin extends Component {
             handleDelete={this.handleDelete}
             handleMove={this.handleMove}
             handleFolderSelection={this.handleFolderSelection}
-            files={files}
-            folders={folders}
+            collection={collection}
           />
         )}
         <Sidebar
@@ -168,9 +179,7 @@ class Admin extends Component {
               render={(props) => (
                 <Folders
                   {...props}
-                  files={files}
-                  folders={folders}
-                  count={count}
+                  collection={collection}
                   getFiles={this.getFiles}
                 />
               )}
@@ -182,9 +191,8 @@ class Admin extends Component {
               render={(props) => (
                 <Files
                   {...props}
-                  files={files}
-                  folders={folders}
-                  count={count}
+                  collection={collection}
+                  folderId={collection.rootFolder._id}
                   getFiles={this.getFiles}
                   isChecked={this.showHideComponent}
                 />

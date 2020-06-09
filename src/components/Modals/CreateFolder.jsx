@@ -4,7 +4,13 @@ import confid from "../../config";
 import { Button, Modal, Form, Input } from "reactstrap";
 
 const CreateFolder = (props) => {
-  const { buttonLabel, buttonIcon, modalClassName, getFiles } = props;
+  const {
+    buttonLabel,
+    buttonIcon,
+    modalClassName,
+    collection,
+    getFiles,
+  } = props;
   let buttonIconClasses = "ni ni-";
   if (buttonIcon) buttonIconClasses += buttonIcon;
 

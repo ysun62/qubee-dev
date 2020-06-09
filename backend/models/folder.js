@@ -15,6 +15,8 @@ const folderSchema = new mongoose.Schema({
     required: true,
     default: Date.now,
   },
+  modifiedDate: Date,
+  parentMap: mongoose.Mixed,
   parents: [String],
   isRoot: {
     type: Boolean,
@@ -22,6 +24,16 @@ const folderSchema = new mongoose.Schema({
     default: false,
   },
   isShared: {
+    type: Boolean,
+    required: true,
+    default: false,
+  },
+  protectedFolder: {
+    type: Boolean,
+    required: true,
+    default: false,
+  },
+  restricted: {
     type: Boolean,
     required: true,
     default: false,
@@ -42,12 +54,8 @@ const Folder = mongoose.model("Folder", folderSchema);
 
 function validateFolder(folder) {
   const schema = Joi.object({
-    _id: Joi.ObjectId().required(),
     name: Joi.string().min(1).max(50).required(),
-    slug: Joi.string().min(1).max(50).required(),
     folderId: Joi.ObjectId().required(),
-    rootDir: Joi.boolean(),
-    accessLevel: Joi.string().required(),
   });
 
   return schema.validate(folder);

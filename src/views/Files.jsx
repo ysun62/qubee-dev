@@ -3,7 +3,7 @@ import FilesHeader from "../components/Common/FilesHeader";
 import FilesBody from "../components/Common/FilesBody";
 import { Container, Row, Col, Card } from "reactstrap";
 
-function Files({ files, folders, count, getFiles, isChecked }) {
+function Files({ collection, getFiles, isChecked }) {
   return (
     <>
       <Container className="pt-7" fluid>
@@ -11,13 +11,12 @@ function Files({ files, folders, count, getFiles, isChecked }) {
           <Col className="mb-5 mb-xl-0" xl="12">
             <Card className="shadow file-manager">
               <FilesHeader
-                count={count}
+                collection={collection}
                 createFolderButton={true}
                 getFiles={getFiles}
               />
               <FilesBody
-                folders={folders}
-                files={files}
+                collection={collection}
                 getFiles={getFiles}
                 isChecked={isChecked}
               />

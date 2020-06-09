@@ -25,5 +25,3 @@ export function saveFolder(folder) {
 export function deleteFolder(folderId) {
   return http.delete(folderUrl(folderId));
 }
-
-export function createRootDir() {}

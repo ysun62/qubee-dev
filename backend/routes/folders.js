@@ -7,67 +7,10 @@ const fs = Promise.promisifyAll(require("fs"));
 const { join } = require("path");
 const mongoose = require("mongoose");
 const router = express.Router();
+const createUploadsDirs = require("../utils/createUploadsDirs");
 const { Folder, folderBasePath, validateFolder } = require("../models/folder");
-const { Setting, validateSetting } = require("../models/setting");
 
 const uploadsFolder = join(__dirname, folderBasePath);
-
-async function createStartupFolders() {
-  const isInit = await Setting.find().select("appInit");
-
-  if (!isInit.length || !isInit[0].appInit) {
-    const folderExists = await checkCreateUploadsFolder(uploadsFolder);
-    const startupFolders = [
-      {
-        name: "Documents",
-        isRoot: true,
-      },
-      {
-        name: "Pictures",
-        isRoot: true,
-      },
-      {
-        name: "Videos",
-        isRoot: true,
-      },
-    ];
-
-    if (!folderExists)
-      return console.log("There was an error creating the uploads folder.");
-
-    for (let folder of startupFolders) {
-      await new Folder({
-        name: folder.name,
-        isRoot: folder.isRoot,
-      }).save();
-    }
-
-    try {
-      if (isInit[0]) {
-        await Setting.findOneAndUpdate(
-          { _id: isInit[0]._id },
-          {
-            $set: {
-              appInit: true,
-            },
-          },
-          { new: true }
-        );
-      } else {
-        await new Setting({
-          appInit: true,
-        }).save();
-      }
-    } catch (ex) {
-      console.log(ex);
-    }
-
-    dbDebug("App instantiated");
-  } else {
-    dbDebug("App already instantiated");
-  }
-}
-createStartupFolders();
 
 function deleteFolderRecursive(path) {
   if (fs.existsSync(path)) {
@@ -85,23 +28,8 @@ function deleteFolderRecursive(path) {
   }
 }
 
-async function checkCreateUploadsFolder(uploadsFolder) {
-  try {
-    await fs.accessAsync(uploadsFolder);
-    return true;
-  } catch (ex) {
-    try {
-      await fs.mkdirAsync(uploadsFolder);
-      return true;
-    } catch (ex) {
-      fsDebug("Cannot create folder", ex);
-      return false;
-    }
-  }
-}
-
 router.post("/", async (req, res) => {
-  const folderExists = await checkCreateUploadsFolder(uploadsFolder);
+  const folderExists = await createUploadsDirs(uploadsFolder);
 
   if (!folderExists) {
     return res
@@ -150,6 +78,20 @@ router.post("/", async (req, res) => {
   //   fsDebug("Directory already exists.", err);
   //   res.status(500).send("Directory already exists.");
   // }
+});
+
+router.put("/:id", async (req, res) => {
+  // Update this code...
+  const folder = Folder.updateOne({ _id: 1 }, [
+    {
+      $set: {
+        lastModified: "$$NOW",
+        cancellation: { date: "$$CLUSTER_TIME", reason: "user request" },
+        status: "D",
+      },
+    },
+  ]);
+  res.send(folder);
 });
 
 router.delete("/:id", async (req, res) => {

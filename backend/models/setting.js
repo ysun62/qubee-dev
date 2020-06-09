@@ -17,22 +17,6 @@ const settingSchema = mongoose.model(
   })
 );
 
-// appInit: {
-//       type: new mongoose.Schema({
-//         name: {
-//           type: String,
-//           required: true,
-//           default: "App Init",
-//         },
-//         isInstantiation: {
-//           type: Boolean,
-//           required: true,
-//           default: false,
-//         },
-//       }),
-//       required: true,
-//     },
-
 function validateSetting(setting) {
   const schema = Joi.object({
     appInit: Joi.boolean().required(),

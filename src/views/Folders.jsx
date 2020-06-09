@@ -35,7 +35,7 @@ class Folders extends Component {
 
     const dirFiles = files.filter((file) => file.folder._id === folderId);
     const dirFolders = folders.filter(
-      (folder) => folder.folder._id === folderId
+      (folder) => folder.parents._id === folderId
     );
 
     this.setState({

@@ -9,46 +9,65 @@ const fileSchema = mongoose.model(
     name: {
       type: String,
       required: true,
-    },
-    path: {
-      type: String,
-      required: true,
+      minlength: 1,
+      maxlength: 255,
+      trim: true,
     },
     metaTags: {
       type: [String],
       min: 3,
       max: 255,
+      trim: true,
+    },
+    createdDate: {
+      type: Date,
+      required: true,
+      default: Date.now,
     },
     size: {
       type: Number,
       required: true,
     },
-    dateAdded: {
-      type: Date,
+    modifiedDate: Date,
+    parentMap: mongoose.Mixed,
+    parents: [String],
+    isRoot: {
+      type: Boolean,
       required: true,
-      default: Date.now,
+      default: false,
     },
-    folder: folderSchema,
-    accessLevel: {
+    isShared: {
+      type: Boolean,
+      required: true,
+      default: false,
+    },
+    protectedFolder: {
+      type: Boolean,
+      required: true,
+      default: false,
+    },
+    restricted: {
+      type: Boolean,
+      required: true,
+      default: false,
+    },
+    kind: {
       type: String,
       required: true,
-      default: "standard",
+      default: "FILE",
+    },
+    accessRuleIds: {
+      type: [Number],
+      required: true,
+      default: [1, 2, 3],
     },
   })
 );
 
 function validateFile(file) {
   const schema = Joi.object({
-    name: Joi.string().min(5).max(255).required(),
-    path: Joi.string().required(),
+    name: Joi.string().min(1).max(255).required(),
     metaTags: Joi.array().items(Joi.string()),
-    size: Joi.number().min(0).required(),
-    dateAdded: Joi.number().min(0).required(),
-    folders: Joi.array().items(
-      Joi.object().keys({
-        _id: Joi.string().required(),
-      })
-    ),
   });
 
   return schema.validate(file);
