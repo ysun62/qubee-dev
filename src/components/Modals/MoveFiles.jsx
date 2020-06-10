@@ -10,8 +10,8 @@ const MoveFiles = ({
   buttonIcon,
   modalClassName,
   handleMove,
-  folders,
   handleFolderSelection,
+  collection,
 }) => {
   let buttonIconClasses = "fas fa-";
 
@@ -51,7 +51,7 @@ const MoveFiles = ({
         </div>
         <div className="modal-body">
           <UploadFolderPicker
-            folders={folders}
+            collection={collection}
             handleFolderSelection={handleFolderSelection}
           />
         </div>

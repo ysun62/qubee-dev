@@ -1,18 +1,19 @@
 import React from "react";
 
-function TableHeader({ ...rest }) {
+function TableHeader({ isSelected, selectAll }) {
   return (
     <thead className="thead-light">
       <tr>
         <th scope="col" width="76">
-          <div className="custom-control custom-checkbox mb-3">
+          <div className="custom-control custom-checkbox mb-4">
             <input
               className="custom-control-input"
-              id="check-all"
+              id="checkAll"
               type="checkbox"
-              {...rest}
+              checked={isSelected}
+              onChange={selectAll}
             />
-            <label className="custom-control-label" htmlFor="check-all"></label>
+            <label className="custom-control-label" htmlFor="checkAll"></label>
           </div>
         </th>
         <th scope="col" width="50%">

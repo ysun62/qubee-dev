@@ -3,7 +3,13 @@ import TableHeader from "./TableHeader";
 import TableBody from "./TableBody";
 import { Table } from "reactstrap";
 
-function FilesBody({ collection, getFiles, isChecked, ...rest }) {
+function FilesBody({
+  collection,
+  getFiles,
+  isSelected,
+  onCheckboxChange,
+  selectAll,
+}) {
   return (
     <Table
       className="align-items-center table-flush"
@@ -11,11 +17,12 @@ function FilesBody({ collection, getFiles, isChecked, ...rest }) {
       responsive
       size="sm"
     >
-      <TableHeader {...rest} />
+      <TableHeader isSelected={isSelected} selectAll={selectAll} />
       <TableBody
         collection={collection}
         getFiles={getFiles}
-        isChecked={isChecked}
+        isSelected={isSelected}
+        onCheckboxChange={onCheckboxChange}
       />
     </Table>
   );

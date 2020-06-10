@@ -3,7 +3,13 @@ import FilesHeader from "../components/Common/FilesHeader";
 import FilesBody from "../components/Common/FilesBody";
 import { Container, Row, Col, Card } from "reactstrap";
 
-function Files({ collection, getFiles, isChecked }) {
+function Files({
+  collection,
+  getFiles,
+  selectAll,
+  isSelected,
+  onCheckboxChange,
+}) {
   return (
     <>
       <Container className="pt-7" fluid>
@@ -18,7 +24,9 @@ function Files({ collection, getFiles, isChecked }) {
               <FilesBody
                 collection={collection}
                 getFiles={getFiles}
-                isChecked={isChecked}
+                selectAll={selectAll}
+                isSelected={isSelected}
+                onCheckboxChange={onCheckboxChange}
               />
             </Card>
           </Col>

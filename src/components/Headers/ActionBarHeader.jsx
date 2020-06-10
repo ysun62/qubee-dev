@@ -6,8 +6,7 @@ function ActionBarHeader({
   handleDelete,
   handleMove,
   handleFolderSelection,
-  files,
-  folders,
+  collection,
 }) {
   return (
     <header className="action-bar fixed-top bg-secondary">
@@ -23,8 +22,7 @@ function ActionBarHeader({
               handleDelete={handleDelete}
               handleMove={handleMove}
               handleFolderSelection={handleFolderSelection}
-              files={files}
-              folders={folders}
+              collection={collection}
             />
           </Col>
         </Row>

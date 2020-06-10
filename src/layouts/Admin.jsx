@@ -25,27 +25,33 @@ import AdminNavbar from "components/Navbars/AdminNavbar";
 import AdminFooter from "components/Footers/AdminFooter";
 import ActionBarHeader from "components/Headers/ActionBarHeader";
 import Sidebar from "components/Sidebar/Sidebar";
+import Checkbox from "../components/Common/Checkbox";
 import Folders from "../views/Folders";
 import SearchResults from "../views/SearchResults";
 import Files from "../views/Files";
-
 import http from "../services/httpService";
 import config from "../config";
 import routes from "routes.js";
 
 class Admin extends Component {
-  state = {
-    display: false,
-    collection: {
-      files: [],
-      folders: [],
-      count: 0,
-      rootFolder: {},
-      sharedFolder: {},
-    },
-    selection: {},
-    selectMode: false,
-  };
+  constructor(props) {
+    super(props);
+    this.state = {
+      collection: {
+        dataCache: [],
+        count: 0,
+        rootFolder: {},
+        sharedFolder: {},
+      },
+      selection: {
+        selectionData: [],
+        deletableCount: 0,
+        editableCount: 0,
+      },
+      selectMode: true,
+      selected: false,
+    };
+  }
 
   componentDidMount() {
     document.body.classList.add("bg-default");
@@ -65,13 +71,23 @@ class Admin extends Component {
   getFiles = async () => {
     const { data: files } = await getFiles();
     const { data: folders } = await getFolders();
+    const dataCache = folders.concat(files);
+
     this.setState({
       collection: {
-        files,
-        folders,
+        dataCache: dataCache,
         count: files.length + folders.length,
         rootFolder: folders.find(({ name }) => name === "All"),
         sharedFolder: folders.find(({ name }) => name === "Shared"),
+      },
+      selection: {
+        selectionData: dataCache.reduce(
+          (options, option) => ({
+            ...options,
+            [option]: false,
+          }),
+          {}
+        ),
       },
     });
   };
@@ -131,25 +147,55 @@ class Admin extends Component {
     console.log(folder);
   };
 
-  showHideComponent(value) {
-    if (value) {
-      this.setState({
-        display: true,
-      });
-    } else {
-      this.setState({
-        display: false,
-      });
+  showHideComponent = (value) => {
+    console.log(value.target);
+    // if (value) {
+    //   this.setState({
+    //     display: true,
+    //   });
+    // } else {
+    //   this.setState({
+    //     display: false,
+    //   });
+    // }
+  };
+
+  createCheckbox = (option) => (
+    <Checkbox
+      file={option}
+      isSelected={this.state.checkboxes[option]}
+      onCheckboxChange={this.handleCheckboxChange}
+      key={option}
+    />
+  );
+
+  handleCheckboxClick = (e) => {
+    const item = e.target.id;
+    const isChecked = e.target.checked;
+    const files = this.state.collection.dataCache.filter(
+      (file) => file._id === item
+    );
+
+    if (item && isChecked) {
+      this.setState((prevState) => ({
+        selection: {
+          selectionData: prevState.selection.selectionData.add(files[0]),
+        },
+      }));
     }
-  }
+  };
+
+  // clearAllCheckboxes = () => {
+  //   const clearCheckedItems = new Map();
+  //   this.setState({ checkedItems: clearCheckedItems });
+  // };
 
   render() {
-    const { display, collection, rootFolder, sharedFolder } = this.state;
-
+    const { selectMode, collection } = this.state;
     return (
       <>
         <ToastContainer draggable={false} position="bottom-left" />
-        {display && (
+        {selectMode && (
           <ActionBarHeader
             {...this.props}
             handleDelete={this.handleDelete}
@@ -194,7 +240,8 @@ class Admin extends Component {
                   collection={collection}
                   folderId={collection.rootFolder._id}
                   getFiles={this.getFiles}
-                  isChecked={this.showHideComponent}
+                  isSelected={this.state.selection}
+                  onCheckboxChange={this.handleCheckboxClick}
                 />
               )}
             />

@@ -9,7 +9,7 @@ function FileEditActions({
   handleDelete,
   handleMove,
   handleFolderSelection,
-  ...rest // files and folders props
+  collection,
 }) {
   return (
     <Nav className="justify-content-end navbar" role="tablist">
@@ -18,7 +18,7 @@ function FileEditActions({
           buttonLabel="Share"
           buttonIcon="share-alt"
           modalClassName="modal-dialog-centered"
-          {...rest}
+          collection={collection}
         />
       </NavItem>
       {/* <NavItem>
@@ -44,7 +44,7 @@ function FileEditActions({
           modalClassName="modal-dialog"
           handleMove={handleMove}
           handleFolderSelection={handleFolderSelection}
-          {...rest}
+          collection={collection}
         />
       </NavItem>
       <NavItem>
@@ -53,7 +53,7 @@ function FileEditActions({
           buttonIcon="trash-alt"
           modalClassName="modal-dialog"
           handleDelete={handleDelete}
-          {...rest}
+          collection={collection}
         />
       </NavItem>
       <NavItem>
