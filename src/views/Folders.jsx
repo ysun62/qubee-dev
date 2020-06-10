@@ -1,7 +1,7 @@
 import React, { Component } from "react";
-import http from "../services/httpService";
 import CreateFolder from "../components/Modals/CreateFolder";
-import config from "../config";
+import { getFolders } from "../services/folderService";
+import { getFiles } from "../services/fileService";
 //import Header from "components/Headers/Header";
 import {
   Container,
@@ -15,39 +15,55 @@ import {
 } from "reactstrap";
 import { NavLink } from "react-router-dom";
 
-class Files extends Component {
+class Folders extends Component {
   state = {
     files: [],
     folders: [],
+    metaTags: [],
+    checkedItems: new Map(),
+    count: 0,
   };
 
-  async componentDidMount() {
-    const { data: files } = await http.get(config.imagesEndpoint);
-    const { data: folders } = await http.get(config.foldersEndpoint);
-    this.setState({ files, folders });
+  componentDidMount() {
+    this.getFiles();
   }
 
-  handleDelete = async (file) => {
-    const originalFiles = this.state.files;
+  getFiles = async () => {
+    const { data: files } = await getFiles();
+    const { data: folders } = await getFolders();
+    const folderId = this.props.match.params.id;
 
-    const files = this.state.files.filter((p) => p._id !== file._id);
-    this.setState({ files });
+    const dirFiles = files.filter((file) => file.folder._id === folderId);
+    const dirFolders = folders.filter(
+      (folder) => folder.parents._id === folderId
+    );
 
-    try {
-      await http.delete(`${config.apiEndpoint}/${file._id}`);
-      //throw new Error("Something went wrong!");
-    } catch (err) {
-      // Expected (404: not found, 400: bad request) - Client Errors
-      // - Display a specific error message
-      if (err.response && err.response.status === 404)
-        alert("This file has already been deleted.");
-      this.setState({ files: originalFiles });
-    }
+    this.setState({
+      files: dirFiles,
+      folders: dirFolders,
+      count: dirFiles.length + dirFolders.length,
+    });
   };
 
-  render() {
-    console.log(this.state.files);
+  // handleDelete = async (file) => {
+  //   const originalFiles = this.state.files;
 
+  //   const files = this.state.files.filter((p) => p._id !== file._id);
+  //   this.setState({ files });
+
+  //   try {
+  //     await http.delete(`${config.apiEndpoint}/${file._id}`);
+  //     //throw new Error("Something went wrong!");
+  //   } catch (err) {
+  //     // Expected (404: not found, 400: bad request) - Client Errors
+  //     // - Display a specific error message
+  //     if (err.response && err.response.status === 404)
+  //       alert("This file has already been deleted.");
+  //     this.setState({ files: originalFiles });
+  //   }
+  // };
+
+  render() {
     return (
       <>
         {/* Page content */}
@@ -59,7 +75,7 @@ class Files extends Component {
                   <Row className="align-items-center">
                     <div className="col">
                       <h3>ID - {this.props.match.params.id}</h3>
-                      <h3 className="mb-0">All 3</h3>
+                      <h3 className="mb-0">All {this.state.count}</h3>
                     </div>
                     <div className="col text-right">
                       <CreateFolder
@@ -125,12 +141,6 @@ class Files extends Component {
                               </span>
                             </NavLink>
                           </Media>
-                          {/* <Button
-                            color="danger"
-                            onClick={() => this.handleDelete(file)}
-                          >
-                            Delete
-                          </Button> */}
                         </td>
                         <td>{folder.dateAdded}</td>
                         <td></td>
@@ -158,12 +168,6 @@ class Files extends Component {
                               <span className="mb-0 text-sm">{file.name}</span>
                             </a>
                           </Media>
-                          {/* <Button
-                            color="danger"
-                            onClick={() => this.handleDelete(file)}
-                          >
-                            Delete
-                          </Button> */}
                         </td>
                         <td>{file.dateAdded}</td>
                         <td>{file.fileSize}</td>
@@ -180,4 +184,4 @@ class Files extends Component {
   }
 }
 
-export default Files;
+export default Folders;

@@ -1,9 +1,16 @@
 import React, { useState } from "react";
 import http from "../../services/httpService";
+import confid from "../../config";
 import { Button, Modal, Form, Input } from "reactstrap";
 
-const UploadFile = (props) => {
-  const { buttonLabel, buttonIcon, modalClassName } = props;
+const CreateFolder = (props) => {
+  const {
+    buttonLabel,
+    buttonIcon,
+    modalClassName,
+    collection,
+    getFiles,
+  } = props;
   let buttonIconClasses = "ni ni-";
   if (buttonIcon) buttonIconClasses += buttonIcon;
 
@@ -14,28 +21,19 @@ const UploadFile = (props) => {
 
   const handleOnChange = (e) => setInputField(e.currentTarget.value);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const formData = new FormData();
-    formData.append("folderName", inputField);
 
-    try {
-      const res = http
-        .post("http://localhost:5000/folders", formData, {})
-        .then((response) => {
-          console.log(response);
-          //this.props.history.push("/folder")
-        });
-      console.log(res);
-    } catch (err) {
-      console.log(err);
-
-      // if (err.response.status === 500) {
-      //   console.log("There was a problem with the server!");
-      // } else {
-      //   console.log(err.response.data.msg);
-      // }
-    }
+    await http
+      .post(confid.foldersEndpoint, {
+        name: inputField,
+      })
+      .then((response) => {
+        getFiles(); // Update parent component view
+        toggle(e);
+        console.log(response);
+      })
+      .catch((ex) => console.log(ex));
   };
 
   return (
@@ -61,7 +59,7 @@ const UploadFile = (props) => {
             <span aria-hidden={true}>×</span>
           </button>
         </div>
-        <Form method="POST" onSubmit={handleSubmit}>
+        <Form onSubmit={handleSubmit}>
           <div className="modal-body">
             <Input
               type="text"
@@ -77,12 +75,7 @@ const UploadFile = (props) => {
               <Button data-dismiss="modal" color="link" onClick={toggle}>
                 Cancel
               </Button>
-              <Button
-                color="primary"
-                disabled={!inputField}
-                type="submit"
-                // onClick={handleOnClick}
-              >
+              <Button color="primary" disabled={!inputField} type="submit">
                 Create
               </Button>
             </div>
@@ -93,4 +86,4 @@ const UploadFile = (props) => {
   );
 };
 
-export default UploadFile;
+export default CreateFolder;

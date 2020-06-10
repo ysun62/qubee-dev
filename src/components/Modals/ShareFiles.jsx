@@ -9,13 +9,13 @@ import {
   Card,
   CardBody,
   NavItem,
-  NavLink,
   Nav,
   TabContent,
   TabPane,
+  Input,
 } from "reactstrap";
 
-export class ShareFile extends Component {
+class ShareFiles extends Component {
   state = {
     tabs: 1,
     modal: false,
@@ -32,6 +32,10 @@ export class ShareFile extends Component {
     this.setState({
       [state]: index,
     });
+  };
+
+  handleShare = (url) => {
+    window.open(url);
   };
 
   render() {
@@ -158,26 +162,68 @@ export class ShareFile extends Component {
               <CardBody>
                 <TabContent activeTab={"tabs" + this.state.tabs}>
                   <TabPane tabId="tabs1">
-                    <Button className="w-100 bg-cyan" color="primary">
-                      Get share link
-                    </Button>
+                    {/* <Button
+											className="w-100 bg-cyan"
+											color="primary"
+										>
+											Get share link
+										</Button> */}
+                    <Input
+                      type="text"
+                      value="http://localhost:3000/uploads/History-Matters-Ray-Charles-fullhd.mp4"
+                    />
                   </TabPane>
                   <TabPane tabId="tabs2">
-                    <p className="description">
-                      Cosby sweater eu banh mi, qui irure terry richardson ex
-                      squid. Aliquip placeat salvia cillum iphone. Seitan
-                      aliquip quis cardigan american apparel, butcher voluptate
-                      nisi qui.
-                    </p>
+                    <Button
+                      className="w-100 bg-cyan"
+                      color="primary"
+                      onClick={() =>
+                        this.handleShare(
+                          "mailto:contact@c-istudios.com?subject=Check%20this%20out&body=http%3A%2F%2Flocalhost%3A3000%2Fuploads%2FHistory-Matters-Ray-Charles-fullhd.mp4"
+                        )
+                      }
+                    >
+                      Open email client
+                    </Button>
                   </TabPane>
                   <TabPane tabId="tabs3">
-                    <p className="description">
-                      Raw denim you probably haven't heard of them jean shorts
-                      Austin. Nesciunt tofu stumptown aliqua, retro synth master
-                      cleanse. Mustache cliche tempor, williamsburg carles vegan
-                      helvetica. Reprehenderit butcher retro keffiyeh
-                      dreamcatcher synth.
-                    </p>
+                    <Button
+                      className="w-100 bg-cyan"
+                      color="primary"
+                      onClick={() =>
+                        this.handleShare(
+                          "https://www.facebook.com/sharer/sharer.php?u=https://qubee.io/uploads/History-Matters-Ray-Charles-fullhd.mp4"
+                        )
+                      }
+                    >
+                      Continue on Facebook
+                    </Button>
+                  </TabPane>
+                  <TabPane tabId="tabs4">
+                    <Button
+                      className="w-100 bg-cyan"
+                      color="primary"
+                      onClick={() =>
+                        this.handleShare(
+                          "https://twitter.com/share?text=Check%20this%20out&url=http://localhost:3000/uploads/History-Matters-Ray-Charles-fullhd.mp4&hashtags=qubee,cistudios"
+                        )
+                      }
+                    >
+                      Continue on Twitter
+                    </Button>
+                  </TabPane>
+                  <TabPane tabId="tabs5">
+                    <Button
+                      className="w-100 bg-cyan"
+                      color="primary"
+                      onClick={() =>
+                        this.handleShare(
+                          "https://www.linkedin.com/shareArticle/?url=http:/qubee.io/uploads/History-Matters-Ray-Charles-fullhd.mp4&title=History%20Matters"
+                        )
+                      }
+                    >
+                      Continue on LinkedIn
+                    </Button>
                   </TabPane>
                 </TabContent>
               </CardBody>
@@ -191,22 +237,6 @@ export class ShareFile extends Component {
                   You can disable this link anytime in Shared Items.
                 </p>
               </TabPane>
-              <TabPane tabId="tabs2">
-                <p className="description">
-                  Cosby sweater eu banh mi, qui irure terry richardson ex squid.
-                  Aliquip placeat salvia cillum iphone. Seitan aliquip quis
-                  cardigan american apparel, butcher voluptate nisi qui.
-                </p>
-              </TabPane>
-              <TabPane tabId="tabs3">
-                <p className="description">
-                  Raw denim you probably haven't heard of them jean shorts
-                  Austin. Nesciunt tofu stumptown aliqua, retro synth master
-                  cleanse. Mustache cliche tempor, williamsburg carles vegan
-                  helvetica. Reprehenderit butcher retro keffiyeh dreamcatcher
-                  synth.
-                </p>
-              </TabPane>
             </TabContent>
           </ModalFooter>
         </Modal>
@@ -215,4 +245,4 @@ export class ShareFile extends Component {
   }
 }
 
-export default ShareFile;
+export default ShareFiles;
