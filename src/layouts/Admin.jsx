@@ -68,6 +68,7 @@ class Admin extends Component {
     this.refs.mainContent.scrollTop = 0;
   }
 
+  // TODO: Count should display the number of files withing a folder.
   getFiles = async () => {
     const { data: files } = await getFiles();
     const { data: folders } = await getFolders();
