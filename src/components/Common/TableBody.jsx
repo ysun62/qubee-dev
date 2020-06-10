@@ -1,18 +1,15 @@
 import React, { useState, useEffect } from "react";
-import Tags from "./Tags";
-import fileSizeConversion from "../../utils/fileSizeConversion";
 import { Media } from "reactstrap";
 import { Link } from "react-router-dom";
 
 function TableBody({ collection, getFiles, isSelected, onCheckboxChange }) {
-  const [folderId, setFolderId] = useState("");
-  const [checkboxes, setCheckboxes] = useState([]);
-  const [files, setFiles] = useState([]);
-  const [folders, setFolders] = useState([]);
+  //const [folderId, setFolderId] = useState("");
+  //const [checkboxes, setCheckboxes] = useState([]);
+  const [allFiles, setAllFiles] = useState([]);
 
   useEffect(() => {
-    setFolderId(collection.rootFolder._id);
-    setFiles(
+    //setFolderId(collection.rootFolder._id);
+    setAllFiles(
       collection.dataCache.filter(
         (file) => file.parents[0] === collection.rootFolder._id
       )
@@ -21,8 +18,8 @@ function TableBody({ collection, getFiles, isSelected, onCheckboxChange }) {
 
   return (
     <tbody>
-      {files &&
-        files.map((file) => (
+      {allFiles &&
+        allFiles.map((file) => (
           <tr key={file._id}>
             <th scope="row">
               <div className="custom-control custom-checkbox mb-4">
