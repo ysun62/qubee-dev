@@ -1,6 +1,7 @@
 .vscode
+.env
 node_modules/
 uploads/
 shared/
 tmp/
-.env*
+build/
