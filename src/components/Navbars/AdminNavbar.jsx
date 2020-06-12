@@ -16,7 +16,8 @@
 
 */
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, Redirect } from "react-router-dom";
+import { toast } from "react-toastify";
 import http from "../../services/httpService";
 
 // reactstrap components
@@ -38,43 +39,41 @@ import {
 } from "reactstrap";
 
 class AdminNavbar extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      inputField: "",
-      searchResults: {},
-      loading: false,
-      message: "",
-    };
-
-    this.handleChange = this.handleChange.bind(this);
-    this.handleSubmit = this.handleSubmit.bind(this);
-    this.displaySearch = this.displaySearch.bind(this);
-  }
+  state = {
+    inputField: "",
+    term: "",
+    results: [],
+    loading: false,
+    message: "",
+    redirect: false,
+  };
 
   handleChange = (e) => {
-    const term = e.currentTarget.value;
-    this.setState({ inputField: term, message: "" });
+    this.setState({ redirect: false, term: e.target.value });
   };
 
   handleSubmit = async (e) => {
     e.preventDefault();
 
-    this.setState({ redirect: true });
+    const numberOfChar = [...this.state.term];
 
-    // try {
-    //   const response = await http.get("http://localhost:5000/api/searches", {
-    //     params: { searchTerm: term},
-    //   });
-    //   this.setState({ searchResults: response.data });
-    //   this.displaySearch();
-    // } catch (error) {
-    //   console.log("There was a error", error);
-    // }
-  };
+    let url = `http://localhost:5000/api/searches?s=${encodeURI(
+      this.state.term
+    )}`;
 
-  displaySearch = () => {
-    console.log(this.state.searchResults);
+    if (numberOfChar.length >= 3) {
+      await http
+        .get(url)
+        .then((response) => {
+          this.setState({ redirect: true, results: response.data });
+          console.log(response.data);
+        })
+        .catch((error) => {
+          console.error("There was an error:", error);
+        });
+    } else {
+      toast.warn("At least 3 charaters required to search.");
+    }
   };
 
   render() {
@@ -101,15 +100,23 @@ class AdminNavbar extends React.Component {
                   </InputGroupAddon>
                   <Input
                     placeholder="Search"
-                    name="search"
-                    id="search"
+                    name="s"
+                    id="s"
                     type="search"
-                    value={this.state.inputField}
+                    value={this.state.term}
                     onChange={this.handleChange}
                   />
                 </InputGroup>
               </FormGroup>
             </Form>
+            {this.state.redirect && (
+              <Redirect
+                to={{
+                  pathname: `/admin/search/${this.state.term}`,
+                  state: { results: this.state.results },
+                }}
+              />
+            )}
             <Nav className="align-items-center d-none d-md-flex" navbar>
               <UncontrolledDropdown nav>
                 <DropdownToggle className="pr-0" nav>

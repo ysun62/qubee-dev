@@ -1,7 +1,8 @@
 import React, { Component } from "react";
 import http from "../services/httpService";
-import CreateFolder from "../components/Modals/CreateFolder";
 import config from "../config";
+import fileSizeConversion from "../utils/fileSizeConversion";
+import FilesHeader from "../components/Common/FilesHeader";
 import {
   Container,
   Row,
@@ -9,34 +10,35 @@ import {
   Table,
   Col,
   Card,
-  CardHeader,
+  CardTitle,
+  CardBody,
+  CardText,
 } from "reactstrap";
-import { NavLink } from "react-router-dom";
 
-export class SearchResults extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      files: [],
-      folders: [],
-    };
+class SearchResults extends Component {
+  state = {
+    results: [],
+    count: 0,
+  };
+
+  componentDidMount() {
+    this.displayResults();
   }
 
-  async componentDidMount() {
-    const { data: files } = await http.get(config.imagesEndpoint);
-    const { data: folders } = await http.get(config.foldersEndpoint);
-    this.setState({ files, folders });
+  componentDidUpdate(prevProps) {
+    if (
+      this.props.location.state.results !== prevProps.location.state.results
+    ) {
+      this.displayResults();
+    }
   }
 
-  handleSearch = async () => {
-    try {
-      const response = await http.get("http://localhost:5000/api/searches", {
-        params: { q: this.state.inputField },
-      });
-      this.setState({ searchResults: response.data });
-      this.displaySearch();
-    } catch (error) {
-      console.log("There was a error", error);
+  displayResults = () => {
+    const props = this.props.location.state.results;
+    if (props) {
+      this.setState({ results: props, count: props.length });
+    } else {
+      this.setState({ results: [] });
     }
   };
 
@@ -59,6 +61,80 @@ export class SearchResults extends Component {
   };
 
   render() {
+    const hasResults = this.state.results.length > 0;
+    let SearchResultsView;
+    if (hasResults) {
+      SearchResultsView = (
+        <Table
+          className="align-items-center table-flush"
+          hover
+          responsive
+          size="sm"
+        >
+          <thead className="thead-light">
+            <tr>
+              <th scope="col" width="76">
+                <div className="custom-control custom-checkbox mb-3">
+                  <input
+                    className="custom-control-input"
+                    id="check-all"
+                    type="checkbox"
+                  />
+                  <label
+                    className="custom-control-label"
+                    htmlFor="check-all"
+                  ></label>
+                </div>
+              </th>
+              <th scope="col" width="50%">
+                File Name
+              </th>
+              <th scope="col">Date Added</th>
+              <th scope="col">Size</th>
+            </tr>
+          </thead>
+          <tbody>
+            {this.state.results.map((result) => (
+              <tr key={result._id}>
+                <th scope="row">
+                  <div className="custom-control custom-checkbox mb-4">
+                    <input
+                      className="custom-control-input"
+                      id={result._id}
+                      type="checkbox"
+                    />
+                    <label
+                      className="custom-control-label"
+                      htmlFor={result._id}
+                    ></label>
+                  </div>
+                </th>
+                <td>
+                  <Media className="align-items-center mb-2">
+                    <a href={result.path} target="blank">
+                      <i className="fas fa-file-image mr-2" />
+                      <span className="mb-0 text-sm">{result.name}</span>
+                    </a>
+                  </Media>
+                </td>
+                <td>{result.dateAdded}</td>
+                <td>{fileSizeConversion(result.size, true)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </Table>
+      );
+    } else {
+      SearchResultsView = (
+        <CardBody>
+          <CardText style={{ textAlign: "center" }}>
+            <strong>No results found</strong>
+            <br />
+            Please try again.
+          </CardText>
+        </CardBody>
+      );
+    }
     return (
       <>
         {/* Page content */}
@@ -66,122 +142,11 @@ export class SearchResults extends Component {
           <Row className="">
             <Col className="mb-5 mb-xl-0" xl="12">
               <Card className="shadow file-manager">
-                <CardHeader className="border-0">
-                  <Row className="align-items-center">
-                    <div className="col">
-                      <h3>ID - {this.props.match.params.id}</h3>
-                      <h3 className="mb-0">All 3</h3>
-                    </div>
-                    <div className="col text-right">
-                      <CreateFolder
-                        buttonLabel="Create new folder"
-                        modalClassName="modal-dialog"
-                      />
-                    </div>
-                  </Row>
-                </CardHeader>
-                <Table
-                  className="align-items-center table-flush"
-                  hover
-                  responsive
-                  size="sm"
-                >
-                  <thead className="thead-light">
-                    <tr>
-                      <th scope="col" width="76">
-                        <div className="custom-control custom-checkbox mb-3">
-                          <input
-                            className="custom-control-input"
-                            id="check-all"
-                            type="checkbox"
-                          />
-                          <label
-                            className="custom-control-label"
-                            htmlFor="check-all"
-                          ></label>
-                        </div>
-                      </th>
-                      <th scope="col" width="50%">
-                        File Name
-                      </th>
-                      <th scope="col">Date Added</th>
-                      <th scope="col">Size</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {this.state.folders.map((folder) => (
-                      <tr key={folder._id}>
-                        <th scope="row">
-                          <div className="custom-control custom-checkbox mb-4">
-                            <input
-                              className="custom-control-input"
-                              id={folder._id}
-                              type="checkbox"
-                            />
-                            <label
-                              className="custom-control-label"
-                              htmlFor={folder._id}
-                            ></label>
-                          </div>
-                        </th>
-                        <td>
-                          <Media className="align-items-center">
-                            <NavLink
-                              className=""
-                              to={`/${folder.folderRelativePath}`}
-                            >
-                              <i className="ni ni-folder-17 mr-3"></i>
-                              <span className="mb-0 text-sm">
-                                {folder.name}
-                              </span>
-                            </NavLink>
-                          </Media>
-                          {/* <Button
-                            color="danger"
-                            onClick={() => this.handleDelete(file)}
-                          >
-                            Delete
-                          </Button> */}
-                        </td>
-                        <td>{folder.dateAdded}</td>
-                        <td></td>
-                      </tr>
-                    ))}
-                    {this.state.files.map((file) => (
-                      <tr key={file._id}>
-                        <th scope="row">
-                          <div className="custom-control custom-checkbox mb-4">
-                            <input
-                              className="custom-control-input"
-                              id={file._id}
-                              type="checkbox"
-                            />
-                            <label
-                              className="custom-control-label"
-                              htmlFor={file._id}
-                            ></label>
-                          </div>
-                        </th>
-                        <td>
-                          <Media className="align-items-center">
-                            <a href={file.fileUrl} target="blank">
-                              <i className="ni ni-image mr-3"></i>
-                              <span className="mb-0 text-sm">{file.name}</span>
-                            </a>
-                          </Media>
-                          {/* <Button
-                            color="danger"
-                            onClick={() => this.handleDelete(file)}
-                          >
-                            Delete
-                          </Button> */}
-                        </td>
-                        <td>{file.dateAdded}</td>
-                        <td>{file.fileSize}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </Table>
+                <FilesHeader
+                  count={this.state.count}
+                  createFolderButton={false}
+                />
+                {SearchResultsView}
               </Card>
             </Col>
           </Row>

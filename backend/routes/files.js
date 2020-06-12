@@ -1,258 +1,185 @@
 const Promise = require("bluebird");
 const express = require("express");
-const { IncomingForm } = require("formidable");
-const fs = Promise.promisifyAll(require("fs"));
-const util = require("util");
-const { join } = require("path");
-const mongoose = require("mongoose");
+const fsDebug = require("debug")("app:fs");
+const dbDebug = require("debug")("app:db");
+const debug = require("debug")("app:debug");
+const multer = require("multer");
 const moment = require("moment");
+const MyCustomStorage = require("../utils/customStorage");
+const fs = Promise.promisifyAll(require("fs"));
+const path = require("path");
+const mongoose = require("mongoose");
+const mimeTypes = require("../utils/mimetypes");
 const { v4: uuidv4 } = require("uuid");
 const router = express.Router();
-const File = require("../models/file");
-const Folder = require("../models/folder");
-const mimeTypes = [
-  // Images
-  "png",
-  "jpeg",
-  "gif",
-  "bmp",
-  "x-windows-bmp",
-  "tiff",
-  "x-icon",
-  "svg+xml",
-  "webp",
-  // Videos
-  "3gpp",
-  "3gpp2",
-  "mov",
-  "mp4",
-  "x-troff-msvideo",
-  "avi",
-  "msvideo",
-  "x-msvideo",
-  "quicktime",
-  "mpeg",
-  "x-mpeg",
-  "webm",
-  // Audio
-  "aac",
-  "aiff",
-  "x-aiff",
-  "x-midi",
-  "ogg",
-  "mpeg3",
-  "x-mpeg-3",
-  "wav",
-  // Documents
-  "postscript",
-  "pdf",
-  "octet-stream",
-  "vnd.adobe.photoshop",
-  "msword",
-  "vnd.openxmlformats-officedocument.wordprocessingml.document",
-  "vnd.ms-fontobject",
-  "vnd.openxmlformats-officedocument.presentationml.presentation",
-  "vnd.ms-powerpoint",
-  "vnd.visio",
-  "rtf",
-  "x-rtf",
-  "richtext",
-  "plain",
-  "vnd.ms-excel",
-  "vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-  "xml",
-  "html",
-  "css",
-  "csv",
-  "json",
-  "epub+zip",
-  "otf",
-  "ttf",
-  "woff",
-  "woff2",
-  // Compresses
-  "zip",
-  "x-tar",
-  "x-zip",
-  "x-gzip",
-  "x-bzip",
-  "x-bzip2",
-  "x-rar-compressed",
-  "x-7z-compressed",
-];
+const { File, fileBasePath, validate } = require("../models/file");
+const { Folder } = require("../models/folder");
+
+const tempDir = path.join(__dirname, "../public", "uploads/");
+
+// const storage = multer.diskStorage({
+//   destination: function (req, file, cb) {
+//     cb(null, tempDir);
+//   },
+//   filename: function (req, file, cb) {
+//     cb(
+//       null,
+//       Date.now() + "-" + file.originalname.toLowerCase().split(" ").join("-")
+//     );
+//   },
+// });
+
+const storage = MyCustomStorage({
+  destination: function (req, file, cb) {
+    cb(
+      null,
+      tempDir +
+        Date.now() +
+        "-" +
+        file.originalname.toLowerCase().split(" ").join("-")
+    );
+  },
+});
+
+const fileFilter = (req, file, cb) => {
+  if (mimeTypes.indexOf(file.mimetype) !== -1) {
+    cb(null, true);
+  } else {
+    req.fileValidationError = "The file type is invalid.";
+    return cb(new Error("The file type is invalid."), false);
+  }
+};
+
+const upload = multer({
+  storage,
+  fileFilter,
+  limits: {
+    fileSize: 1024 * 1024 * 5120,
+  },
+});
 
 // Returns true or false if it was successfull or not
 async function checkCreateUploadsFolder(uploadsFolder) {
+  const rootDirectory = Boolean(await Folder.findOne({ name: "Files" }));
+  const folder = new Folder({
+    name: "Files",
+    slug: "files",
+    rootDirectory: true,
+  });
+
+  dbDebug("Root dir exist:", rootDirectory);
+
   try {
-    await fs.statAsync(uploadsFolder);
-  } catch (err) {
-    if (err && err.code === "ENOENT") {
-      try {
-        await fs.mkdirAsync(uploadsFolder);
-      } catch (err) {
-        console.error("Error creating the uploads folder", err);
-        return false;
+    await fs.accessAsync(uploadsFolder);
+    if (!rootDirectory) {
+      await folder.save();
+      return true;
+    }
+    return true;
+  } catch (ex) {
+    try {
+      await fs.mkdirAsync(uploadsFolder);
+      if (!rootDirectory) {
+        await folder.save();
+        return true;
       }
-    } else {
-      console.log("Error reading the uploads folder");
+      return true;
+    } catch (ex) {
+      fsDebug("Cannot create folder", ex);
       return false;
     }
   }
-  return true;
 }
 
-// Returns true or false in case it was successful
-function checkFileType(file) {
-  const type = file.type.split("/").pop();
-  if (mimeTypes.indexOf(type) === -1) {
-    console.log("The file type is invalid.");
-    return false;
-  }
-  return true;
-}
-
-router.post("/", async (req, res, next) => {
-  const uploadsFolder = join(__dirname, "../../public", "uploads");
-  const form = new IncomingForm({
-    multiples: true,
-    uploadDir: uploadsFolder,
-    keepExtensions: true,
-  });
+router.post("/", upload.array("mediaFiles", 10), async (req, res, next) => {
+  const uploadsFolder = path.join(__dirname, fileBasePath);
+  const selectedFiles = req.files;
   const folderExists = await checkCreateUploadsFolder(uploadsFolder);
-  const files = [];
-  const fields = [];
+
+  debug(folderExists);
 
   if (!folderExists) {
-    return res.json({
-      ok: false,
-      msg: "There was an error creating the uploads folder.",
-    });
+    const error = new Error("There was an error creating the uploads folder.");
+    return res.status(400).send(error);
   }
 
-  form
-    .on("field", async (fieldName, value) => {
-      value.toLowerCase().split(/[ ,]+/);
-      console.log({ fieldName, value });
-      fields.push({ fieldName, value });
-    })
-    .on("file", async (fieldName, file) => {
-      const fileName =
-        uuidv4() + "-" + file.name.toLowerCase().split(" ").join("-");
-      console.log({ file, fileName });
-      const isValidFile = checkFileType(file);
+  debug(selectedFiles);
 
-      if (!isValidFile) {
-        try {
-          await fs.unlinkAsync(file.path);
-        } catch (err) {
-          console.log("The file was deleted.", err);
-        }
-      }
+  for (let selectedFile of selectedFiles) {
+    const filename = selectedFile.originalname
+      .toLowerCase()
+      .split(" ")
+      .join("-");
+    const parentDirectory =
+      (await Folder.findById(req.body.folderId)) ||
+      (await Folder.findOne({ name: "Files" }).select("_id name slug"));
 
-      files.push({ fieldName, file });
+    debug(parentDirectory);
 
-      try {
-        await fs.renameAsync(file.path, join(uploadsFolder, fileName));
-        const selectedFile = new File({
-          fileName: file.name,
-          filePath: `/uploads/${fileName}`,
-          fileSize: file.size,
-        });
-        await selectedFile.save();
-      } catch (err) {
-        console.log(
-          "The file upload failed, trying to remove the temp file..."
-        );
-      }
-    })
-    .on("end", () => {
-      console.log("-> upload done");
-      // res.writeHead(200, { "content-type": "text/plain" });
-      // res.write(`received fields:\n\n${util.inspect(fields)}`);
-      // res.write("\n\n");
-      // res.end(`received files:\n\n${util.inspect(files)}`);
+    if (!parentDirectory) {
+      return res.status(400).send("Invalid folder.");
+    }
+
+    const file = new File({
+      name: selectedFile.originalname,
+      slug: selectedFile.originalname.replace(/\s+/g, "-").toLowerCase(),
+      path: new mongoose.Types.ObjectId(),
+      size: selectedFile.size,
+      folder: {
+        _id: parentDirectory._id,
+        name: parentDirectory.name,
+        slug: parentDirectory.slug,
+      },
     });
 
-  form.parse(req);
+    try {
+      await fs.accessAsync(path.join(uploadsFolder, filename));
+      fsDebug("The file already exist.");
+      res.status(400).send("The file already exist.");
+    } catch (ex) {
+      try {
+        await fs.renameAsync(
+          selectedFile.path,
+          path.join(uploadsFolder, filename)
+        );
+        fsDebug("The file moved successfully.");
+        try {
+          await file.save();
+          dbDebug("Document saved successfully in MongoDB.", file);
+          res.send(file);
+        } catch (ex) {
+          dbDebug("Could not save document to MongoDB.", ex);
+          res.status(500).send("Could not save document to MongoDB.");
+        }
+      } catch (ex) {
+        fsDebug("Could not move file to location.", ex);
+        res.status(500).send("Could not move file to location.");
+      }
+    }
+  }
+});
 
-  // form.parse(req, async (err, fields, files) => {
-  //   let myUploadedFiles = [];
+router.put("/:id", async (req, res) => {
+  // const { error } = validate(req.body);
+  // if (error) return res.status(400).send(error.details[0].message);
 
-  //   if (err) {
-  //     console.log("Error parsing the files", err);
-  //     return res.json({
-  //       ok: false,
-  //       msg: "Error parsing the files.",
-  //     });
-  //   }
+  console.log(req.body.metaTags);
 
-  //   if (!files.mediaFiles.length) {
-  //     // There's only one file
-  //     const file = files.mediaFiles;
-  //     const isValidFile = checkFileType(file);
-  //     const fileName = encodeURIComponent(file.name.replace(/&. *;+/g, "-"));
+  // const folder = await Folder.findById(req.body.folderId);
+  // if (!folder) return res.status(400).send("Invalid folder.");
 
-  //     if (!isValidFile) {
-  //       return res.json({
-  //         ok: false,
-  //         msg: "The file received is an invalid type.",
-  //       });
-  //     }
+  const file = await File.findByIdAndUpdate(
+    req.params.id,
+    {
+      $set: req.body,
+    },
+    { new: true }
+  );
 
-  //     try {
-  //       await fs.renameAsync(file.path, join(uploadsFolder, fileName));
-  //     } catch (err) {
-  //       console.log(
-  //         "The file upload failed, trying to remove the temp file..."
-  //       );
-  //       try {
-  //         await fs.unlinkAsync(file.path);
-  //       } catch (err) {
-  //         console.log("The file was deleted.", err);
-  //       }
-  //       return res.json({
-  //         ok: false,
-  //         msg: "The file was not uploaded.",
-  //       });
-  //     }
-  //     myUploadedFiles.push(fileName);
-  //   } else {
-  //     // There are multiple files
-  //     for (let i = 0; i < files.mediaFiles.length; i++) {
-  //       const file = files.mediaFiles[i];
-  //       const isValidFile = checkFileType(file);
-  //       const fileName = encodeURIComponent(file.name.replace(/&. *;+/g, "-"));
+  if (!file)
+    return res.status(404).send("The movie with the given ID was not found");
 
-  //       if (!isValidFile) {
-  //         return res.json({
-  //           ok: false,
-  //           msg: "The file received is an invalid type.",
-  //         });
-  //       }
-
-  //       try {
-  //         await fs.renameAsync(file.path, join(uploadsFolder, fileName));
-  //       } catch (err) {
-  //         console.log(
-  //           "The file upload failed, trying to remove the temp file..."
-  //         );
-  //         try {
-  //           await fs.unlinkAsync(file.path);
-  //         } catch (err) {}
-  //         return res.json({
-  //           ok: false,
-  //           msg: "The file was not uploaded.",
-  //         });
-  //       }
-  //       myUploadedFiles.push(fileName);
-  //     }
-  //   }
-  //   return res.json({
-  //     ok: true,
-  //     msg: "The files was uploaded successfully.",
-  //     files: myUploadedFiles,
-  //   });
-  // });
+  res.send(file);
 });
 
 router.get("/", async (req, res) => {
@@ -260,14 +187,25 @@ router.get("/", async (req, res) => {
   res.send(files);
 });
 
-router.delete("/:id", async (req, res) => {
-  const file = await File.findByIdAndRemove(req.params.id);
-  //const file = await File.deleteOne({ params: req.params.id });
+router.get("/:id", async (req, res) => {
+  const file = await File.findById(req.params.id);
 
   if (!file)
     return res.status(404).send("The movie with the given ID was not found.");
 
   res.send(file);
+});
+
+router.delete("/:id", async (req, res) => {
+  console.log(req);
+
+  //const file = await File.findByIdAndRemove(req.params.id);
+  //const file = await File.deleteOne({ params: req.params.id });
+
+  // if (!file)
+  //   return res.status(404).send("The movie with the given ID was not found.");
+
+  // res.send(file);
 });
 
 module.exports = router;

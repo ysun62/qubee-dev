@@ -1,14 +1,18 @@
 import React, { useState } from "react";
 import { toast } from "react-toastify";
-import { FilePond, registerPlugin } from "react-filepond";
 import { Button, Modal } from "reactstrap";
 import config from "../../config";
+import UploadFolderPicker from "../Common/UploadFolderPicker";
 import "react-toastify/dist/ReactToastify.css";
-import "filepond/dist/filepond.min.css";
 
-registerPlugin();
-
-const UploadFile = ({ buttonLabel, buttonIcon, modalClassName, getFiles }) => {
+const MoveFiles = ({
+  buttonLabel,
+  buttonIcon,
+  modalClassName,
+  handleMove,
+  handleFolderSelection,
+  collection,
+}) => {
   let buttonIconClasses = "fas fa-";
 
   if (buttonIcon) buttonIconClasses += buttonIcon;
@@ -17,38 +21,23 @@ const UploadFile = ({ buttonLabel, buttonIcon, modalClassName, getFiles }) => {
 
   const toggle = () => setModal(!modal);
 
-  const handleOnError = (error, file, status) => {
-    console.log(error, file, status);
-  };
-
   const handleProcessedFiles = () => {
-    getFiles();
+    handleMove();
     toggle();
   };
 
   return (
-    <div className="file-upload-component">
-      <Button
-        block
-        className="mb-3 bg-gradient-cyan"
-        color="default"
-        type="button"
-        onClick={toggle}
-      >
+    <>
+      <Button block color="link" type="button" onClick={toggle}>
         <span className="btn-inner--icon">
           <i className={buttonIconClasses} />
         </span>
         <span className="btn-inner--text">{buttonLabel}</span>
       </Button>
-      <Modal
-        className={modalClassName}
-        isOpen={modal}
-        toggle={toggle}
-        backdrop="static"
-      >
+      <Modal className={modalClassName} isOpen={modal} toggle={toggle}>
         <div className="modal-header">
           <h5 className="modal-title" id="modal-title-default">
-            File uploader
+            Move
           </h5>
           <button
             aria-label="Close"
@@ -61,21 +50,28 @@ const UploadFile = ({ buttonLabel, buttonIcon, modalClassName, getFiles }) => {
           </button>
         </div>
         <div className="modal-body">
-          <FilePond
-            //ref={(ref) => (pond = ref)}
-            allowMultiple={true}
-            name={"mediaFiles"}
-            onerror={(error, file, status) =>
-              handleOnError(error, file, status)
-            }
-            onprocessfiles={handleProcessedFiles}
-            maxFiles={10}
-            server={config.filesEndpoint}
-          ></FilePond>
+          <UploadFolderPicker
+            collection={collection}
+            handleFolderSelection={handleFolderSelection}
+          />
+        </div>
+        <div className="modal-footer">
+          <div className="text-center">
+            <Button data-dismiss="modal" color="link" onClick={toggle}>
+              Cancel
+            </Button>
+            <Button
+              color="primary"
+              type="submit"
+              onClick={handleProcessedFiles}
+            >
+              Move to Foldername
+            </Button>
+          </div>
         </div>
       </Modal>
-    </div>
+    </>
   );
 };
 
-export default UploadFile;
+export default MoveFiles;

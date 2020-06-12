@@ -1,4 +1,6 @@
 {
-	"filesEndpoint": "http://localhost:5000/api/files",
-	"foldersEndpoint": "http://localhost:5000/api/folders"
+  "filesEndpoint": "http://localhost:5000/api/files",
+  "foldersEndpoint": "http://localhost:5000/api/folders",
+  "searchesEndpoint": "http://localhost:5000/api/searches",
+  "deletesEndpoint": "http://localhost:5000/api/deletes"
 }
