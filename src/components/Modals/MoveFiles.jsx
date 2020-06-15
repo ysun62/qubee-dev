@@ -1,7 +1,5 @@
 import React, { useState } from "react";
-import { toast } from "react-toastify";
 import { Button, Modal } from "reactstrap";
-import config from "../../config";
 import UploadFolderPicker from "../Common/UploadFolderPicker";
 import "react-toastify/dist/ReactToastify.css";
 

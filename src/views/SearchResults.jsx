@@ -1,6 +1,5 @@
 import React, { Component } from "react";
-import http from "../services/httpService";
-import config from "../config";
+import { deleteFile } from "../services/fileService";
 import fileSizeConversion from "../utils/fileSizeConversion";
 import FilesHeader from "../components/Common/FilesHeader";
 import {
@@ -10,7 +9,6 @@ import {
   Table,
   Col,
   Card,
-  CardTitle,
   CardBody,
   CardText,
 } from "reactstrap";
@@ -49,7 +47,7 @@ class SearchResults extends Component {
     this.setState({ files });
 
     try {
-      await http.delete(`${config.apiEndpoint}/${file._id}`);
+      await deleteFile(file._id);
       //throw new Error("Something went wrong!");
     } catch (err) {
       // Expected (404: not found, 400: bad request) - Client Errors

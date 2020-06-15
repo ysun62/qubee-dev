@@ -1,8 +1,6 @@
 import React, { useState } from "react";
-import { toast } from "react-toastify";
 import { FilePond, registerPlugin } from "react-filepond";
 import { Button, Modal } from "reactstrap";
-import config from "../../config";
 import "react-toastify/dist/ReactToastify.css";
 import "filepond/dist/filepond.min.css";
 
@@ -64,7 +62,7 @@ const UploadFile = ({ buttonLabel, buttonIcon, modalClassName, getFiles }) => {
             }
             onprocessfiles={handleProcessedFiles}
             maxFiles={10}
-            server={config.filesEndpoint}
+            server={process.env.REACT_APP_API_URL + "/files"}
           ></FilePond>
         </div>
       </Modal>

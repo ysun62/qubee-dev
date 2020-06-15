@@ -1,6 +1,4 @@
 import React, { useState } from "react";
-//import http from "../../services/httpService";
-//import confid from "../../config";
 import { Button, Modal } from "reactstrap";
 
 const DeleteFiles = ({

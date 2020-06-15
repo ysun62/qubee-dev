@@ -1,16 +1,9 @@
 import React, { useState } from "react";
-import http from "../../services/httpService";
-import confid from "../../config";
+import { saveFolder } from "../../services/folderService";
 import { Button, Modal, Form, Input } from "reactstrap";
 
 const CreateFolder = (props) => {
-  const {
-    buttonLabel,
-    buttonIcon,
-    modalClassName,
-    collection,
-    getFiles,
-  } = props;
+  const { buttonLabel, buttonIcon, modalClassName, getFiles } = props;
   let buttonIconClasses = "ni ni-";
   if (buttonIcon) buttonIconClasses += buttonIcon;
 
@@ -24,10 +17,11 @@ const CreateFolder = (props) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    await http
-      .post(confid.foldersEndpoint, {
-        name: inputField,
-      })
+    const folderName = {
+      name: inputField,
+    };
+
+    await saveFolder(folderName)
       .then((response) => {
         getFiles(); // Update parent component view
         toggle(e);
