@@ -26,10 +26,10 @@ import {
   Container,
   Row,
   Col,
-  UncontrolledTooltip
+  UncontrolledTooltip,
 } from "reactstrap";
 // core components
-import Header from "components/Headers/Header";
+import Header from "../../components/Headers/Header";
 
 class Icons extends React.Component {
   state = {};

@@ -1,9 +1,9 @@
 import React from "react";
-import classnames from "classnames";
-import ShareFiles from "components/Modals/ShareFiles";
-import DeleteFiles from "components/Modals/DeleteFiles";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import ShareFiles from "../Modals/ShareFiles";
+import DeleteFiles from "../Modals/DeleteFiles";
 import MoveFiles from "../Modals/MoveFiles";
-import { Container, NavItem, NavLink, Nav, Button, Row, Col } from "reactstrap";
+import { NavItem, Nav, Button } from "reactstrap";
 
 function FileEditActions({
   handleDelete,
@@ -16,7 +16,7 @@ function FileEditActions({
       <NavItem>
         <ShareFiles
           buttonLabel="Share"
-          buttonIcon="share-alt"
+          buttonIcon={<FontAwesomeIcon icon="share-alt" />}
           modalClassName="modal-dialog-centered"
           collection={collection}
         />
@@ -40,7 +40,7 @@ function FileEditActions({
       <NavItem>
         <MoveFiles
           buttonLabel="Move"
-          buttonIcon="file-export"
+          buttonIcon={<FontAwesomeIcon icon="file-export" />}
           modalClassName="modal-dialog"
           handleMove={handleMove}
           handleFolderSelection={handleFolderSelection}
@@ -50,7 +50,7 @@ function FileEditActions({
       <NavItem>
         <DeleteFiles
           buttonLabel="Delete"
-          buttonIcon="trash-alt"
+          buttonIcon={<FontAwesomeIcon icon="trash-alt" />}
           modalClassName="modal-dialog"
           handleDelete={handleDelete}
           collection={collection}

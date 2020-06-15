@@ -1,5 +1,5 @@
 import React from "react";
-import FileEditActions from "components/Common/FileEditActions";
+import FileEditActions from "../Common/FileEditActions";
 import { Container, NavItem, NavLink, Nav, Button, Row, Col } from "reactstrap";
 
 function ActionBarHeader({

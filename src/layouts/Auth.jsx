@@ -21,10 +21,10 @@ import { Route, Switch, Redirect } from "react-router-dom";
 import { Container, Row, Col } from "reactstrap";
 
 // core components
-import AuthNavbar from "components/Navbars/AuthNavbar";
-import AuthFooter from "components/Footers/AuthFooter";
+import AuthNavbar from "../components/Navbars/AuthNavbar";
+import AuthFooter from "../components/Footers/AuthFooter";
 
-import routes from "routes.js";
+import routes from "../routes.js";
 
 class Auth extends React.Component {
   componentDidMount() {
@@ -33,7 +33,7 @@ class Auth extends React.Component {
   componentWillUnmount() {
     document.body.classList.remove("bg-default");
   }
-  getRoutes = routes => {
+  getRoutes = (routes) => {
     return routes.map((prop, key) => {
       if (prop.layout === "/auth") {
         return (

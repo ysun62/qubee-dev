@@ -16,11 +16,6 @@ function TableBody({ collection, getFiles, isSelected, onCheckboxChange }) {
     );
   }, [collection.dataCache, collection.files, collection.rootFolder._id]);
 
-  handleIsSelected() {
-    Object.keys(this.state.checkboxes)
-      .filter(checkbox => this.state.checkboxes[checkbox])
-  }
-
   return (
     <tbody>
       {allFiles &&

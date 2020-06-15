@@ -17,24 +17,16 @@
 */
 /*eslint-disable*/
 import React from "react";
-import UploadFile from "components/Modals/UploadFile";
+import UploadFile from "../Modals/UploadFile";
 import { NavLink as NavLinkRRD, Link } from "react-router-dom";
-// nodejs library to set properties for components
 import { PropTypes } from "prop-types";
-
-// reactstrap components
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  Button,
-  Card,
-  CardHeader,
-  CardBody,
-  CardTitle,
   Collapse,
   DropdownMenu,
   DropdownItem,
   UncontrolledDropdown,
   DropdownToggle,
-  FormGroup,
   Form,
   Input,
   InputGroupAddon,
@@ -46,14 +38,10 @@ import {
   NavItem,
   NavLink,
   Nav,
-  Progress,
-  Table,
   Container,
   Row,
   Col,
 } from "reactstrap";
-
-var ps;
 
 class Sidebar extends React.Component {
   state = {
@@ -161,7 +149,7 @@ class Sidebar extends React.Component {
                   <span className="avatar avatar-sm rounded-circle">
                     <img
                       alt="..."
-                      src={require("assets/img/theme/team-1-800x800.jpg")}
+                      src={require("../../assets/img/theme/team-1-800x800.jpg")}
                     />
                   </span>
                 </Media>
@@ -243,7 +231,7 @@ class Sidebar extends React.Component {
             {/* Navigation */}
             <UploadFile
               buttonLabel="Upload"
-              buttonIcon="cloud-upload-alt"
+              buttonIcon={<FontAwesomeIcon icon="cloud-upload-alt" />}
               modalClassName="modal-dialog"
               getFiles={getFiles}
             />

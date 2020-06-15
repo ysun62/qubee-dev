@@ -13,10 +13,6 @@ const MoveFiles = ({
   handleFolderSelection,
   collection,
 }) => {
-  let buttonIconClasses = "fas fa-";
-
-  if (buttonIcon) buttonIconClasses += buttonIcon;
-
   const [modal, setModal] = useState(false);
 
   const toggle = () => setModal(!modal);
@@ -29,9 +25,7 @@ const MoveFiles = ({
   return (
     <>
       <Button block color="link" type="button" onClick={toggle}>
-        <span className="btn-inner--icon">
-          <i className={buttonIconClasses} />
-        </span>
+        {buttonIcon}
         <span className="btn-inner--text">{buttonLabel}</span>
       </Button>
       <Modal className={modalClassName} isOpen={modal} toggle={toggle}>

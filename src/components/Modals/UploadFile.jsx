@@ -9,10 +9,6 @@ import "filepond/dist/filepond.min.css";
 registerPlugin();
 
 const UploadFile = ({ buttonLabel, buttonIcon, modalClassName, getFiles }) => {
-  let buttonIconClasses = "fas fa-";
-
-  if (buttonIcon) buttonIconClasses += buttonIcon;
-
   const [modal, setModal] = useState(false);
 
   const toggle = () => setModal(!modal);
@@ -35,9 +31,7 @@ const UploadFile = ({ buttonLabel, buttonIcon, modalClassName, getFiles }) => {
         type="button"
         onClick={toggle}
       >
-        <span className="btn-inner--icon">
-          <i className={buttonIconClasses} />
-        </span>
+        {buttonIcon}
         <span className="btn-inner--text">{buttonLabel}</span>
       </Button>
       <Modal

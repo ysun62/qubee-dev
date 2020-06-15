@@ -21,17 +21,17 @@ import { ToastContainer } from "react-toastify";
 import { Container } from "reactstrap";
 import { getFolders } from "../services/folderService";
 import { getFiles } from "../services/fileService";
-import AdminNavbar from "components/Navbars/AdminNavbar";
-import AdminFooter from "components/Footers/AdminFooter";
-import ActionBarHeader from "components/Headers/ActionBarHeader";
-import Sidebar from "components/Sidebar/Sidebar";
+import AdminNavbar from "../components/Navbars/AdminNavbar";
+import AdminFooter from "../components/Footers/AdminFooter";
+import ActionBarHeader from "../components/Headers/ActionBarHeader";
+import Sidebar from "../components/Sidebar/Sidebar";
 import Checkbox from "../components/Common/Checkbox";
 import Folders from "../views/Folders";
 import SearchResults from "../views/SearchResults";
 import Files from "../views/Files";
 import http from "../services/httpService";
 import config from "../config";
-import routes from "routes.js";
+import routes from "../routes.js";
 
 class Admin extends Component {
   constructor(props) {
@@ -72,7 +72,7 @@ class Admin extends Component {
   getFiles = async () => {
     const { data: files } = await getFiles();
     const { data: folders } = await getFolders();
-    const dataCache = folders.concat(files);
+    const dataCache = [...folders, ...files];
 
     this.setState({
       collection: {
@@ -240,7 +240,7 @@ class Admin extends Component {
           routes={routes}
           logo={{
             innerLink: "/admin/index",
-            imgSrc: require("assets/img/brand/qubee_logo.png"),
+            imgSrc: require("../assets/img/brand/qubee_logo.png"),
             imgAlt: "...",
           }}
           getFiles={this.getFiles}
