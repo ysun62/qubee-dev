@@ -1,6 +1,6 @@
 import React from "react";
 
-function TableHeader({ isSelected, selectAll }) {
+function TableHeader({ isSelected, onSelectAll }) {
   return (
     <thead className="thead-light">
       <tr>
@@ -10,8 +10,7 @@ function TableHeader({ isSelected, selectAll }) {
               className="custom-control-input"
               id="checkAll"
               type="checkbox"
-              checked={isSelected}
-              onChange={selectAll}
+              onChange={onSelectAll}
             />
             <label className="custom-control-label" htmlFor="checkAll"></label>
           </div>

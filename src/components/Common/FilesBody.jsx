@@ -8,7 +8,7 @@ function FilesBody({
   getFiles,
   isSelected,
   onCheckboxChange,
-  selectAll,
+  onSelectAll,
 }) {
   return (
     <Table
@@ -17,11 +17,11 @@ function FilesBody({
       responsive
       size="sm"
     >
-      <TableHeader isSelected={isSelected} selectAll={selectAll} />
+      <TableHeader isSelected={isSelected} onSelectAll={onSelectAll} />
       <TableBody
         collection={collection}
         getFiles={getFiles}
-        isSelected={isSelected}
+        // isSelected={isSelected}
         onCheckboxChange={onCheckboxChange}
       />
     </Table>

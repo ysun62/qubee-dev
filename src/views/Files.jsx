@@ -6,7 +6,7 @@ import { Container, Row, Col, Card } from "reactstrap";
 function Files({
   collection,
   getFiles,
-  selectAll,
+  onSelectAll,
   isSelected,
   onCheckboxChange,
 }) {
@@ -24,8 +24,8 @@ function Files({
               <FilesBody
                 collection={collection}
                 getFiles={getFiles}
-                selectAll={selectAll}
-                isSelected={isSelected}
+                onSelectAll={onSelectAll}
+                // isSelected={isSelected}
                 onCheckboxChange={onCheckboxChange}
               />
             </Card>

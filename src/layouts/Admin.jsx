@@ -170,6 +170,39 @@ class Admin extends Component {
     />
   );
 
+  selectAllCheckboxes = (isSelected) => {
+    Object.keys(this.state.selection.selectionData).forEach((checkbox) => {
+      // BONUS: Can you explain why we pass updater function to setState instead of an object?
+      this.setState((prevState) => ({
+        selection: {
+          selectionData: {
+            ...prevState.selection.selectionData,
+            [checkbox]: isSelected,
+          },
+        },
+      }));
+    });
+  };
+
+  selectAll = () => this.selectAllCheckboxes(true);
+
+  deselectAll = () => this.selectAllCheckboxes(false);
+
+  handleCheckboxChange = (changeEvent) => {
+    const { id } = changeEvent.target;
+
+    // this.handleIsSelected(id);
+
+    this.setState((prevState) => ({
+      selection: {
+        selectionData: {
+          ...prevState.selection.selectionData,
+          [id]: !prevState.selection.selectionData[id],
+        },
+      },
+    }));
+  };
+
   handleCheckboxClick = (e) => {
     const item = e.target.id;
     const isChecked = e.target.checked;
@@ -186,13 +219,10 @@ class Admin extends Component {
     }
   };
 
-  // clearAllCheckboxes = () => {
-  //   const clearCheckedItems = new Map();
-  //   this.setState({ checkedItems: clearCheckedItems });
-  // };
-
   render() {
-    const { selectMode, collection } = this.state;
+    const { selectMode, collection, selection } = this.state;
+    console.log(selection.selectionData);
+
     return (
       <>
         <ToastContainer draggable={false} position="bottom-left" />
@@ -241,8 +271,9 @@ class Admin extends Component {
                   collection={collection}
                   folderId={collection.rootFolder._id}
                   getFiles={this.getFiles}
-                  isSelected={this.state.selection}
-                  onCheckboxChange={this.handleCheckboxClick}
+                  //isSelected={this.handleIsSelected}
+                  onSelectAll={this.selectAll}
+                  onCheckboxChange={this.handleCheckboxChange}
                 />
               )}
             />
