@@ -1,2 +1,3 @@
 # qubee
-A cloud storage solution
+
+A C&I Studios cloud storage solution build with ReactJS, NodeJS, ExpresJS, and MongoDB.

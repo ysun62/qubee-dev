@@ -17,7 +17,6 @@
 */
 import Index from "views/Index";
 import Files from "views/Files";
-import Folders from "views/Folders";
 import Profile from "views/examples/Profile";
 import Maps from "views/examples/Maps";
 import Register from "views/examples/Register";
@@ -39,6 +38,7 @@ var routes = [
     icon: "ni ni-folder-17 text-primary",
     component: Files,
     layout: "/admin",
+    displayActionBar: false,
   },
   {
     path: "/icons",

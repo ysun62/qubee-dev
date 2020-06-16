@@ -1,0 +1,5 @@
+{
+  "name": "qubee",
+  "port": "5000",
+  "requiresAuth": false
+}

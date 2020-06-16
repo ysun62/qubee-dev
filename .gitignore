@@ -1,5 +1,7 @@
 .vscode
-node_modules
-package-lock.json
-!uploads
-uploads/*
+.env
+node_modules/
+uploads/
+shared/
+tmp/
+build/

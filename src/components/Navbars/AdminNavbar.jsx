@@ -16,7 +16,10 @@
 
 */
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, Redirect } from "react-router-dom";
+import { toast } from "react-toastify";
+import http from "../../services/httpService";
+
 // reactstrap components
 import {
   DropdownMenu,
@@ -32,10 +35,47 @@ import {
   Navbar,
   Nav,
   Container,
-  Media
+  Media,
 } from "reactstrap";
 
 class AdminNavbar extends React.Component {
+  state = {
+    inputField: "",
+    term: "",
+    results: [],
+    loading: false,
+    message: "",
+    redirect: false,
+  };
+
+  handleChange = (e) => {
+    this.setState({ redirect: false, term: e.target.value });
+  };
+
+  handleSubmit = async (e) => {
+    e.preventDefault();
+
+    const numberOfChar = [...this.state.term];
+
+    let url = `http://localhost:5000/api/searches?s=${encodeURI(
+      this.state.term
+    )}`;
+
+    if (numberOfChar.length >= 3) {
+      await http
+        .get(url)
+        .then((response) => {
+          this.setState({ redirect: true, results: response.data });
+          console.log(response.data);
+        })
+        .catch((error) => {
+          console.error("There was an error:", error);
+        });
+    } else {
+      toast.warn("At least 3 charaters required to search.");
+    }
+  };
+
   render() {
     return (
       <>
@@ -47,7 +87,10 @@ class AdminNavbar extends React.Component {
             >
               {this.props.brandText}
             </Link>
-            <Form className="navbar-search navbar-search-dark form-inline mr-3 d-none d-md-flex ml-lg-auto">
+            <Form
+              className="navbar-search navbar-search-dark form-inline mr-3 d-none d-md-flex ml-lg-auto"
+              onSubmit={this.handleSubmit}
+            >
               <FormGroup className="mb-0">
                 <InputGroup className="input-group-alternative">
                   <InputGroupAddon addonType="prepend">
@@ -55,10 +98,25 @@ class AdminNavbar extends React.Component {
                       <i className="fas fa-search" />
                     </InputGroupText>
                   </InputGroupAddon>
-                  <Input placeholder="Search" type="text" />
+                  <Input
+                    placeholder="Search"
+                    name="s"
+                    id="s"
+                    type="search"
+                    value={this.state.term}
+                    onChange={this.handleChange}
+                  />
                 </InputGroup>
               </FormGroup>
             </Form>
+            {this.state.redirect && (
+              <Redirect
+                to={{
+                  pathname: `/admin/search/${this.state.term}`,
+                  state: { results: this.state.results },
+                }}
+              />
+            )}
             <Nav className="align-items-center d-none d-md-flex" navbar>
               <UncontrolledDropdown nav>
                 <DropdownToggle className="pr-0" nav>
@@ -97,7 +155,10 @@ class AdminNavbar extends React.Component {
                     <span>Support</span>
                   </DropdownItem>
                   <DropdownItem divider />
-                  <DropdownItem href="#pablo" onClick={e => e.preventDefault()}>
+                  <DropdownItem
+                    href="#pablo"
+                    onClick={(e) => e.preventDefault()}
+                  >
                     <i className="ni ni-user-run" />
                     <span>Logout</span>
                   </DropdownItem>

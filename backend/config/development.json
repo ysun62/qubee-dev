@@ -1,0 +1,6 @@
+{
+  "name": "qubee - Development",
+  "db_dev": "mongodb://localhost:27017/qubee",
+  "port": "5000",
+  "requiresAuth": false
+}
