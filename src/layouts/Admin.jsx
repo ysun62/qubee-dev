@@ -30,7 +30,6 @@ import Folders from "../views/Folders";
 import SearchResults from "../views/SearchResults";
 import Files from "../views/Files";
 import http from "../services/httpService";
-import config from "../config";
 import routes from "../routes.js";
 
 class Admin extends Component {
@@ -55,7 +54,7 @@ class Admin extends Component {
 
   componentDidMount() {
     document.body.classList.add("bg-default");
-    this.getFiles();
+    this.getAllFiles();
   }
 
   componentWillUnmount() {
@@ -69,7 +68,7 @@ class Admin extends Component {
   }
 
   // TODO: Count should display the number of files withing a folder.
-  getFiles = async () => {
+  getAllFiles = async () => {
     const { data: files } = await getFiles();
     const { data: folders } = await getFolders();
     const dataCache = [...folders, ...files];
@@ -129,7 +128,9 @@ class Admin extends Component {
     this.setState({ files });
 
     try {
-      await http.delete(`${config.filesEndpoint}/${file._id}`);
+      await http.delete(
+        `${process.env.REACT_APP_API_ENDPOINT}/files/${file._id}`
+      );
       //throw new Error("Something went wrong!");
     } catch (err) {
       // Expected (404: not found, 400: bad request) - Client Errors
@@ -205,6 +206,8 @@ class Admin extends Component {
 
   handleCheckboxClick = (e) => {
     const item = e.target.id;
+    console.log(item);
+
     const isChecked = e.target.checked;
     const files = this.state.collection.dataCache.filter(
       (file) => file._id === item
@@ -220,8 +223,7 @@ class Admin extends Component {
   };
 
   render() {
-    const { selectMode, collection, selection } = this.state;
-    console.log(selection.selectionData);
+    const { selectMode, collection } = this.state;
 
     return (
       <>
@@ -243,7 +245,7 @@ class Admin extends Component {
             imgSrc: require("../assets/img/brand/qubee_logo.png"),
             imgAlt: "...",
           }}
-          getFiles={this.getFiles}
+          getFiles={this.getAllFiles}
         />
         <div className="main-content" ref="mainContent">
           <AdminNavbar
@@ -257,7 +259,7 @@ class Admin extends Component {
                 <Folders
                   {...props}
                   collection={collection}
-                  getFiles={this.getFiles}
+                  getFiles={this.getAllFiles}
                 />
               )}
             />
@@ -270,10 +272,10 @@ class Admin extends Component {
                   {...props}
                   collection={collection}
                   folderId={collection.rootFolder._id}
-                  getFiles={this.getFiles}
-                  //isSelected={this.handleIsSelected}
+                  getFiles={this.getAllFiles}
+                  isSelected={this.handleIsSelected}
                   onSelectAll={this.selectAll}
-                  onCheckboxChange={this.handleCheckboxChange}
+                  onCheckboxClick={this.handleCheckboxClick}
                 />
               )}
             />

@@ -82,6 +82,20 @@
   }
 }
 
+.file-list-item {
+  .btn-link {
+    svg {
+      color: $gray-600;
+    }
+
+    &:hover {
+      svg {
+        color: $primary;
+      }
+    }
+  }
+}
+
 .btn-neutral {
   color: theme-color("primary");
 }

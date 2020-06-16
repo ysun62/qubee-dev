@@ -31,7 +31,11 @@ import {
   faFileExport,
   faTrashAlt,
   faCloudUploadAlt,
+  faCheckSquare,
+  faFileImage,
+  faFolderOpen,
 } from "@fortawesome/free-solid-svg-icons";
+import { faSquare } from "@fortawesome/free-regular-svg-icons";
 import { BrowserRouter, Route, Switch, Redirect } from "react-router-dom";
 
 import "./assets/plugins/nucleo/css/nucleo.css";
@@ -49,7 +53,11 @@ library.add(
   faShareAlt,
   faFileExport,
   faTrashAlt,
-  faCloudUploadAlt
+  faCloudUploadAlt,
+  faSquare,
+  faCheckSquare,
+  faFileImage,
+  faFolderOpen
 );
 
 //logger.init();

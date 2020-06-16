@@ -1,11 +1,13 @@
 import React from "react";
+import { Button } from "reactstrap";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 function TableHeader({ isSelected, onSelectAll }) {
   return (
     <thead className="thead-light">
-      <tr>
+      <tr className="file-list-item">
         <th scope="col" width="76">
-          <div className="custom-control custom-checkbox mb-4">
+          {/* <div className="custom-control custom-checkbox mb-4">
             <input
               className="custom-control-input"
               id="checkAll"
@@ -13,7 +15,13 @@ function TableHeader({ isSelected, onSelectAll }) {
               onChange={onSelectAll}
             />
             <label className="custom-control-label" htmlFor="checkAll"></label>
-          </div>
+          </div> */}
+          <Button color="link" size="sm" onClick={onSelectAll}>
+            <FontAwesomeIcon
+              icon={isSelected ? "check-square" : ["far", "square"]}
+              size="lg"
+            />
+          </Button>
         </th>
         <th scope="col" width="50%">
           File Name
