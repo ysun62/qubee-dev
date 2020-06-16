@@ -8,7 +8,7 @@ function Files({
   getFiles,
   onSelectAll,
   isSelected,
-  onCheckboxChange,
+  onCheckboxClick,
 }) {
   return (
     <>
@@ -25,8 +25,8 @@ function Files({
                 collection={collection}
                 getFiles={getFiles}
                 onSelectAll={onSelectAll}
-                // isSelected={isSelected}
-                onCheckboxChange={onCheckboxChange}
+                isSelected={isSelected}
+                onCheckboxClick={onCheckboxClick}
               />
             </Card>
           </Col>

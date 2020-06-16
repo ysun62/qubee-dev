@@ -7,7 +7,7 @@ function FilesBody({
   collection,
   getFiles,
   isSelected,
-  onCheckboxChange,
+  onCheckboxClick,
   onSelectAll,
 }) {
   return (
@@ -21,8 +21,8 @@ function FilesBody({
       <TableBody
         collection={collection}
         getFiles={getFiles}
-        // isSelected={isSelected}
-        onCheckboxChange={onCheckboxChange}
+        isSelected={isSelected}
+        onCheckboxClick={onCheckboxClick}
       />
     </Table>
   );

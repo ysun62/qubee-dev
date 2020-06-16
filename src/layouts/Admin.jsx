@@ -206,6 +206,8 @@ class Admin extends Component {
 
   handleCheckboxClick = (e) => {
     const item = e.target.id;
+    console.log(item);
+
     const isChecked = e.target.checked;
     const files = this.state.collection.dataCache.filter(
       (file) => file._id === item
@@ -271,9 +273,9 @@ class Admin extends Component {
                   collection={collection}
                   folderId={collection.rootFolder._id}
                   getFiles={this.getAllFiles}
-                  //isSelected={this.handleIsSelected}
+                  isSelected={this.handleIsSelected}
                   onSelectAll={this.selectAll}
-                  onCheckboxChange={this.handleCheckboxChange}
+                  onCheckboxClick={this.handleCheckboxClick}
                 />
               )}
             />
