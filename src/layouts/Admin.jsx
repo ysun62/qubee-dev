@@ -25,7 +25,6 @@ import AdminNavbar from "../components/Navbars/AdminNavbar";
 import AdminFooter from "../components/Footers/AdminFooter";
 import ActionBarHeader from "../components/Headers/ActionBarHeader";
 import Sidebar from "../components/Sidebar/Sidebar";
-import Checkbox from "../components/Common/Checkbox";
 import Folders from "../views/Folders";
 import SearchResults from "../views/SearchResults";
 import Files from "../views/Files";
@@ -43,12 +42,10 @@ class Admin extends Component {
         sharedFolder: {},
       },
       selection: {
+        selected: null,
         selectionData: [],
-        deletableCount: 0,
-        editableCount: 0,
       },
       selectMode: true,
-      selected: false,
     };
   }
 
@@ -72,16 +69,24 @@ class Admin extends Component {
     const { data: files } = await getFiles();
     const { data: folders } = await getFolders();
     const dataCache = [...folders, ...files];
+    let filesIdArray = [];
+
+    // This excludes folders with names All and Shared
+    // then is loops over the rest of the files and push
+    // the files ID to an array
+    dataCache
+      .filter((data) => data.name !== "All" && data.name !== "Shared")
+      .map((data) => filesIdArray.push(data._id));
 
     this.setState({
       collection: {
         dataCache: dataCache,
-        count: files.length + folders.length,
+        count: filesIdArray.length,
         rootFolder: folders.find(({ name }) => name === "All"),
         sharedFolder: folders.find(({ name }) => name === "Shared"),
       },
       selection: {
-        selectionData: dataCache.reduce(
+        selectionData: filesIdArray.reduce(
           (options, option) => ({
             ...options,
             [option]: false,
@@ -145,52 +150,23 @@ class Admin extends Component {
     console.log(files);
   };
 
-  handleFolderSelection = (folder) => {
-    console.log(folder);
-  };
-
-  showHideComponent = (value) => {
-    console.log(value.target);
-    // if (value) {
-    //   this.setState({
-    //     display: true,
-    //   });
-    // } else {
-    //   this.setState({
-    //     display: false,
-    //   });
-    // }
-  };
-
-  createCheckbox = (option) => (
-    <Checkbox
-      file={option}
-      isSelected={this.state.checkboxes[option]}
-      onCheckboxChange={this.handleCheckboxChange}
-      key={option}
-    />
-  );
-
   selectAllCheckboxes = (isSelected) => {
-    Object.keys(this.state.selection.selectionData).forEach((checkbox) => {
-      // BONUS: Can you explain why we pass updater function to setState instead of an object?
+    Object.keys(this.state.selection.selectionData).forEach((fileId) => {
       this.setState((prevState) => ({
         selection: {
           selectionData: {
             ...prevState.selection.selectionData,
-            [checkbox]: isSelected,
+            [fileId]: isSelected,
           },
         },
       }));
     });
   };
 
-  selectAll = () => this.selectAllCheckboxes(true);
+  selectAll = (bool) => this.selectAllCheckboxes(bool);
 
-  deselectAll = () => this.selectAllCheckboxes(false);
-
-  handleCheckboxChange = (changeEvent) => {
-    const { id } = changeEvent.target;
+  handleCheckboxChange = (file) => {
+    const id = file._id;
 
     // this.handleIsSelected(id);
 
@@ -204,26 +180,10 @@ class Admin extends Component {
     }));
   };
 
-  handleCheckboxClick = (e) => {
-    const item = e.target.id;
-    console.log(item);
-
-    const isChecked = e.target.checked;
-    const files = this.state.collection.dataCache.filter(
-      (file) => file._id === item
-    );
-
-    if (item && isChecked) {
-      this.setState((prevState) => ({
-        selection: {
-          selectionData: prevState.selection.selectionData.add(files[0]),
-        },
-      }));
-    }
-  };
-
   render() {
-    const { selectMode, collection } = this.state;
+    const { selectMode, collection, selection } = this.state;
+
+    console.log(selection.selectionData, selection.selected);
 
     return (
       <>
@@ -273,9 +233,9 @@ class Admin extends Component {
                   collection={collection}
                   folderId={collection.rootFolder._id}
                   getFiles={this.getAllFiles}
-                  isSelected={this.handleIsSelected}
+                  isSelected={selection.selectionData}
                   onSelectAll={this.selectAll}
-                  onCheckboxClick={this.handleCheckboxClick}
+                  onCheckboxClick={this.handleCheckboxChange}
                 />
               )}
             />

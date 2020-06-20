@@ -18,7 +18,11 @@ function TableBody({ collection, getFiles, isSelected, onCheckboxClick }) {
     );
   }, [collection.dataCache, collection.files, collection.rootFolder._id]);
 
-  //const handleCheckboxClick = () => setIsChecked(!isChecked);
+  const handleCheckboxClick = (file) => {
+    //setIsChecked(!isChecked);
+    //isSelected(!false);
+    onCheckboxClick(file);
+  };
 
   return (
     <tbody>
@@ -38,10 +42,18 @@ function TableBody({ collection, getFiles, isSelected, onCheckboxClick }) {
                   className="custom-control-label"
                   htmlFor={file._id}
                 ></label>
-              </div> */}
-              <Button color="link" size="sm" onClick={onCheckboxClick}>
+              </div>
+
+              .includes(file._id) */}
+              <Button
+                color="link"
+                size="sm"
+                onClick={() => handleCheckboxClick(file)}
+              >
                 <FontAwesomeIcon
-                  icon={isSelected ? "check-square" : ["far", "square"]}
+                  icon={
+                    isSelected[file._id] ? "check-square" : ["far", "square"]
+                  }
                   size="lg"
                 />
               </Button>
