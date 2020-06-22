@@ -9,6 +9,9 @@ function FilesBody({
   isSelected,
   onCheckboxClick,
   onSelectAll,
+  setFolderId,
+  setFileCount,
+  ...props
 }) {
   return (
     <Table
@@ -17,12 +20,19 @@ function FilesBody({
       responsive
       size="sm"
     >
-      <TableHeader isSelected={isSelected} onSelectAll={onSelectAll} />
+      <TableHeader
+        {...props}
+        isSelected={isSelected}
+        onSelectAll={onSelectAll}
+      />
       <TableBody
+        {...props}
         collection={collection}
         getFiles={getFiles}
         isSelected={isSelected}
         onCheckboxClick={onCheckboxClick}
+        setFolderId={setFolderId}
+        setFileCount={setFileCount}
       />
     </Table>
   );

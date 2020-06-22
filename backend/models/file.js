@@ -1,5 +1,4 @@
 const Joi = require("@hapi/joi");
-const { folderSchema } = require("./folder");
 const fileBasePath = "../../public/uploads";
 const mongoose = require("mongoose");
 
@@ -12,6 +11,14 @@ const fileSchema = mongoose.model(
       minlength: 1,
       maxlength: 255,
       trim: true,
+    },
+    slug: {
+      type: String,
+      required: true,
+      minlength: 1,
+      maxlength: 255,
+      trim: true,
+      lowercase: true,
     },
     metaTags: {
       type: [String],
@@ -30,7 +37,10 @@ const fileSchema = mongoose.model(
     },
     modifiedDate: Date,
     parentMap: mongoose.Mixed,
-    parents: [String],
+    parentDirectoryId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Folder",
+    },
     isRoot: {
       type: Boolean,
       required: true,

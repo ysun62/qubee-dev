@@ -1,12 +1,19 @@
 import React, { useState } from "react";
 import { FilePond, registerPlugin } from "react-filepond";
 import { Button, Modal } from "reactstrap";
+import FilePondPluginFileMetadata from "filepond-plugin-file-metadata";
 import "react-toastify/dist/ReactToastify.css";
 import "filepond/dist/filepond.min.css";
 
-registerPlugin();
+registerPlugin(FilePondPluginFileMetadata);
 
-const UploadFile = ({ buttonLabel, buttonIcon, modalClassName, getFiles }) => {
+const UploadFile = ({
+  buttonLabel,
+  buttonIcon,
+  modalClassName,
+  getFolderId,
+  getFiles,
+}) => {
   const [modal, setModal] = useState(false);
 
   const toggle = () => setModal(!modal);
@@ -54,15 +61,15 @@ const UploadFile = ({ buttonLabel, buttonIcon, modalClassName, getFiles }) => {
         </div>
         <div className="modal-body">
           <FilePond
-            //ref={(ref) => (pond = ref)}
             allowMultiple={true}
             name={"mediaFiles"}
             onerror={(error, file, status) =>
               handleOnError(error, file, status)
             }
             onprocessfiles={handleProcessedFiles}
-            maxFiles={10}
+            maxFiles={12}
             server={process.env.REACT_APP_API_URL + "/files"}
+            fileMetadataObject={{ parentDirectoryId: getFolderId }}
           ></FilePond>
         </div>
       </Modal>

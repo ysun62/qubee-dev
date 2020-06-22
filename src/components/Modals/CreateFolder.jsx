@@ -2,30 +2,39 @@ import React, { useState } from "react";
 import { saveFolder } from "../../services/folderService";
 import { Button, Modal, Form, Input } from "reactstrap";
 
-const CreateFolder = (props) => {
-  const { buttonLabel, buttonIcon, modalClassName, getFiles } = props;
+const CreateFolder = ({
+  buttonLabel,
+  buttonIcon,
+  modalClassName,
+  getFiles,
+  getFolderId,
+}) => {
   let buttonIconClasses = "ni ni-";
   if (buttonIcon) buttonIconClasses += buttonIcon;
 
   const [modal, setModal] = useState(false);
   const [inputField, setInputField] = useState("");
 
-  const toggle = () => setModal(!modal);
+  const toggle = () => {
+    // Update parent component view
+    getFiles();
+    setModal(!modal);
+  };
 
-  const handleOnChange = (e) => setInputField(e.currentTarget.value);
+  const handleOnChange = (e) => setInputField(e.target.value);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    // TODO: Update the parents property with the correct IDs
     const folderName = {
       name: inputField,
+      parentDirectoryId: getFolderId,
     };
 
     await saveFolder(folderName)
       .then((response) => {
-        getFiles(); // Update parent component view
-        toggle(e);
-        console.log(response);
+        toggle();
       })
       .catch((ex) => console.log(ex));
   };

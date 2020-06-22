@@ -88,7 +88,7 @@ class Sidebar extends React.Component {
   };
 
   render() {
-    const { bgColor, routes, logo, getFiles } = this.props;
+    const { bgColor, routes, logo, getFiles, getFolderId } = this.props;
     let navbarBrandProps;
     if (logo && logo.innerLink) {
       navbarBrandProps = {
@@ -234,6 +234,7 @@ class Sidebar extends React.Component {
               buttonIcon={<FontAwesomeIcon icon="cloud-upload-alt" />}
               modalClassName="modal-dialog"
               getFiles={getFiles}
+              getFolderId={getFolderId}
             />
             <Nav navbar>{this.createLinks(routes)}</Nav>
             {/* Divider */}

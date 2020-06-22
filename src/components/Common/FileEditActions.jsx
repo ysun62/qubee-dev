@@ -6,10 +6,11 @@ import MoveFiles from "../Modals/MoveFiles";
 import { NavItem, Nav, Button } from "reactstrap";
 
 function FileEditActions({
-  handleDelete,
   handleMove,
   handleFolderSelection,
   collection,
+  selectedData,
+  getFiles,
 }) {
   return (
     <Nav className="justify-content-end navbar" role="tablist">
@@ -19,6 +20,7 @@ function FileEditActions({
           buttonIcon={<FontAwesomeIcon icon="share-alt" />}
           modalClassName="modal-dialog-centered"
           collection={collection}
+          selectedData={selectedData}
         />
       </NavItem>
       {/* <NavItem>
@@ -45,6 +47,8 @@ function FileEditActions({
           handleMove={handleMove}
           handleFolderSelection={handleFolderSelection}
           collection={collection}
+          selectedData={selectedData}
+          getFiles={getFiles}
         />
       </NavItem>
       <NavItem>
@@ -52,8 +56,9 @@ function FileEditActions({
           buttonLabel="Delete"
           buttonIcon={<FontAwesomeIcon icon="trash-alt" />}
           modalClassName="modal-dialog"
-          handleDelete={handleDelete}
           collection={collection}
+          selectedData={selectedData}
+          getFiles={getFiles}
         />
       </NavItem>
       <NavItem>

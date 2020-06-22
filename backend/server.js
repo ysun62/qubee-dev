@@ -46,42 +46,30 @@ db.once("open", async function () {
     join(__dirname, "../public", "shared")
   );
   const rootDir = await Folder.findOne({ name: "All" });
+  const initialFolders = ["Documents", "Pictures", "Videos"];
 
-  //debug("App root folder -> " + rootDir.name + "/" + rootDir._id);
+  // debug("App root folder -> " + rootDir.name + "/" + rootDir._id);
 
   // Check if app has instatiated and database is seeded
   if (!isInit.length || !isInit[0].appInit) {
-    const initialFolders = [
-      {
-        name: "Documents",
-        parentMap: {
-          FOLDER: rootDir._id,
-        },
-        parents: rootDir._id,
-      },
-      {
-        name: "Pictures",
-        parentMap: {
-          FOLDER: rootDir._id,
-        },
-        parents: rootDir._id,
-      },
-      {
-        name: "Videos",
-        parentMap: {
-          FOLDER: rootDir._id,
-        },
-        parents: rootDir._id,
-      },
-    ];
-
+    // Check if root directories exist
     if (!foldersExists)
       return debug("There was an error creating the directories.");
 
-    for (let folder of initialFolders) {
-      await new Folder(folder).save();
-    }
+    // Create initial folder documents in MongoDB
+    initialFolders.map(async (folder) => {
+      await new Folder({
+        name: folder,
+        slug: folder.replace(/\s+/g, "-").toLowerCase(),
+        parentMap: {
+          FOLDER: rootDir._id,
+        },
+        parentDirectoryId: rootDir._id,
+      }).save();
+    });
 
+    // Create settings document in MonogDB and set
+    // appInit property to true after instatiation
     try {
       if (isInit[0]) {
         await Setting.findOneAndUpdate(

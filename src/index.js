@@ -65,8 +65,8 @@ library.add(
 ReactDOM.render(
   <BrowserRouter>
     <Switch>
-      <Route path="/admin" component={AdminLayout} />
-      <Route path="/auth" component={AuthLayout} />
+      {/* <Route path="/admin" component={AdminLayout} />
+      <Route path="/auth" component={AuthLayout} /> */}
       <Route path="/admin" render={(props) => <AdminLayout {...props} />} />
       <Route path="/auth" render={(props) => <AuthLayout {...props} />} />
       <Redirect from="/" to="/admin/files" />

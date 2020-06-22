@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import http from "../../services/httpService";
 import { getFile, saveFile } from "../../services/fileService";
 import { toast } from "react-toastify";
 import { Button, Modal, Form, Input, Badge, Label } from "reactstrap";
@@ -7,7 +6,7 @@ import { Button, Modal, Form, Input, Badge, Label } from "reactstrap";
 const MetaTag = (props) => {
   const { buttonLabel, modalClassName, fileId, getFiles } = props;
   const [modal, setModal] = useState(false);
-  const [originalValue, setOriginalValue] = useState("");
+  //const [originalValue, setOriginalValue] = useState("");
   const [inputField, setInputField] = useState(null);
   const [fileName, setFileName] = useState({});
 
@@ -18,7 +17,7 @@ const MetaTag = (props) => {
 
       // Break the array of tags into a list
       const metaTags = data.metaTags.join("\n");
-      setOriginalValue(metaTags);
+      //setOriginalValue(metaTags);
       setInputField(metaTags);
     }
     getFileById();

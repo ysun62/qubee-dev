@@ -1,17 +1,51 @@
 import React, { useState } from "react";
 import { Button, Modal } from "reactstrap";
+import { deleteFile } from "../../services/fileService";
+import { deleteFolder } from "../../services/folderService";
 
 const DeleteFiles = ({
   buttonLabel,
   buttonIcon,
   modalClassName,
-  handleDelete,
+  collection,
+  selectedData,
+  getFiles,
 }) => {
   const [modal, setModal] = useState(false);
 
-  const toggle = () => setModal(!modal);
+  const toggle = () => {
+    // Refresh file list
+    getFiles();
+    setModal(!modal);
+  };
 
-  const onHandleDelete = () => handleDelete();
+  const onHandleDelete = () => {
+    const fileIds = Object.keys(selectedData);
+    const dataCache = collection.dataCache;
+
+    // Loop through all selected file IDs
+    fileIds.map(async (id) => {
+      // Find the model in the collection that match the selected file ID
+      const model = dataCache.find((data) => data._id === id);
+      const modelChildren = dataCache.filter(
+        (data) => data.parentDirectoryId === id
+      );
+
+      console.log(modelChildren);
+
+      // TODO: Rework this code block to delete files inside folders if they exist
+      if (model.kind === "FOLDER") {
+        // if (modelChildren.length) {
+        //   await deleteFile(id).then(() => toggle());
+        // } else {
+
+        await deleteFolder(id).then(() => toggle());
+        //}
+      } else {
+        await deleteFile(id).then(() => toggle());
+      }
+    });
+  };
 
   return (
     <>
