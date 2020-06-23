@@ -83,13 +83,13 @@ DEBUG=app:* npm run dev
 Windows CMD:
 
 ```shell
-set DEBUG=* & npm run dev
+set DEBUG=app:* & npm run dev
 ```
 
 PowerShell:
 
 ```shell
-$env:DEBUG='app';npm run dev
+$env:DEBUG='app:*';npm run dev
 ```
 
 The app will automatically create two directories in the qubee (root) public directory:
