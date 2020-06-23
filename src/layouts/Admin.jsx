@@ -207,6 +207,7 @@ class Admin extends Component {
             imgSrc: require("../assets/img/brand/qubee_logo.png"),
             imgAlt: "...",
           }}
+          collection={collection}
           getFiles={this.getAllFiles}
           getFolderId={folderId}
         />

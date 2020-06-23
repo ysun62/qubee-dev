@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Button, Modal } from "reactstrap";
-import { saveFolder } from "../../services/folderService";
+// import { saveFolder } from "../../services/folderService";
 import { saveFile } from "../../services/fileService";
 import UploadFolderPicker from "../Common/UploadFolderPicker";
 import "react-toastify/dist/ReactToastify.css";
@@ -15,9 +15,7 @@ const MoveFiles = ({
   getFiles,
 }) => {
   const [modal, setModal] = useState(false);
-  const [selectedFolderId, setSelectedFolderId] = useState(
-    collection.dataCache.find((d) => d.slug === "all")._id
-  );
+  const [selectedFolderId, setSelectedFolderId] = useState();
 
   const toggle = () => {
     getFiles();
@@ -26,7 +24,7 @@ const MoveFiles = ({
 
   const handleProcessedFiles = () => {
     const fileIds = Object.keys(selectedData);
-    const models = collection.models;
+    // const models = collection.models;
 
     // Loop through all selected file IDs
     fileIds.map(async (id) => {

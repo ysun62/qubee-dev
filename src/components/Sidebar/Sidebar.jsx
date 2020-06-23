@@ -88,8 +88,17 @@ class Sidebar extends React.Component {
   };
 
   render() {
-    const { bgColor, routes, logo, getFiles, getFolderId } = this.props;
+    const {
+      bgColor,
+      routes,
+      logo,
+      getFiles,
+      getFolderId,
+      collection,
+    } = this.props;
+
     let navbarBrandProps;
+
     if (logo && logo.innerLink) {
       navbarBrandProps = {
         to: logo.innerLink,
@@ -101,6 +110,7 @@ class Sidebar extends React.Component {
         target: "_blank",
       };
     }
+
     return (
       <Navbar
         className="navbar-vertical fixed-left navbar-dark bg-darker"
@@ -233,6 +243,7 @@ class Sidebar extends React.Component {
               buttonLabel="Upload"
               buttonIcon={<FontAwesomeIcon icon="cloud-upload-alt" />}
               modalClassName="modal-dialog"
+              collection={collection}
               getFiles={getFiles}
               getFolderId={getFolderId}
             />

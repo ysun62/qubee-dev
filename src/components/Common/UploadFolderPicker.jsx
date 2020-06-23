@@ -26,7 +26,7 @@ function UploadFolderPicker({ collection, selectedData, selectedFolderId }) {
         <li className="list-inline-item">
           <Button
             onClick={() =>
-              setFolderId(
+              handleOnCLick(
                 collection.dataCache.find((d) => d.slug === "all")._id
               )
             }
