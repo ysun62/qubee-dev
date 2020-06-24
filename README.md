@@ -9,11 +9,12 @@ These instructions will get you a copy of the project up and running on your loc
 ### Prerequisites
 
 - [NodeJS v12.4.0 (npm v6.9.0)](https://nodejs.org/download/release/v12.4.0/)
+- [MongoDB Server](https://www.mongodb.com/try/download/community)
 - [MongoDB Compass](https://www.mongodb.com/products/compass)
 
 If you already have node installed on your machine but not currently on v12.4.0, you may encounter errors when running the app in your terminal. Use the node version manager (NVM) to install and switch to node v12.4.0.
 
-MonogoDB is our databse of choice. Make sure to download the latest version of MongoDB Compass and installed on your machine.
+MonogoDB is our databse of choice. Make sure to download the latest version of MongoDB Server and Compass and installed on your machine.
 
 Run this command in your terminal to install and switch to node v12.4.0:
 
@@ -74,7 +75,7 @@ This command will concurrently run `react-scripts start` for the frontend of our
 
 We also have a [debugger npm package](https://www.npmjs.com/package/debug) in our app that we use to replace `console.log()` in the backend. To start the app with the debugger enabled:
 
-Mac OS:
+Mac OS / Git Bash:
 
 ```zsh
 DEBUG=app:* npm run dev
