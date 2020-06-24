@@ -13,7 +13,7 @@ These instructions will get you a copy of the project up and running on your loc
 
 If you already have node installed on your machine but not currently on v12.4.0, you may encounter errors when running the app in your terminal. Use the node version manager (NVM) to install and switch to node v12.4.0.
 
-MonogoDB is our databse of choice. Make sure to hve the latest version of MongoDB Compass installed on your machine.
+MonogoDB is our databse of choice. Make sure to download the latest version of MongoDB Compass and installed on your machine.
 
 Run this command in your terminal to install and switch to node v12.4.0:
 
