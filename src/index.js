@@ -28,6 +28,7 @@ import {
 } from "@fortawesome/free-brands-svg-icons";
 import {
   faShareAlt,
+  faEdit,
   faFileExport,
   faTrashAlt,
   faCloudUploadAlt,
@@ -51,6 +52,7 @@ library.add(
   faLinkedinIn,
   faYoutube,
   faShareAlt,
+  faEdit,
   faFileExport,
   faTrashAlt,
   faCloudUploadAlt,
