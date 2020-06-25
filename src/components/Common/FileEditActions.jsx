@@ -1,9 +1,10 @@
 import React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { NavItem, Nav, Button } from "reactstrap";
 import ShareFiles from "../Modals/ShareFiles";
 import DeleteFiles from "../Modals/DeleteFiles";
 import MoveFiles from "../Modals/MoveFiles";
-import { NavItem, Nav, Button } from "reactstrap";
+import RenameFile from "../Modals/RenameFile";
 
 function FileEditActions({
   handleMove,
@@ -30,15 +31,18 @@ function FileEditActions({
           </span>
           <span className="btn-inner--text d-md-inline d-none">Download</span>
         </Button>
-      </NavItem>
-      <NavItem>
-        <Button color="link">
-          <span className="btn-inner--icon mr-md-1 mr-0">
-            <i className="fas fa-edit" />
-          </span>
-          <span className="btn-inner--text d-md-inline d-none">Rename</span>
-        </Button>
       </NavItem> */}
+      <NavItem>
+        <RenameFile
+          buttonLabel="Rename"
+          buttonIcon={<FontAwesomeIcon icon="edit" />}
+          disable={false}
+          modalClassName="modal-dialog"
+          collection={collection}
+          selectedData={selectedData}
+          getFiles={getFiles}
+        />
+      </NavItem>
       <NavItem>
         <MoveFiles
           buttonLabel="Move"
