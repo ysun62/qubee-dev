@@ -99,25 +99,56 @@ router.put("/:id", async (req, res) => {
   // const { error } = validate(req.body);
   // if (error) return res.status(400).send(error.details[0].message);
 
-  console.log(moment().format(Date()));
+  dbDebug(req.body);
 
-  console.log(req.body);
+  const oldFilename = await File.findById(req.body._id);
+  dbDebug(oldFilename.slug);
 
   // const folder = await Folder.findById(req.body.folderId);
   // if (!folder) return res.status(400).send("Invalid folder.");
 
-  // const file = await File.findByIdAndUpdate(
-  //   req.params.id,
-  //   {
-  //     $set: req.body,
-  //   },
-  //   { new: true }
-  // );
+  if (req.body.slug !== oldFilename.slug) {
+    await fs
+      .accessAsync(join(uploadsFolder, oldFilename.slug))
+      .then(async () => {
+        fs.rename(
+          join(uploadsFolder, req.body.slug),
+          join(uploadsFolder, oldFilename.slug),
+          (err) => {
+            return res
+              .status(500)
+              .send("There was an error renaming the file with given ID.", err);
+          }
+        );
 
-  // if (!file)
-  //   return res.status(404).send("The movie with the given ID was not found");
+        const file = await File.findByIdAndUpdate(
+          req.params.id,
+          { $set: req.body },
+          { new: true }
+        );
 
-  // res.send(file);
+        if (!file)
+          return res
+            .status(404)
+            .send("The file with the given ID was not found.");
+
+        res.send(file);
+      })
+      .catch(() => {
+        res.status(500).send("The file doesn't exist in the uploads folder.");
+      });
+  } else {
+    const file = await File.findByIdAndUpdate(
+      req.params.id,
+      { $set: req.body },
+      { new: true }
+    );
+
+    if (!file)
+      return res.status(404).send("The file with the given ID was not found.");
+
+    res.send(file);
+  }
 });
 
 router.delete("/:id", async (req, res) => {

@@ -1,7 +1,15 @@
 import React, { useState } from "react";
 import { saveFolder } from "../../services/folderService";
 import { saveFile } from "../../services/fileService";
-import { Button, Modal, Form, Input } from "reactstrap";
+import {
+  Button,
+  Modal,
+  Form,
+  InputGroup,
+  Input,
+  InputGroupAddon,
+  InputGroupText,
+} from "reactstrap";
 
 const RenameFile = ({
   buttonLabel,
@@ -72,13 +80,20 @@ const RenameFile = ({
         </div>
         <Form onSubmit={handleSubmit}>
           <div className="modal-body">
-            <Input
-              type="text"
-              name="rename"
-              id="rename"
-              value={inputField}
-              onChange={handleOnChange}
-            />
+            <InputGroup>
+              <Input
+                type="text"
+                name="rename"
+                id="rename"
+                value={inputField}
+                onChange={handleOnChange}
+              />
+              <InputGroupAddon addonType="append">
+                <InputGroupText>
+                  .{selectedDataObj.fileExtension}
+                </InputGroupText>
+              </InputGroupAddon>
+            </InputGroup>
           </div>
           <div className="modal-footer">
             <div className="text-center">

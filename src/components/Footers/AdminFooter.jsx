@@ -35,7 +35,7 @@ class Footer extends React.Component {
                 rel="noopener"
                 target="_blank"
               >
-                C&amp;I Studios, Inc.
+                Qubee, Inc.
               </a>
             </div>
           </Col>

@@ -37,14 +37,14 @@ class Login extends React.Component {
                     rel="noopener"
                     target="_blank"
                   >
-                    C&amp;I Studios, Inc.
+                    Qubee, Inc.
                   </a>
                 </div>
               </Col>
 
               <Col xl="6">
                 <Nav className="nav-footer justify-content-center justify-content-xl-end">
-                <NavItem>
+                  <NavItem>
                     <NavLink
                       href="https://c-istudios.com/about/?ref=qubee-admin-footer"
                       rel="noopener noreferrer"
