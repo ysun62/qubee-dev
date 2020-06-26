@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { saveFolder } from "../../services/folderService";
+import { saveFile } from "../../services/fileService";
 import { Button, Modal, Form, Input } from "reactstrap";
 
 const RenameFile = ({
@@ -7,12 +8,12 @@ const RenameFile = ({
   buttonIcon,
   disable,
   modalClassName,
-  collection,
   selectedData,
   getFiles,
 }) => {
+  const selectedDataObj = Object.values(selectedData)[0];
   const [modal, setModal] = useState(false);
-  const [inputField, setInputField] = useState("");
+  const [inputField, setInputField] = useState(selectedDataObj.name);
 
   const toggle = () => {
     // Update parent component view
@@ -25,17 +26,25 @@ const RenameFile = ({
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // TODO: Update the parents property with the correct IDs
-    const folderName = {
+    const updatedName = {
       name: inputField,
-      parentDirectoryId: Object.values(selectedData)[0]._id,
+      slug: inputField.replace(/\s+/g, "-").toLowerCase(),
+      _id: selectedDataObj._id,
     };
 
-    await saveFolder(folderName)
-      .then((response) => {
-        toggle();
-      })
-      .catch((ex) => console.log(ex));
+    if (selectedDataObj.kind === "FOLDER") {
+      await saveFolder(updatedName)
+        .then(() => {
+          toggle();
+        })
+        .catch((ex) => console.log(ex));
+    } else {
+      await saveFile(updatedName)
+        .then(() => {
+          toggle();
+        })
+        .catch((ex) => console.log(ex));
+    }
   };
 
   console.log(Object.values(selectedData)[0]._id);

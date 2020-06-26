@@ -74,15 +74,19 @@ router.post("/", async (req, res) => {
 
 router.put("/:id", async (req, res) => {
   // Update this code...
-  const folder = Folder.updateOne({ _id: 1 }, [
+  console.log(req.body);
+
+  const folder = await Folder.findByIdAndUpdate(
+    req.params.id,
     {
-      $set: {
-        lastModified: "$$NOW",
-        cancellation: { date: "$$CLUSTER_TIME", reason: "user request" },
-        status: "D",
-      },
+      $set: req.body,
     },
-  ]);
+    { new: true }
+  );
+
+  if (!folder)
+    return res.status(404).send("The folder with the given ID was not found");
+
   res.send(folder);
 });
 

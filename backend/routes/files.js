@@ -5,6 +5,7 @@ const dbDebug = require("debug")("app:db");
 const debug = require("debug")("app:debug");
 const multer = require("multer");
 const moment = require("moment");
+const fileExtension = require("file-extension");
 const MyCustomStorage = require("../utils/customStorage");
 const fs = Promise.promisifyAll(require("fs"));
 const { join } = require("path");
@@ -50,6 +51,7 @@ router.post("/", upload.array("mediaFiles", 12), async (req, res) => {
   debug("Selected file ->", selectedFiles);
 
   for (let selectedFile of selectedFiles) {
+    const fileExt = fileExtension(selectedFile.originalname);
     const slug = selectedFile.originalname.replace(/\s+/g, "-").toLowerCase();
     const parentDirectoryId = JSON.parse(req.body.mediaFiles).parentDirectoryId;
 
@@ -62,6 +64,7 @@ router.post("/", upload.array("mediaFiles", 12), async (req, res) => {
 
     const file = new File({
       name: selectedFile.originalname,
+      fileExtension: fileExt,
       slug,
       size: selectedFile.size,
       parentDirectoryId,
@@ -96,23 +99,25 @@ router.put("/:id", async (req, res) => {
   // const { error } = validate(req.body);
   // if (error) return res.status(400).send(error.details[0].message);
 
+  console.log(moment().format(Date()));
+
   console.log(req.body);
 
   // const folder = await Folder.findById(req.body.folderId);
   // if (!folder) return res.status(400).send("Invalid folder.");
 
-  const file = await File.findByIdAndUpdate(
-    req.params.id,
-    {
-      $set: req.body,
-    },
-    { new: true }
-  );
+  // const file = await File.findByIdAndUpdate(
+  //   req.params.id,
+  //   {
+  //     $set: req.body,
+  //   },
+  //   { new: true }
+  // );
 
-  if (!file)
-    return res.status(404).send("The movie with the given ID was not found");
+  // if (!file)
+  //   return res.status(404).send("The movie with the given ID was not found");
 
-  res.send(file);
+  // res.send(file);
 });
 
 router.delete("/:id", async (req, res) => {

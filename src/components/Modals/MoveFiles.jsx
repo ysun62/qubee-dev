@@ -9,7 +9,6 @@ const MoveFiles = ({
   buttonLabel,
   buttonIcon,
   modalClassName,
-  handleMove,
   collection,
   selectedData,
   getFiles,
@@ -55,8 +54,6 @@ const MoveFiles = ({
   };
 
   const selectFolderId = (id) => setSelectedFolderId(id);
-
-  console.log(selectedFolderId);
 
   return (
     <>

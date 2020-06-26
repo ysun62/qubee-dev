@@ -20,6 +20,11 @@ const fileSchema = mongoose.model(
       trim: true,
       lowercase: true,
     },
+    fileExtension: {
+      type: String,
+      required: true,
+      lowercase: true,
+    },
     metaTags: {
       type: [String],
       min: 3,
@@ -31,11 +36,11 @@ const fileSchema = mongoose.model(
       required: true,
       default: Date.now,
     },
+    modifiedDate: Date,
     size: {
       type: Number,
       required: true,
     },
-    modifiedDate: Date,
     parentMap: mongoose.Mixed,
     parentDirectoryId: {
       type: mongoose.Schema.Types.ObjectId,
