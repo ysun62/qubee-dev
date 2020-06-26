@@ -29,9 +29,11 @@ class UserHeader extends React.Component {
           style={{
             minHeight: "600px",
             backgroundImage:
-              "url(" + require("assets/img/theme/profile-cover.jpg") + ")",
+              "url(" +
+              require("../../assets/img/theme/profile-cover.jpg") +
+              ")",
             backgroundSize: "cover",
-            backgroundPosition: "center top"
+            backgroundPosition: "center top",
           }}
         >
           {/* Mask */}
@@ -48,7 +50,7 @@ class UserHeader extends React.Component {
                 <Button
                   color="info"
                   href="#pablo"
-                  onClick={e => e.preventDefault()}
+                  onClick={(e) => e.preventDefault()}
                 >
                   Edit profile
                 </Button>

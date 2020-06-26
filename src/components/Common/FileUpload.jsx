@@ -3,7 +3,6 @@ import http from "../../services/httpService";
 import { toast } from "react-toastify";
 import { FilePond, registerPlugin } from "react-filepond";
 // import { Form, Button, Input, Progress, Label } from "reactstrap";
-import config from "../../config";
 import "react-toastify/dist/ReactToastify.css";
 import "filepond/dist/filepond.min.css";
 
@@ -91,7 +90,7 @@ function FileUpload({ getFiles, toggle }) {
         onerror={(error, file, status) => handleOnError(error, file, status)}
         onprocessfiles={handleProcessedFiles}
         maxFiles={10}
-        server={config.filesEndpoint}
+        server={process.env.REACT_APP_API_URL + "/files"}
       ></FilePond>
       {/* <Form onSubmit={this.handleSubmit}>
           <div className="progress-wrapper" style={{ paddingTop: 0 }}>

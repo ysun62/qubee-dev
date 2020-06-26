@@ -1,24 +1,23 @@
 import React, { useState, useEffect } from "react";
-import http from "../../services/httpService";
-import config from "../../config";
+import { getFile, saveFile } from "../../services/fileService";
 import { toast } from "react-toastify";
 import { Button, Modal, Form, Input, Badge, Label } from "reactstrap";
 
 const MetaTag = (props) => {
   const { buttonLabel, modalClassName, fileId, getFiles } = props;
   const [modal, setModal] = useState(false);
-  const [originalValue, setOriginalValue] = useState("");
+  //const [originalValue, setOriginalValue] = useState("");
   const [inputField, setInputField] = useState(null);
   const [fileName, setFileName] = useState({});
 
   useEffect(() => {
     async function getFileById() {
-      const { data } = await http.get(config.filesEndpoint + "/" + fileId);
+      const { data } = await getFile(fileId);
       setFileName(data.name);
 
       // Break the array of tags into a list
       const metaTags = data.metaTags.join("\n");
-      setOriginalValue(metaTags);
+      //setOriginalValue(metaTags);
       setInputField(metaTags);
     }
     getFileById();
@@ -41,12 +40,12 @@ const MetaTag = (props) => {
     if (checkDuplicate(tagArray))
       return toast.error("There are duplicate tags.");
 
-    const tags = {
+    const file = {
+      _id: fileId,
       metaTags: inputField ? tagArray : [],
     };
 
-    await http
-      .put(config.filesEndpoint + "/" + fileId, tags)
+    await saveFile(file)
       .then((response) => {
         getFiles(); // Update parent component view
         toggle(e);

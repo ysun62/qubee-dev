@@ -7,27 +7,13 @@ const multer = require("multer");
 const moment = require("moment");
 const MyCustomStorage = require("../utils/customStorage");
 const fs = Promise.promisifyAll(require("fs"));
-const path = require("path");
-const mongoose = require("mongoose");
+const { join } = require("path");
 const mimeTypes = require("../utils/mimetypes");
-const { v4: uuidv4 } = require("uuid");
 const router = express.Router();
 const { File, fileBasePath, validate } = require("../models/file");
-const { Folder } = require("../models/folder");
 
-const tempDir = path.join(__dirname, "../public", "uploads/");
-
-// const storage = multer.diskStorage({
-//   destination: function (req, file, cb) {
-//     cb(null, tempDir);
-//   },
-//   filename: function (req, file, cb) {
-//     cb(
-//       null,
-//       Date.now() + "-" + file.originalname.toLowerCase().split(" ").join("-")
-//     );
-//   },
-// });
+const tempDir = join(__dirname, "../public", "uploads/");
+const uploadsFolder = join(__dirname, fileBasePath);
 
 const storage = MyCustomStorage({
   destination: function (req, file, cb) {
@@ -58,102 +44,49 @@ const upload = multer({
   },
 });
 
-// Returns true or false if it was successfull or not
-async function checkCreateUploadsFolder(uploadsFolder) {
-  const rootDirectory = Boolean(await Folder.findOne({ name: "Files" }));
-  const folder = new Folder({
-    name: "Files",
-    slug: "files",
-    rootDirectory: true,
-  });
-
-  dbDebug("Root dir exist:", rootDirectory);
-
-  try {
-    await fs.accessAsync(uploadsFolder);
-    if (!rootDirectory) {
-      await folder.save();
-      return true;
-    }
-    return true;
-  } catch (ex) {
-    try {
-      await fs.mkdirAsync(uploadsFolder);
-      if (!rootDirectory) {
-        await folder.save();
-        return true;
-      }
-      return true;
-    } catch (ex) {
-      fsDebug("Cannot create folder", ex);
-      return false;
-    }
-  }
-}
-
-router.post("/", upload.array("mediaFiles", 10), async (req, res, next) => {
-  const uploadsFolder = path.join(__dirname, fileBasePath);
+router.post("/", upload.array("mediaFiles", 12), async (req, res) => {
   const selectedFiles = req.files;
-  const folderExists = await checkCreateUploadsFolder(uploadsFolder);
 
-  debug(folderExists);
-
-  if (!folderExists) {
-    const error = new Error("There was an error creating the uploads folder.");
-    return res.status(400).send(error);
-  }
-
-  debug(selectedFiles);
+  debug("Selected file ->", selectedFiles);
 
   for (let selectedFile of selectedFiles) {
-    const filename = selectedFile.originalname
-      .toLowerCase()
-      .split(" ")
-      .join("-");
-    const parentDirectory =
-      (await Folder.findById(req.body.folderId)) ||
-      (await Folder.findOne({ name: "Files" }).select("_id name slug"));
+    const slug = selectedFile.originalname.replace(/\s+/g, "-").toLowerCase();
+    const parentDirectoryId = JSON.parse(req.body.mediaFiles).parentDirectoryId;
 
-    debug(parentDirectory);
+    dbDebug("Parent directory ID ->", parentDirectoryId);
 
-    if (!parentDirectory) {
-      return res.status(400).send("Invalid folder.");
+    if (!parentDirectoryId) {
+      dbDebug("Invalid folder");
+      return res.status(400).send("Invalid folder");
     }
 
     const file = new File({
       name: selectedFile.originalname,
-      slug: selectedFile.originalname.replace(/\s+/g, "-").toLowerCase(),
-      path: new mongoose.Types.ObjectId(),
+      slug,
       size: selectedFile.size,
-      folder: {
-        _id: parentDirectory._id,
-        name: parentDirectory.name,
-        slug: parentDirectory.slug,
-      },
+      parentDirectoryId,
     });
 
     try {
-      await fs.accessAsync(path.join(uploadsFolder, filename));
-      fsDebug("The file already exist.");
-      res.status(400).send("The file already exist.");
+      await fs.accessAsync(join(uploadsFolder, slug));
+      fsDebug("File already exists.");
+      res.status(400).send("File already exists.");
     } catch (ex) {
       try {
-        await fs.renameAsync(
-          selectedFile.path,
-          path.join(uploadsFolder, filename)
-        );
-        fsDebug("The file moved successfully.");
+        await fs.renameAsync(selectedFile.path, join(uploadsFolder, slug));
+        fsDebug("File moved to uploads folder successfully.");
         try {
           await file.save();
-          dbDebug("Document saved successfully in MongoDB.", file);
+          dbDebug("Document created successfully in MongoDB.", file);
           res.send(file);
         } catch (ex) {
-          dbDebug("Could not save document to MongoDB.", ex);
-          res.status(500).send("Could not save document to MongoDB.");
+          await fs.unlinkAsync(join(uploadsFolder, slug));
+          dbDebug("Could not create document in MongoDB.", ex);
+          res.status(500).send("Could not create document in MongoDB.");
         }
       } catch (ex) {
-        fsDebug("Could not move file to location.", ex);
-        res.status(500).send("Could not move file to location.");
+        fsDebug("Could not move file to uploads folder.", ex);
+        res.status(500).send("Could not move file to  uploads folder.");
       }
     }
   }
@@ -163,7 +96,7 @@ router.put("/:id", async (req, res) => {
   // const { error } = validate(req.body);
   // if (error) return res.status(400).send(error.details[0].message);
 
-  console.log(req.body.metaTags);
+  console.log(req.body);
 
   // const folder = await Folder.findById(req.body.folderId);
   // if (!folder) return res.status(400).send("Invalid folder.");
@@ -182,6 +115,27 @@ router.put("/:id", async (req, res) => {
   res.send(file);
 });
 
+router.delete("/:id", async (req, res) => {
+  const file = await File.findById(req.params.id);
+
+  dbDebug(file);
+
+  if (!file)
+    return res.status(404).send("The file with the given ID was not found.");
+
+  await fs
+    .unlinkAsync(join(uploadsFolder, file.slug))
+    .then(() => {
+      fsDebug("File delete successfully!");
+      file.remove();
+      res.send(file);
+    })
+    .catch((ex) => {
+      fsDebug("File was not deleted.", ex);
+      res.status(500).send("File was not deleted. " + ex);
+    });
+});
+
 router.get("/", async (req, res) => {
   const files = await File.find().select("-__v").sort("name");
   res.send(files);
@@ -191,21 +145,9 @@ router.get("/:id", async (req, res) => {
   const file = await File.findById(req.params.id);
 
   if (!file)
-    return res.status(404).send("The movie with the given ID was not found.");
+    return res.status(404).send("The file with the given ID was not found.");
 
   res.send(file);
-});
-
-router.delete("/:id", async (req, res) => {
-  console.log(req);
-
-  //const file = await File.findByIdAndRemove(req.params.id);
-  //const file = await File.deleteOne({ params: req.params.id });
-
-  // if (!file)
-  //   return res.status(404).send("The movie with the given ID was not found.");
-
-  // res.send(file);
 });
 
 module.exports = router;

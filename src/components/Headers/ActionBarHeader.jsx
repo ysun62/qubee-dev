@@ -1,12 +1,13 @@
 import React from "react";
-import FileEditActions from "components/Common/FileEditActions";
-import { Container, NavItem, NavLink, Nav, Button, Row, Col } from "reactstrap";
+import FileEditActions from "../Common/FileEditActions";
+import { Container, Row, Col } from "reactstrap";
 
 function ActionBarHeader({
-  handleDelete,
   handleMove,
   handleFolderSelection,
   collection,
+  selectedData,
+  getFiles,
 }) {
   return (
     <header className="action-bar fixed-top bg-secondary">
@@ -19,10 +20,11 @@ function ActionBarHeader({
           </Col>
           <Col md="9">
             <FileEditActions
-              handleDelete={handleDelete}
               handleMove={handleMove}
               handleFolderSelection={handleFolderSelection}
               collection={collection}
+              selectedData={selectedData}
+              getFiles={getFiles}
             />
           </Col>
         </Row>

@@ -1,30 +1,36 @@
 import React, { useState } from "react";
-import { toast } from "react-toastify";
 import { FilePond, registerPlugin } from "react-filepond";
 import { Button, Modal } from "reactstrap";
-import config from "../../config";
+import FilePondPluginFileMetadata from "filepond-plugin-file-metadata";
 import "react-toastify/dist/ReactToastify.css";
 import "filepond/dist/filepond.min.css";
+// import UploadFolderPicker from "../Common/UploadFolderPicker";
 
-registerPlugin();
+registerPlugin(FilePondPluginFileMetadata);
 
-const UploadFile = ({ buttonLabel, buttonIcon, modalClassName, getFiles }) => {
-  let buttonIconClasses = "fas fa-";
-
-  if (buttonIcon) buttonIconClasses += buttonIcon;
-
+const UploadFile = ({
+  buttonLabel,
+  buttonIcon,
+  modalClassName,
+  collection,
+  selectedData,
+  getFolderId,
+  getFiles,
+}) => {
   const [modal, setModal] = useState(false);
 
-  const toggle = () => setModal(!modal);
+  // const [selectedFolderId, setSelectedFolderId] = useState();
+
+  const toggle = () => {
+    getFiles();
+    setModal(!modal);
+  };
 
   const handleOnError = (error, file, status) => {
     console.log(error, file, status);
   };
 
-  const handleProcessedFiles = () => {
-    getFiles();
-    toggle();
-  };
+  // const selectFolderId = (id) => setSelectedFolderId(id);
 
   return (
     <div className="file-upload-component">
@@ -35,9 +41,7 @@ const UploadFile = ({ buttonLabel, buttonIcon, modalClassName, getFiles }) => {
         type="button"
         onClick={toggle}
       >
-        <span className="btn-inner--icon">
-          <i className={buttonIconClasses} />
-        </span>
+        {buttonIcon}
         <span className="btn-inner--text">{buttonLabel}</span>
       </Button>
       <Modal
@@ -61,16 +65,21 @@ const UploadFile = ({ buttonLabel, buttonIcon, modalClassName, getFiles }) => {
           </button>
         </div>
         <div className="modal-body">
+          {/* <UploadFolderPicker
+            collection={collection}
+            selectedData={selectedData}
+            selectedFolderId={selectFolderId}
+          /> */}
           <FilePond
-            //ref={(ref) => (pond = ref)}
             allowMultiple={true}
             name={"mediaFiles"}
             onerror={(error, file, status) =>
               handleOnError(error, file, status)
             }
-            onprocessfiles={handleProcessedFiles}
-            maxFiles={10}
-            server={config.filesEndpoint}
+            onprocessfiles={toggle}
+            maxFiles={12}
+            server={process.env.REACT_APP_API_URL + "/files"}
+            fileMetadataObject={{ parentDirectoryId: getFolderId }}
           ></FilePond>
         </div>
       </Modal>

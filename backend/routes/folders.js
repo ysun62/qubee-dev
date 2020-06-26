@@ -7,50 +7,42 @@ const fs = Promise.promisifyAll(require("fs"));
 const { join } = require("path");
 const mongoose = require("mongoose");
 const router = express.Router();
-const createUploadsDirs = require("../utils/createUploadsDirs");
 const { Folder, folderBasePath, validateFolder } = require("../models/folder");
+const { File, fileBasePath, validate } = require("../models/file");
 
 const uploadsFolder = join(__dirname, folderBasePath);
 
-function deleteFolderRecursive(path) {
-  if (fs.existsSync(path)) {
-    fs.readdirSync(path).forEach((file, index) => {
-      const curPath = join(path, file);
-      if (fs.lstatSync(curPath).isDirectory()) {
-        // recurse
-        deleteFolderRecursive(curPath);
-      } else {
-        // delete file
-        fs.unlinkSync(curPath);
-      }
-    });
-    fs.rmdirSync(path);
-  }
-}
+// function deleteFolderRecursive(path) {
+//   if (fs.existsSync(path)) {
+//     fs.readdirSync(path).forEach((file, index) => {
+//       const curPath = join(path, file);
+//       if (fs.lstatSync(curPath).isDirectory()) {
+//         // recurse
+//         deleteFolderRecursive(curPath);
+//       } else {
+//         // delete file
+//         fs.unlinkSync(curPath);
+//       }
+//     });
+//     fs.rmdirSync(path);
+//   }
+// }
 
 router.post("/", async (req, res) => {
-  const folderExists = await createUploadsDirs(uploadsFolder);
+  const folderName = req.body.name;
+  const parentDirectoryId = req.body.parentDirectoryId;
+  const slug = folderName.replace(/\s+/g, "-").toLowerCase();
 
-  if (!folderExists) {
-    return res
-      .status(500)
-      .send("There was an error creating the uploads folder.");
-  }
+  dbDebug(parentDirectoryId);
 
-  const parentDirectory = await Folder.findById(req.body.folderId);
-  //|| (await Folder.findOne({ name: "Files" }).select("_id name"));
-
-  dbDebug(parentDirectory);
-
-  if (!parentDirectory) {
+  if (!parentDirectoryId) {
     return res.status(400).send("Invalid folder.");
   }
 
-  //const slug = req.body.name.replace(/\s+/g, "-").toLowerCase();
-
   const folder = new Folder({
-    name: req.body.name,
-    parents: [parentDirectory._id],
+    name: folderName,
+    slug,
+    parentDirectoryId,
   });
 
   // Create virtual directories
@@ -95,11 +87,14 @@ router.put("/:id", async (req, res) => {
 });
 
 router.delete("/:id", async (req, res) => {
-  const folder = await Folder.findByIdAndRemove(req.params.id);
-  //const image = await Image.deleteOne({ params: req.params.id });
+  const folder = await Folder.findById(req.params.id);
+
+  dbDebug(folder);
 
   if (!folder)
-    return res.status(404).send("The movie with the given ID was not found.");
+    return res.status(404).send("The folder with the given ID was not found.");
+
+  await folder.remove();
 
   res.send(folder);
 });

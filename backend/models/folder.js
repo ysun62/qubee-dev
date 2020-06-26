@@ -10,6 +10,14 @@ const folderSchema = new mongoose.Schema({
     maxlength: 50,
     trim: true,
   },
+  slug: {
+    type: String,
+    required: true,
+    minlength: 1,
+    maxlength: 50,
+    trim: true,
+    lowercase: true,
+  },
   createdDate: {
     type: Date,
     required: true,
@@ -17,7 +25,10 @@ const folderSchema = new mongoose.Schema({
   },
   modifiedDate: Date,
   parentMap: mongoose.Mixed,
-  parents: [String],
+  parentDirectoryId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Folder",
+  },
   isRoot: {
     type: Boolean,
     required: true,

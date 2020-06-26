@@ -1,24 +1,27 @@
 import React from "react";
-import classnames from "classnames";
-import ShareFiles from "components/Modals/ShareFiles";
-import DeleteFiles from "components/Modals/DeleteFiles";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { NavItem, Nav, Button } from "reactstrap";
+import ShareFiles from "../Modals/ShareFiles";
+import DeleteFiles from "../Modals/DeleteFiles";
 import MoveFiles from "../Modals/MoveFiles";
-import { Container, NavItem, NavLink, Nav, Button, Row, Col } from "reactstrap";
+import RenameFile from "../Modals/RenameFile";
 
 function FileEditActions({
-  handleDelete,
   handleMove,
   handleFolderSelection,
   collection,
+  selectedData,
+  getFiles,
 }) {
   return (
     <Nav className="justify-content-end navbar" role="tablist">
       <NavItem>
         <ShareFiles
           buttonLabel="Share"
-          buttonIcon="share-alt"
+          buttonIcon={<FontAwesomeIcon icon="share-alt" />}
           modalClassName="modal-dialog-centered"
           collection={collection}
+          selectedData={selectedData}
         />
       </NavItem>
       {/* <NavItem>
@@ -28,32 +31,38 @@ function FileEditActions({
           </span>
           <span className="btn-inner--text d-md-inline d-none">Download</span>
         </Button>
-      </NavItem>
-      <NavItem>
-        <Button color="link">
-          <span className="btn-inner--icon mr-md-1 mr-0">
-            <i className="fas fa-edit" />
-          </span>
-          <span className="btn-inner--text d-md-inline d-none">Rename</span>
-        </Button>
       </NavItem> */}
+      <NavItem>
+        <RenameFile
+          buttonLabel="Rename"
+          buttonIcon={<FontAwesomeIcon icon="edit" />}
+          disable={false}
+          modalClassName="modal-dialog"
+          collection={collection}
+          selectedData={selectedData}
+          getFiles={getFiles}
+        />
+      </NavItem>
       <NavItem>
         <MoveFiles
           buttonLabel="Move"
-          buttonIcon="file-export"
+          buttonIcon={<FontAwesomeIcon icon="file-export" />}
           modalClassName="modal-dialog"
           handleMove={handleMove}
           handleFolderSelection={handleFolderSelection}
           collection={collection}
+          selectedData={selectedData}
+          getFiles={getFiles}
         />
       </NavItem>
       <NavItem>
         <DeleteFiles
           buttonLabel="Delete"
-          buttonIcon="trash-alt"
+          buttonIcon={<FontAwesomeIcon icon="trash-alt" />}
           modalClassName="modal-dialog"
-          handleDelete={handleDelete}
           collection={collection}
+          selectedData={selectedData}
+          getFiles={getFiles}
         />
       </NavItem>
       <NavItem>

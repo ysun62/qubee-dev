@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import CreateFolder from "../components/Modals/CreateFolder";
 import { getFolders } from "../services/folderService";
 import { getFiles } from "../services/fileService";
-//import Header from "components/Headers/Header";
+//import Header from "../components/Headers/Header";
 import {
   Container,
   Row,

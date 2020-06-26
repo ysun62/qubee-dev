@@ -12,10 +12,12 @@ async function createUploadsDirs(uploadsDir, sharedDir) {
   const rootDirs = [
     {
       name: "All",
+      slug: "all",
       isRoot: true,
     },
     {
       name: "Shared",
+      slug: "shared",
       isRoot: true,
     },
   ];

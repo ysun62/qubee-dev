@@ -31,7 +31,7 @@ import {
   InputGroupAddon,
   InputGroupText,
   InputGroup,
-  Col
+  Col,
 } from "reactstrap";
 
 class Login extends FormValidation {
@@ -102,7 +102,7 @@ class Login extends FormValidation {
                   <span className="btn-inner--icon">
                     <img
                       alt="..."
-                      src={require("assets/img/icons/common/github.svg")}
+                      src={require("../../assets/img/icons/common/github.svg")}
                     />
                   </span>
                   <span className="btn-inner--text">Github</span>

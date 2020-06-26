@@ -46,15 +46,11 @@ class ShareFiles extends Component {
       backdrop,
       keyboard,
     } = this.props;
-    let buttonIconClasses = "fas fa-";
-    if (buttonIcon) buttonIconClasses += buttonIcon;
 
     return (
       <>
         <Button color="link" type="button" onClick={this.handleToggle}>
-          <span className="btn-inner--icon mr-md-1 mr-0">
-            <i className={buttonIconClasses} />
-          </span>
+          {buttonIcon}
           <span className="btn-inner--text d-md-inline d-none">
             {buttonLabel}
           </span>

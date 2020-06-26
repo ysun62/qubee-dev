@@ -21,17 +21,13 @@ import { ToastContainer } from "react-toastify";
 import { Container } from "reactstrap";
 import { getFolders } from "../services/folderService";
 import { getFiles } from "../services/fileService";
-import AdminNavbar from "components/Navbars/AdminNavbar";
-import AdminFooter from "components/Footers/AdminFooter";
-import ActionBarHeader from "components/Headers/ActionBarHeader";
-import Sidebar from "components/Sidebar/Sidebar";
-import Checkbox from "../components/Common/Checkbox";
-import Folders from "../views/Folders";
+import AdminNavbar from "../components/Navbars/AdminNavbar";
+import AdminFooter from "../components/Footers/AdminFooter";
+import ActionBarHeader from "../components/Headers/ActionBarHeader";
+import Sidebar from "../components/Sidebar/Sidebar";
 import SearchResults from "../views/SearchResults";
 import Files from "../views/Files";
-import http from "../services/httpService";
-import config from "../config";
-import routes from "routes.js";
+import routes from "../routes.js";
 
 class Admin extends Component {
   constructor(props) {
@@ -39,23 +35,23 @@ class Admin extends Component {
     this.state = {
       collection: {
         dataCache: [],
-        count: 0,
+        models: [],
         rootFolder: {},
         sharedFolder: {},
       },
       selection: {
+        selected: null,
         selectionData: [],
-        deletableCount: 0,
-        editableCount: 0,
       },
-      selectMode: true,
-      selected: false,
+      count: 0,
+      folderId: "",
+      selectMode: false,
     };
   }
 
   componentDidMount() {
     document.body.classList.add("bg-default");
-    this.getFiles();
+    this.getAllFiles();
   }
 
   componentWillUnmount() {
@@ -68,27 +64,20 @@ class Admin extends Component {
     this.refs.mainContent.scrollTop = 0;
   }
 
-  // TODO: Count should display the number of files withing a folder.
-  getFiles = async () => {
+  getAllFiles = async () => {
     const { data: files } = await getFiles();
     const { data: folders } = await getFolders();
-    const dataCache = folders.concat(files);
+    const dataCache = [...folders, ...files];
+    let models = dataCache.filter(
+      (data) => data.name !== "All" && data.name !== "Shared"
+    );
 
     this.setState({
       collection: {
         dataCache: dataCache,
-        count: files.length + folders.length,
+        models: models,
         rootFolder: folders.find(({ name }) => name === "All"),
         sharedFolder: folders.find(({ name }) => name === "Shared"),
-      },
-      selection: {
-        selectionData: dataCache.reduce(
-          (options, option) => ({
-            ...options,
-            [option]: false,
-          }),
-          {}
-        ),
       },
     });
   };
@@ -122,98 +111,105 @@ class Admin extends Component {
     return "Brand";
   };
 
-  handleDelete = async (file) => {
-    const originalFiles = this.state.files;
-
-    const files = this.state.files.filter((p) => p._id !== file._id);
-    this.setState({ files });
-
-    try {
-      await http.delete(`${config.filesEndpoint}/${file._id}`);
-      //throw new Error("Something went wrong!");
-    } catch (err) {
-      // Expected (404: not found, 400: bad request) - Client Errors
-      // - Display a specific error message
-      if (err.response && err.response.status === 404)
-        alert("This file has already been deleted.");
-      this.setState({ files: originalFiles });
-    }
-  };
-
   handleMove = (files) => {
     console.log(files);
   };
 
-  handleFolderSelection = (folder) => {
-    console.log(folder);
-  };
+  handleFileCount = (count) => this.setState({ count });
 
-  showHideComponent = (value) => {
-    console.log(value.target);
-    // if (value) {
-    //   this.setState({
-    //     display: true,
-    //   });
-    // } else {
-    //   this.setState({
-    //     display: false,
-    //   });
-    // }
-  };
+  handleFolderId = (folderId) => this.setState({ folderId });
 
-  createCheckbox = (option) => (
-    <Checkbox
-      file={option}
-      isSelected={this.state.checkboxes[option]}
-      onCheckboxChange={this.handleCheckboxChange}
-      key={option}
-    />
-  );
-
-  handleCheckboxClick = (e) => {
-    const item = e.target.id;
-    const isChecked = e.target.checked;
-    const files = this.state.collection.dataCache.filter(
-      (file) => file._id === item
+  selectAllCheckboxes = (isSelected) => {
+    const selectionData = { ...this.state.selection.selectionData };
+    const models = this.state.collection.models.filter(
+      (m) => m.parentDirectoryId === this.state.folderId
     );
 
-    if (item && isChecked) {
-      this.setState((prevState) => ({
-        selection: {
-          selectionData: prevState.selection.selectionData.add(files[0]),
-        },
-      }));
+    console.log(models);
+
+    if (isSelected) {
+      models.map((model) =>
+        this.setState((prevState) => ({
+          selection: {
+            selectionData: {
+              ...prevState.selection.selectionData,
+              [model._id]: model,
+            },
+          },
+        }))
+      );
+    } else {
+      Object.keys(selectionData).map((model) => {
+        delete selectionData[model];
+        return this.setState({
+          selection: {
+            selectionData: selectionData,
+          },
+        });
+      });
     }
   };
 
-  // clearAllCheckboxes = () => {
-  //   const clearCheckedItems = new Map();
-  //   this.setState({ checkedItems: clearCheckedItems });
-  // };
+  selectAll = (bool) => this.selectAllCheckboxes(bool);
+
+  handleCheckboxChange = (file) => {
+    const id = file._id;
+    const selectionData = { ...this.state.selection.selectionData };
+
+    if (!this.state.selection.selectionData.hasOwnProperty(id)) {
+      this.setState((prevState) => ({
+        selection: {
+          selectionData: {
+            ...prevState.selection.selectionData,
+            [id]: file,
+          },
+        },
+      }));
+    } else {
+      delete selectionData[id];
+      this.setState({
+        selection: {
+          selectionData: selectionData,
+        },
+      });
+    }
+  };
 
   render() {
-    const { selectMode, collection } = this.state;
+    const { collection, selection, count, folderId } = this.state;
+
+    //console.log(selection.selectionData, folderId);
+
+    let actionBarHeader;
+
+    if (Object.keys(selection.selectionData).length) {
+      actionBarHeader = (
+        <ActionBarHeader
+          {...this.props}
+          collection={collection}
+          handleMove={this.handleMove}
+          handleFolderSelection={this.handleFolderSelection}
+          selectedData={selection.selectionData}
+          getFiles={this.getAllFiles}
+        />
+      );
+    }
+
     return (
       <>
         <ToastContainer draggable={false} position="bottom-left" />
-        {selectMode && (
-          <ActionBarHeader
-            {...this.props}
-            handleDelete={this.handleDelete}
-            handleMove={this.handleMove}
-            handleFolderSelection={this.handleFolderSelection}
-            collection={collection}
-          />
-        )}
+        {actionBarHeader}
         <Sidebar
           {...this.props}
           routes={routes}
           logo={{
             innerLink: "/admin/index",
-            imgSrc: require("assets/img/brand/qubee_logo.png"),
+            imgSrc: require("../assets/img/brand/qubee_logo.png"),
             imgAlt: "...",
           }}
-          getFiles={this.getFiles}
+          collection={collection}
+          getFiles={this.getAllFiles}
+          getFolderId={folderId}
         />
         <div className="main-content" ref="mainContent">
           <AdminNavbar
@@ -224,10 +220,17 @@ class Admin extends Component {
             <Route
               path="/admin/folder/:id"
               render={(props) => (
-                <Folders
+                <Files
                   {...props}
                   collection={collection}
-                  getFiles={this.getFiles}
+                  getFiles={this.getAllFiles}
+                  isSelected={selection.selectionData}
+                  onSelectAll={this.selectAll}
+                  onCheckboxClick={this.handleCheckboxChange}
+                  setFolderId={this.handleFolderId}
+                  getFolderId={folderId}
+                  setFileCount={this.handleFileCount}
+                  getFileCount={count}
                 />
               )}
             />
@@ -239,10 +242,14 @@ class Admin extends Component {
                 <Files
                   {...props}
                   collection={collection}
-                  folderId={collection.rootFolder._id}
-                  getFiles={this.getFiles}
-                  isSelected={this.state.selection}
-                  onCheckboxChange={this.handleCheckboxClick}
+                  getFiles={this.getAllFiles}
+                  isSelected={selection.selectionData}
+                  onSelectAll={this.selectAll}
+                  onCheckboxClick={this.handleCheckboxChange}
+                  setFolderId={this.handleFolderId}
+                  getFolderId={folderId}
+                  setFileCount={this.handleFileCount}
+                  getFileCount={count}
                 />
               )}
             />
