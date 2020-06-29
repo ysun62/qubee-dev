@@ -99,10 +99,10 @@ router.put("/:id", async (req, res) => {
   // const { error } = validate(req.body);
   // if (error) return res.status(400).send(error.details[0].message);
 
-  dbDebug(req.body);
+  dbDebug(join(uploadsFolder, req.body.slug));
 
-  const oldFilename = await File.findById(req.body._id);
-  dbDebug(oldFilename.slug);
+  const oldFilename = await File.findById(req.params.id);
+  dbDebug(join(uploadsFolder, oldFilename.slug));
 
   // const folder = await Folder.findById(req.body.folderId);
   // if (!folder) return res.status(400).send("Invalid folder.");
@@ -112,12 +112,13 @@ router.put("/:id", async (req, res) => {
       .accessAsync(join(uploadsFolder, oldFilename.slug))
       .then(async () => {
         fs.rename(
-          join(uploadsFolder, req.body.slug),
           join(uploadsFolder, oldFilename.slug),
+          join(uploadsFolder, req.body.slug),
           (err) => {
-            return res
-              .status(500)
-              .send("There was an error renaming the file with given ID.", err);
+            if (err)
+              return res
+                .status(500)
+                .send("There was an error renaming the file with given ID.");
           }
         );
 
