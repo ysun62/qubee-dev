@@ -56,12 +56,12 @@ When all the packages are installed, browse back to the root directory run this 
 
 ```zsh
 cd ..
-echo "REACT_APP_API_URL=http://localhost:5000/api" > .env.development
+echo "REACT_APP_API_URL=http://localhost:5000/api" > .env
 ```
 
-This will create a development .env file with REACT_APP_API_URL variable. This api URL is used to make calls to the nodejs backend.
+This will create a .env file with REACT_APP_API_URL environment variable. This API URL is used to interact with the nodejs backend.
 
-Finally make sure you have MongoDB compass is running on the default local URL: mongodb://localhost:27017
+Finally make sure you have MongoDB server and compass installed/setup and is running on the default local URL: mongodb://localhost:27017
 
 ## Usage
 
