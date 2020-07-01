@@ -41,7 +41,7 @@ const CreateFolder = ({
 
   return (
     <div className="file-upload-component">
-      <Button color="secondary" type="button" onClick={toggle}>
+      <Button color="secondary" type="button" onClick={toggle} className="ml-1">
         <span className="btn-inner--icon">
           <i className={buttonIconClasses} />
         </span>
