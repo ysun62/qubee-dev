@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import FilesHeader from "../components/Common/FilesHeader";
 import FilesBody from "../components/Common/FilesBody";
 import { Container, Row, Col, Card } from "reactstrap";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 function Files({
   collection,
@@ -35,8 +34,6 @@ function Files({
                 getFiles={getFiles}
                 getFileCount={getFileCount}
                 getFolderId={getFolderId}
-                listIcon={<FontAwesomeIcon icon="th-list" size="lg" />}
-                galleryIcon={<FontAwesomeIcon icon="th" size="lg" />}
                 toggleView={toggleView}
               />
               <FilesBody

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Card,
   Button,
@@ -12,6 +12,23 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 export default function GalleryView({ allFiles, isSelected, onCheckboxClick }) {
+  const [isStarred, setIsStarred] = useState(false);
+  const [hasComment, setHasComment] = useState(false);
+  const [isTimed, setIsTimed] = useState(false);
+
+  //   const onStarClick = (file) => {
+  //     console.log(file);
+  //     setIsStarred(!isStarred);
+  //   };
+
+  //   const onCommentClick = (file) => {
+  //     setHasComment(!hasComment);
+  //   };
+
+  //   const onClockClick = (file) => {
+  //     setIsTimed(!isTimed);
+  //   };
+
   let galleryView;
 
   if (allFiles.length) {
@@ -48,7 +65,25 @@ export default function GalleryView({ allFiles, isSelected, onCheckboxClick }) {
               </CardText>
               <Button>Go somewhere</Button>
             </CardBody>
-            <CardFooter className="text-muted">Footer</CardFooter>
+            <CardFooter className="text-muted">
+              <FontAwesomeIcon
+                size="lg"
+                icon={isStarred ? "star" : ["far", "star"]}
+                // onClick={() => onStarClick(file)}
+                className="mr-4"
+              />
+              <FontAwesomeIcon
+                size="lg"
+                icon={hasComment ? "comment-dots" : "comment"}
+                // onClick={() => onCommentClick(file)}
+              />
+              <FontAwesomeIcon
+                size="lg"
+                icon={isTimed ? "clock" : ["far", "clock"]}
+                className="float-right"
+                // onClick={() => onClockClick(file)}
+              />
+            </CardFooter>
           </Card>
         ))}
       </Container>
