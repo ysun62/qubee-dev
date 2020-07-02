@@ -1,7 +1,8 @@
-import React from "react";
+import React, { useState } from "react";
 import FilesHeader from "../components/Common/FilesHeader";
 import FilesBody from "../components/Common/FilesBody";
 import { Container, Row, Col, Card } from "reactstrap";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 function Files({
   collection,
@@ -15,6 +16,12 @@ function Files({
   getFileCount,
   ...props
 }) {
+  const [view, setView] = useState("list");
+
+  const toggleView = (option) => {
+    option === "list" ? setView("list") : setView("gallery");
+  };
+
   return (
     <>
       <Container className="pt-7" fluid>
@@ -28,9 +35,13 @@ function Files({
                 getFiles={getFiles}
                 getFileCount={getFileCount}
                 getFolderId={getFolderId}
+                listIcon={<FontAwesomeIcon icon="th-list" size="lg" />}
+                galleryIcon={<FontAwesomeIcon icon="th" size="lg" />}
+                toggleView={toggleView}
               />
               <FilesBody
                 {...props}
+                view={view}
                 collection={collection}
                 getFiles={getFiles}
                 onSelectAll={onSelectAll}
