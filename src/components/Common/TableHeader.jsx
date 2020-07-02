@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Button } from "reactstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-function TableHeader({ isSelected, onSelectAll }) {
+function TableHeader({ isSelected, onSelectAll, handleSortFiles }) {
   const [toggleCheckAll, setToggleCheckAll] = useState(false);
 
   const selectAll = () => {
@@ -30,11 +30,11 @@ function TableHeader({ isSelected, onSelectAll }) {
             />
           </Button>
         </th>
-        <th scope="col" width="50%">
+        <th className="sortable" scope="col" width="50%" onClick={() => handleSortFiles('name')}>
           File Name
         </th>
-        <th scope="col">Date Added</th>
-        <th scope="col">Size</th>
+        <th className="sortable" scope="col" onClick={() => handleSortFiles('createdDate')}>Date Added</th>
+        <th className="sortable" scope="col" onClick={() => handleSortFiles('size')}>Size</th>
       </tr>
     </thead>
   );

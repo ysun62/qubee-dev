@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import MetaTags from "../Modals/MetaTags";
 import fileSizeConversion from "../../utils/fileSizeConversion";
+import { sortFiles } from '../../utils/sortFiles';
 
 function TableBody({
   collection,
@@ -21,14 +22,17 @@ function TableBody({
       ? props.match.params.id
       : collection.rootFolder._id;
 
-    setAllFiles(
-      collection.dataCache.filter((file) => file.parentDirectoryId === folderId)
-    );
+    let _allFiles = collection.dataCache.filter((file) => file.parentDirectoryId === folderId);
+    if (collection.sorting) {
+      sortFiles(_allFiles, collection.sorting.attribute, collection.sorting.direction)
+    }
+    setAllFiles(_allFiles);
 
     setFileCount(allFiles.length);
     setFolderId(folderId);
   }, [
     allFiles.length,
+    collection.sorting,
     collection.dataCache,
     collection.rootFolder._id,
     props.match.params.id,
