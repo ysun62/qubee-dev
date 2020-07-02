@@ -1,12 +1,10 @@
 import React from 'react';
 import { Button } from 'reactstrap';
-import { getDownloadFileUrl } from '../../services/fileService';
-import { openInNewTab } from '../../utils/browser';
+import { downloadFiles } from '../../services/fileService';
 
 const DownloadFiles = ({ selectedData, buttonLabel, buttonIcon }) => {
   function handleDownload() {
-    const url = getDownloadFileUrl(selectedData);
-    openInNewTab(url);
+    downloadFiles(selectedData);
   }
 
   return (
