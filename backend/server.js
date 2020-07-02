@@ -10,6 +10,8 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const bodyParser = require("body-parser");
+const zip = require('express-easy-zip');
+
 const createUploadsDirs = require("./utils/createUploadsDirs");
 const filesRoute = require("./routes/files");
 const foldersRoute = require("./routes/folders");
@@ -104,6 +106,7 @@ app.use(
 app.use(bodyParser.json());
 app.use(cookieParser());
 app.use(cors(corsOptions));
+app.use(zip());
 
 // configuring the upload file routes
 app.use(express.static("public"));

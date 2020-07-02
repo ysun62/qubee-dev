@@ -25,6 +25,7 @@ function FilesBody({
         {...props}
         isSelected={isSelected}
         onSelectAll={onSelectAll}
+        handleSortFiles={handleSortFiles}
       />
       <TableBody
         {...props}
@@ -34,7 +35,6 @@ function FilesBody({
         onCheckboxClick={onCheckboxClick}
         setFolderId={setFolderId}
         setFileCount={setFileCount}
-        handleSortFiles={handleSortFiles}
       />
     </Table>
   );

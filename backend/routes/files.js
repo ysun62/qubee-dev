@@ -187,4 +187,27 @@ router.get("/:id", async (req, res) => {
   res.send(file);
 });
 
+router.get("/download/:files", async (req, res) => {
+  const files = req.params.files || '';
+  const filesPms = files.split(';').filter(item => !!item).map(id => File.findById(id));
+  const fileModels = await Promise.all(filesPms);
+
+  const zipFiles = fileModels
+    .filter(file => !!file)
+    .map(file => ({
+      path: join(uploadsFolder, file.slug),
+      name: file.name,
+    }));
+
+  try {
+    await res.zip({
+      files: zipFiles,
+      filename: 'download.zip'
+    });
+  } catch (e) {
+    console.log(e);
+  }
+
+})
+
 module.exports = router;

@@ -25,3 +25,9 @@ export function saveFile(file) {
 export function deleteFile(fileId) {
   return http.delete(fileUrl(fileId));
 }
+
+export function getDownloadFileUrl(selectedData) {
+  const items = Object.values(selectedData);
+  const fileIds = items.filter(item => item.kind === 'FILE').map(item => item._id).join(';');
+  return `${apiEndpoint}/download/${fileIds}`;
+}
