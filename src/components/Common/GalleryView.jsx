@@ -1,21 +1,14 @@
-import React, { useState } from "react";
-import {
-  Card,
-  Button,
-  CardHeader,
-  CardFooter,
-  CardBody,
-  CardTitle,
-  CardText,
-  Container,
-} from "reactstrap";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import React from "react";
+import FileCard from "./FileCard";
+
+const gridStyles = {
+  display: "grid",
+  gridGap: "0.25rem",
+  gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))",
+  padding: "0 1rem 3rem",
+};
 
 export default function GalleryView({ allFiles, isSelected, onCheckboxClick }) {
-  const [isStarred, setIsStarred] = useState(false);
-  const [hasComment, setHasComment] = useState(false);
-  const [isTimed, setIsTimed] = useState(false);
-
   //   const onStarClick = (file) => {
   //     console.log(file);
   //     setIsStarred(!isStarred);
@@ -33,60 +26,19 @@ export default function GalleryView({ allFiles, isSelected, onCheckboxClick }) {
 
   if (allFiles.length) {
     galleryView = (
-      <Container>
+      //   <div className="d-flex justify-content-start px-3 pb-5 flex-wrap">
+      <div style={gridStyles}>
+        {/* <Row xs="1" sm="2" md="4"> */}
         {allFiles.map((file) => (
-          <Card key={file._id}>
-            <CardHeader tag="h3">
-              {" "}
-              <Button
-                color="link"
-                size="sm"
-                type="button"
-                onClick={() => onCheckboxClick(file)}
-              >
-                <FontAwesomeIcon
-                  icon={
-                    isSelected[file._id] ? "check-square" : ["far", "square"]
-                  }
-                  size="lg"
-                />
-              </Button>
-              <FontAwesomeIcon
-                icon="ellipsis-v"
-                size="lg"
-                className="float-right"
-              />
-            </CardHeader>
-            <CardBody>
-              <CardTitle>Special Title Treatment</CardTitle>
-              <CardText>
-                With supporting text below as a natural lead-in to additional
-                content.
-              </CardText>
-              <Button>Go somewhere</Button>
-            </CardBody>
-            <CardFooter className="text-muted">
-              <FontAwesomeIcon
-                size="lg"
-                icon={isStarred ? "star" : ["far", "star"]}
-                // onClick={() => onStarClick(file)}
-                className="mr-4"
-              />
-              <FontAwesomeIcon
-                size="lg"
-                icon={hasComment ? "comment-dots" : "comment"}
-                // onClick={() => onCommentClick(file)}
-              />
-              <FontAwesomeIcon
-                size="lg"
-                icon={isTimed ? "clock" : ["far", "clock"]}
-                className="float-right"
-                // onClick={() => onClockClick(file)}
-              />
-            </CardFooter>
-          </Card>
+          <FileCard
+            file={file}
+            isSelected={isSelected}
+            onCheckboxClick={onCheckboxClick}
+            key={file._id}
+          />
         ))}
-      </Container>
+        {/* </Row> */}
+      </div>
     );
   } else {
     galleryView = <div></div>;

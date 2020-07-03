@@ -36,7 +36,7 @@ function FilesBody({
   ]);
 
   return (
-    <div>
+    <>
       {view === "list" ? (
         <ListView
           allFiles={allFiles}
@@ -54,7 +54,7 @@ function FilesBody({
           onSelectAll={onSelectAll}
         />
       )}
-    </div>
+    </>
   );
 }
 
