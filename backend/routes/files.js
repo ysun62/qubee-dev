@@ -11,9 +11,9 @@ const fs = Promise.promisifyAll(require("fs"));
 const { join } = require("path");
 const mimeTypes = require("../utils/mimetypes");
 const router = express.Router();
-const { File, fileBasePath, validate } = require("../models/file");
+const { File, fileBasePath } = require("../models/file");
 
-const tempDir = join(__dirname, "../../public", "uploads/");
+const tempDir = join(__dirname, "../public", "uploads/");
 const uploadsFolder = join(__dirname, fileBasePath);
 
 const storage = MyCustomStorage({
@@ -186,28 +186,5 @@ router.get("/:id", async (req, res) => {
 
   res.send(file);
 });
-
-router.get("/download/:files", async (req, res) => {
-  const files = req.params.files || '';
-  const filesPms = files.split(';').filter(item => !!item).map(id => File.findById(id));
-  const fileModels = await Promise.all(filesPms);
-
-  const zipFiles = fileModels
-    .filter(file => !!file)
-    .map(file => ({
-      path: join(uploadsFolder, file.slug),
-      name: file.name,
-    }));
-
-  try {
-    await res.zip({
-      files: zipFiles,
-      filename: 'download.zip'
-    });
-  } catch (e) {
-    console.log(e);
-  }
-
-})
 
 module.exports = router;

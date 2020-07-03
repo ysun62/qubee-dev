@@ -1,14 +1,23 @@
-import React, { useState } from "react";
-import { Button } from "reactstrap";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import React, { useState } from 'react';
+import { Button } from 'reactstrap';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-function TableHeader({ isSelected, onSelectAll, handleSortFiles }) {
+function TableHeader({ isSelected, onSelectAll, handleSortFiles, collection }) {
   const [toggleCheckAll, setToggleCheckAll] = useState(false);
-
+  const { sorting } = collection;
   const selectAll = () => {
     onSelectAll(!toggleCheckAll);
     setToggleCheckAll(!toggleCheckAll);
   };
+
+  function renderSortDirection(attributeName) {
+    if (!sorting || sorting.attribute !== attributeName) return null;
+    if (sorting.direction === 'ASC') {
+      return <FontAwesomeIcon icon="arrow-up" />;
+    } else {
+      return <FontAwesomeIcon icon="arrow-down" />;
+    }
+  }
 
   return (
     <thead className="thead-light">
@@ -25,16 +34,33 @@ function TableHeader({ isSelected, onSelectAll, handleSortFiles }) {
           </div> */}
           <Button color="link" size="sm" onClick={selectAll}>
             <FontAwesomeIcon
-              icon={toggleCheckAll ? "check-square" : ["far", "square"]}
+              icon={toggleCheckAll ? 'check-square' : ['far', 'square']}
               size="lg"
             />
           </Button>
         </th>
-        <th className="sortable" scope="col" width="50%" onClick={() => handleSortFiles('name')}>
-          File Name
+        <th
+          className="sortable"
+          scope="col"
+          width="50%"
+          onClick={() => handleSortFiles('name')}
+        >
+          File Name &nbsp;{renderSortDirection('name')}
         </th>
-        <th className="sortable" scope="col" onClick={() => handleSortFiles('createdDate')}>Date Added</th>
-        <th className="sortable" scope="col" onClick={() => handleSortFiles('size')}>Size</th>
+        <th
+          className="sortable"
+          scope="col"
+          onClick={() => handleSortFiles('createdDate')}
+        >
+          Date Added &nbsp;{renderSortDirection('createdDate')}
+        </th>
+        <th
+          className="sortable"
+          scope="col"
+          onClick={() => handleSortFiles('size')}
+        >
+          Size &nbsp;{renderSortDirection('size')}
+        </th>
       </tr>
     </thead>
   );

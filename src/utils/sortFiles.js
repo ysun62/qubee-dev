@@ -32,9 +32,9 @@ function _sortByDate(date1, date2, direction) {
 
 function _sortByNumber(size1, size2, direction) {
   if (size1 < size2) {
-    return direction === 'ASC' ? 1 : -1;
-  } else if (size1 > size2) {
     return direction === 'ASC' ? -1 : 1;
+  } else if (size1 > size2) {
+    return direction === 'ASC' ? 1 : -1;
   } else {
     return 0;
   }
