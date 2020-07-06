@@ -81,7 +81,7 @@ class Admin extends Component {
         sharedFolder: folders.find(({ name }) => name === "Shared"),
         sorting: {
           attribute: 'name',
-          direction: 'DESC',
+          direction: 'ASC',
         },
       },
     });

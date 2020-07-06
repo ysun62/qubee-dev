@@ -13,9 +13,9 @@ function TableHeader({ isSelected, onSelectAll, handleSortFiles, collection }) {
   function renderSortDirection(attributeName) {
     if (!sorting || sorting.attribute !== attributeName) return null;
     if (sorting.direction === 'ASC') {
-      return <FontAwesomeIcon icon="arrow-up" />;
-    } else {
       return <FontAwesomeIcon icon="arrow-down" />;
+    } else {
+      return <FontAwesomeIcon icon="arrow-up" />;
     }
   }
 

@@ -28,7 +28,8 @@ router.post("/", async (req, res) => {
       console.log(e);
     }
   } else if (availableFiles.length === 1 ) {
-    const filename = join(uploadsFolder, file.slug);
+    const file = availableFiles[0];
+    const filename = join(uploadsFolder, file.slug);    
     res.download(filename);
   } else {
     res.status(500).send('File not found');
