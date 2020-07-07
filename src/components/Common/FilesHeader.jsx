@@ -5,12 +5,20 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Button } from "reactstrap";
 
 function FilesHeader({
+  view,
   createFolderButton,
   getFiles,
   getFileCount,
   getFolderId,
   toggleView,
 }) {
+  let listClassname =
+    view === "list" ? "mr-2 px-3 bg-gradient-cyan" : "mr-2 px-3";
+  let galleryClassname =
+    view === "list" ? "mr-2 px-3" : "mr-2 px-3 bg-gradient-cyan";
+  let listColor = view === "list" ? "white" : "black";
+  let galleryColor = view === "list" ? "black" : "white";
+
   return (
     <CardHeader className="border-0">
       <Row className="align-items-center">
@@ -21,18 +29,20 @@ function FilesHeader({
           <Button
             color="secondary"
             type="button"
-            className="mr-2 px-3"
+            className={listClassname}
             onClick={() => toggleView("list")}
+            style={{ border: "none" }}
           >
-            <FontAwesomeIcon icon="th-list" size="lg" />
+            <FontAwesomeIcon icon="th-list" size="lg" color={listColor} />
           </Button>
           <Button
             color="secondary"
             type="button"
-            className="mr-2 px-3"
+            className={galleryClassname}
             onClick={() => toggleView("gallery")}
+            style={{ border: "none" }}
           >
-            <FontAwesomeIcon icon="th" size="lg" />
+            <FontAwesomeIcon icon="th" size="lg" color={galleryColor} />
           </Button>
           {createFolderButton && (
             <CreateFolder

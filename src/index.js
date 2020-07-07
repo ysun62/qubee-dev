@@ -47,6 +47,7 @@ import {
   faSquare,
   faStar as faRegStar,
   faClock as faRegClock,
+  faComment as faRegComment,
 } from "@fortawesome/free-regular-svg-icons";
 import { BrowserRouter, Route, Switch, Redirect } from "react-router-dom";
 
@@ -78,6 +79,7 @@ library.add(
   faRegStar,
   faComment,
   faCommentDots,
+  faRegComment,
   faClock,
   faRegClock
 );
