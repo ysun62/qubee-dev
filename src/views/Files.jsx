@@ -15,7 +15,7 @@ function Files({
   getFileCount,
   ...props
 }) {
-  const [view, setView] = useState("gallery");
+  const [view, setView] = useState("list");
 
   const toggleView = (option) => {
     option === "list" ? setView("list") : setView("gallery");
