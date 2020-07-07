@@ -8,20 +8,12 @@ const gridStyles = {
   padding: "0 1rem 3rem",
 };
 
-export default function GalleryView({ allFiles, isSelected, onCheckboxClick }) {
-  //   const onStarClick = (file) => {
-  //     console.log(file);
-  //     setIsStarred(!isStarred);
-  //   };
-
-  //   const onCommentClick = (file) => {
-  //     setHasComment(!hasComment);
-  //   };
-
-  //   const onClockClick = (file) => {
-  //     setIsTimed(!isTimed);
-  //   };
-
+export default function GalleryView({
+  allFiles,
+  getFiles,
+  isSelected,
+  onCheckboxClick,
+}) {
   let galleryView;
 
   if (allFiles.length) {
@@ -29,14 +21,17 @@ export default function GalleryView({ allFiles, isSelected, onCheckboxClick }) {
       //   <div className="d-flex justify-content-start px-3 pb-5 flex-wrap">
       <div style={gridStyles}>
         {/* <Row xs="1" sm="2" md="4"> */}
-        {allFiles.map((file) => (
-          <FileCard
-            file={file}
-            isSelected={isSelected}
-            onCheckboxClick={onCheckboxClick}
-            key={file._id}
-          />
-        ))}
+        {allFiles.map((file) => {
+          return (
+            <FileCard
+              file={file}
+              getFiles={getFiles}
+              isSelected={isSelected}
+              onCheckboxClick={onCheckboxClick}
+              key={file._id}
+            />
+          );
+        })}
         {/* </Row> */}
       </div>
     );

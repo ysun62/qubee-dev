@@ -56,6 +56,21 @@ const fileSchema = mongoose.model(
       required: true,
       default: false,
     },
+    isStarred: {
+      type: Boolean,
+      required: true,
+      default: false,
+    },
+    hasComment: {
+      type: Boolean,
+      required: true,
+      default: false,
+    },
+    isTimed: {
+      type: Boolean,
+      required: true,
+      default: false,
+    },
     protectedFolder: {
       type: Boolean,
       required: true,

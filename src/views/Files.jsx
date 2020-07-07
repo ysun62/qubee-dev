@@ -29,6 +29,7 @@ function Files({
             <Card className="shadow file-manager">
               <FilesHeader
                 {...props}
+                view={view}
                 collection={collection}
                 createFolderButton={true}
                 getFiles={getFiles}
