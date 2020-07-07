@@ -13,6 +13,7 @@ function Files({
   getFolderId,
   setFileCount,
   getFileCount,
+  handleSortFiles,
   ...props
 }) {
   return (
@@ -38,6 +39,7 @@ function Files({
                 onCheckboxClick={onCheckboxClick}
                 setFolderId={setFolderId}
                 setFileCount={setFileCount}
+                handleSortFiles={handleSortFiles}
               />
             </Card>
           </Col>

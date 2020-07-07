@@ -11,6 +11,7 @@ function FilesBody({
   onSelectAll,
   setFolderId,
   setFileCount,
+  handleSortFiles,
   ...props
 }) {
   return (
@@ -24,6 +25,8 @@ function FilesBody({
         {...props}
         isSelected={isSelected}
         onSelectAll={onSelectAll}
+        handleSortFiles={handleSortFiles}
+        collection={collection}
       />
       <TableBody
         {...props}

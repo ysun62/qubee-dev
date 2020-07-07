@@ -35,6 +35,9 @@ import {
   faCheckSquare,
   faFileImage,
   faFolderOpen,
+  faDownload,
+  faArrowUp,
+  faArrowDown,
 } from "@fortawesome/free-solid-svg-icons";
 import { faSquare } from "@fortawesome/free-regular-svg-icons";
 import { BrowserRouter, Route, Switch, Redirect } from "react-router-dom";
@@ -59,7 +62,10 @@ library.add(
   faSquare,
   faCheckSquare,
   faFileImage,
-  faFolderOpen
+  faFolderOpen,
+  faDownload,
+  faArrowUp,
+  faArrowDown,
 );
 
 //logger.init();
