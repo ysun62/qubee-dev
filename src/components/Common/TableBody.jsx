@@ -5,7 +5,16 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import MetaTags from "../Modals/MetaTags";
 import fileSizeConversion from "../../utils/fileSizeConversion";
 
-function TableBody({ allFiles, getFiles, isSelected, onCheckboxClick }) {
+function TableBody({
+  allFiles,
+  getFiles,
+  isSelected,
+  onCheckboxClick,
+  collection,
+  setFolderId,
+  setFileCount,
+  ...props
+}) {
   let tableBody;
 
   if (allFiles.length) {

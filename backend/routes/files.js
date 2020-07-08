@@ -11,7 +11,7 @@ const fs = Promise.promisifyAll(require("fs"));
 const { join } = require("path");
 const mimeTypes = require("../utils/mimetypes");
 const router = express.Router();
-const { File, fileBasePath, validate } = require("../models/file");
+const { File, fileBasePath } = require("../models/file");
 
 const tempDir = join(__dirname, "../public", "uploads/");
 const uploadsFolder = join(__dirname, fileBasePath);

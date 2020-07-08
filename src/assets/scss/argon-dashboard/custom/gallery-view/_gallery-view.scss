@@ -1,0 +1,43 @@
+//
+// Gallery View
+//
+
+.gallery-grid {
+  display: grid;
+  grid-gap: 0.9rem;
+  grid-template-columns: repeat(1, minmax(300px, 350px));
+  padding: 0 1rem 3rem;
+  justify-content: center;
+
+  .file-card {
+    box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
+    background-color: #f8fbfc;
+
+    &:hover {
+      .file-card-header,
+      .file-card-footer {
+        background-color: $gray-100;
+      }
+    }
+
+    .file-card-body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+      svg {
+        color: $blue;
+        width: 80px;
+        height: 80px;
+      }
+    }
+  }
+
+  @include media-breakpoint-up(lg) {
+    grid-template-columns: repeat(2, minmax(300px, 350px));
+  }
+
+  @include media-breakpoint-up(xl) {
+    grid-template-columns: repeat(auto-fill, minmax(300px, 350px));
+  }
+}

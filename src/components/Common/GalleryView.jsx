@@ -1,13 +1,6 @@
 import React from "react";
 import FileCard from "./FileCard";
 
-const gridStyles = {
-  display: "grid",
-  gridGap: "0.25rem",
-  gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))",
-  padding: "0 1rem 3rem",
-};
-
 export default function GalleryView({
   allFiles,
   getFiles,
@@ -19,7 +12,7 @@ export default function GalleryView({
   if (allFiles.length) {
     galleryView = (
       //   <div className="d-flex justify-content-start px-3 pb-5 flex-wrap">
-      <div style={gridStyles}>
+      <div className="gallery-grid">
         {/* <Row xs="1" sm="2" md="4"> */}
         {allFiles.map((file) => {
           return (
