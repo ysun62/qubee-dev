@@ -11,6 +11,7 @@ function FilesBody({
   onSelectAll,
   setFolderId,
   setFileCount,
+  handleSortFiles,
   ...props
 }) {
   const [allFiles, setAllFiles] = useState([]);

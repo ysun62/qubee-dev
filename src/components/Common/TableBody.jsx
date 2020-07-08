@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import MetaTags from "../Modals/MetaTags";
 import fileSizeConversion from "../../utils/fileSizeConversion";
+import { sortFiles } from '../../utils/sortFiles';
 
 function TableBody({ allFiles, getFiles, isSelected, onCheckboxClick }) {
   let tableBody;

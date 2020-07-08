@@ -15,6 +15,7 @@ function Files({
   getFileCount,
   view,
   toggleView,
+  handleSortFiles,
   ...props
 }) {
   return (
@@ -43,6 +44,7 @@ function Files({
                 onCheckboxClick={onCheckboxClick}
                 setFolderId={setFolderId}
                 setFileCount={setFileCount}
+                handleSortFiles={handleSortFiles}
               />
             </Card>
           </Col>

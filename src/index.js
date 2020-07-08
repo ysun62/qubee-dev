@@ -42,6 +42,9 @@ import {
   faComment,
   faCommentDots,
   faClock,
+  faDownload,
+  faArrowUp,
+  faArrowDown,
 } from "@fortawesome/free-solid-svg-icons";
 import {
   faSquare,
@@ -82,6 +85,9 @@ library.add(
   faRegComment,
   faClock,
   faRegClock
+  faDownload,
+  faArrowUp,
+  faArrowDown,
 );
 
 //logger.init();
