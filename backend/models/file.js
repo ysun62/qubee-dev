@@ -56,17 +56,22 @@ const fileSchema = mongoose.model(
       required: true,
       default: false,
     },
-    isStarred: {
+    isFavorite: {
       type: Boolean,
       required: true,
       default: false,
     },
-    hasComment: {
+    hasComments: {
       type: Boolean,
       required: true,
       default: false,
     },
-    isTimed: {
+    isScheduled: {
+      type: Boolean,
+      required: true,
+      default: false,
+    },
+    isApproved: {
       type: Boolean,
       required: true,
       default: false,

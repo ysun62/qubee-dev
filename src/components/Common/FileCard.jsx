@@ -9,11 +9,45 @@ import {
   CardText,
   Row,
   Badge,
+  UncontrolledTooltip,
 } from "reactstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import fileSizeConversion from "../../utils/fileSizeConversion";
 import MetaTags from "../Modals/MetaTags";
+import fileIcons from "../../utils/FileIcons";
+
+const H4AndTooltip = ({ file }) => {
+  const fileNameLen = file.name.length;
+
+  const shortenedFileName =
+    fileNameLen > 30 &&
+    file.name.substring(0, 10) +
+      "..." +
+      file.name.substring(fileNameLen - 10, fileNameLen);
+
+  const fileName = fileNameLen > 30 ? shortenedFileName : file.name;
+
+  return (
+    <>
+      <h4
+        className="mb-0 d-inline"
+        id={fileNameLen > 30 ? `tooltip${file._id}` : ""}
+      >
+        {fileName}
+      </h4>
+      {fileNameLen > 30 && (
+        <UncontrolledTooltip
+          placement="top"
+          target={`tooltip${file._id}`}
+          autohide={false}
+        >
+          {file.name}
+        </UncontrolledTooltip>
+      )}
+    </>
+  );
+};
 
 export default function FileCard({
   file,
@@ -21,25 +55,27 @@ export default function FileCard({
   isSelected,
   onCheckboxClick,
 }) {
-  const [isStarred, setIsStarred] = useState(file.isStarred);
-  const [hasComment, setHasComment] = useState(file.hasComment);
-  const [isTimed, setIsTimed] = useState(file.isTimed);
+  const [isFavorite, setIsFavorite] = useState(file.isFavorite);
+  const [hasComments, setHasComments] = useState(file.hasComments);
+  const [isScheduled, setIsScheduled] = useState(file.isScheduled);
 
   const onStarClick = () => {
-    setIsStarred((prevIsStarred) => !prevIsStarred);
+    setIsFavorite((prevIsFavorite) => !prevIsFavorite);
   };
 
   const onCommentClick = () => {
-    setHasComment((prevHasComment) => !prevHasComment);
+    setHasComments((prevHasComments) => !prevHasComments);
   };
 
   const onClockClick = () => {
-    setIsTimed((prevIsTimed) => !prevIsTimed);
+    setIsScheduled((prevIsScheduled) => !prevIsScheduled);
   };
 
+  const Icon = fileIcons[file.fileExtension && file.fileExtension];
+
   return (
-    <Card className="mt-3" style={{ width: "300px" }}>
-      <CardHeader tag="h3" className=" px-3 py-3">
+    <Card className="mt-3 file-card">
+      <CardHeader tag="h3" className="file-card-header px-3 py-3">
         {" "}
         <Button
           color="link"
@@ -62,14 +98,17 @@ export default function FileCard({
           <FontAwesomeIcon icon="ellipsis-v" size="lg" />
         </Button>
       </CardHeader>
-      <CardBody style={{ height: "250px" }}>
-        {/* <CardTitle>Special Title Treatment</CardTitle>
-        <CardText>
-          With supporting text below as a natural lead-in to additional content.
-        </CardText>
-        <Button>Go somewhere</Button> */}
+      <CardBody style={{ height: "250px" }} className="file-card-body">
+        {file.kind === "FILE" ? (
+          <Icon />
+        ) : (
+          <FontAwesomeIcon icon="folder-open" />
+        )}
       </CardBody>
-      <CardFooter className="text-muted px-3 pt-2" style={{ height: "120px" }}>
+      <CardFooter
+        className="file-card-footer text-muted px-3 pt-2"
+        style={{ height: "120px" }}
+      >
         <div>
           <Button
             className="p-0 mr-2"
@@ -80,7 +119,7 @@ export default function FileCard({
           >
             <FontAwesomeIcon
               size="lg"
-              icon={isStarred ? "star" : ["far", "star"]}
+              icon={isFavorite ? "star" : ["far", "star"]}
             />
           </Button>
           <Button
@@ -92,7 +131,7 @@ export default function FileCard({
           >
             <FontAwesomeIcon
               size="lg"
-              icon={hasComment ? "comment" : ["far", "comment"]}
+              icon={hasComments ? "comment" : ["far", "comment"]}
             />
           </Button>
           <Button
@@ -104,12 +143,12 @@ export default function FileCard({
           >
             <FontAwesomeIcon
               size="lg"
-              icon={isTimed ? "clock" : ["far", "clock"]}
+              icon={isScheduled ? "clock" : ["far", "clock"]}
             />
           </Button>
         </div>
         <div className="pt-2">
-          <h4 className="mb-0">{file.name}</h4>
+          <H4AndTooltip file={file} />
           {file.size && (
             <p
               style={{ marginTop: "-0.4rem", fontSize: "0.85rem" }}

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import FilesHeader from "../components/Common/FilesHeader";
 import FilesBody from "../components/Common/FilesBody";
 import { Container, Row, Col, Card } from "reactstrap";
@@ -13,14 +13,10 @@ function Files({
   getFolderId,
   setFileCount,
   getFileCount,
+  view,
+  toggleView,
   ...props
 }) {
-  const [view, setView] = useState("list");
-
-  const toggleView = (option) => {
-    option === "list" ? setView("list") : setView("gallery");
-  };
-
   return (
     <>
       <Container className="pt-7" fluid>
