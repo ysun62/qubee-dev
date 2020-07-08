@@ -10,11 +10,14 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const bodyParser = require("body-parser");
+const zip = require('express-easy-zip');
+
 const createUploadsDirs = require("./utils/createUploadsDirs");
 const filesRoute = require("./routes/files");
 const foldersRoute = require("./routes/folders");
 const searchesRoute = require("./routes/searches");
 const settingsRoute = require("./routes/settings");
+const downloadRoute = require("./routes/download");
 
 const app = express();
 const mongo_dev = config.get("db_dev");
@@ -104,6 +107,7 @@ app.use(
 app.use(bodyParser.json());
 app.use(cookieParser());
 app.use(cors(corsOptions));
+app.use(zip());
 
 // configuring the upload file routes
 app.use(express.static("public"));
@@ -111,6 +115,7 @@ app.use("/api/files", filesRoute);
 app.use("/api/folders", foldersRoute);
 app.use("/api/searches", searchesRoute);
 app.use("/api/settings", settingsRoute);
+app.use("/api/download", downloadRoute);
 
 if (app.get("env") === "development") {
   app.use(morgan("tiny"));

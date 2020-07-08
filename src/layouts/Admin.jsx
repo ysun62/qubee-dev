@@ -43,6 +43,7 @@ class Admin extends Component {
         selected: null,
         selectionData: [],
       },
+      sorting: null,
       count: 0,
       folderId: "",
       selectMode: false,
@@ -79,6 +80,31 @@ class Admin extends Component {
         models: models,
         rootFolder: folders.find(({ name }) => name === "All"),
         sharedFolder: folders.find(({ name }) => name === "Shared"),
+        sorting: {
+          attribute: "name",
+          direction: "ASC",
+        },
+      },
+    });
+  };
+
+  handleSortFiles = (attribute) => {
+    let sorting = this.state.collection.sorting;
+    let nextDirection = null;
+    if (attribute === sorting.attribute) {
+      nextDirection = sorting.direction === "DESC" ? "ASC" : "DESC";
+    } else {
+      nextDirection = "DESC";
+    }
+    sorting = {
+      attribute,
+      direction: nextDirection,
+    };
+
+    this.setState({
+      collection: {
+        ...this.state.collection,
+        sorting,
       },
     });
   };
@@ -125,8 +151,6 @@ class Admin extends Component {
     const models = this.state.collection.models.filter(
       (m) => m.parentDirectoryId === this.state.folderId
     );
-
-    console.log(models);
 
     if (isSelected) {
       models.map((model) =>
@@ -246,6 +270,7 @@ class Admin extends Component {
                   getFileCount={count}
                   view={view}
                   toggleView={this.toggleView}
+                  handleSortFiles={this.handleSortFiles}
                 />
               )}
             />
@@ -256,6 +281,7 @@ class Admin extends Component {
                   {...props}
                   view={view}
                   toggleView={this.toggleView}
+                  handleSortFiles={this.handleSortFiles}
                 />
               )}
             />
@@ -276,6 +302,7 @@ class Admin extends Component {
                   getFileCount={count}
                   view={view}
                   toggleView={this.toggleView}
+                  handleSortFiles={this.handleSortFiles}
                 />
               )}
             />
