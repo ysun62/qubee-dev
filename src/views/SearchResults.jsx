@@ -143,6 +143,8 @@ class SearchResults extends Component {
                 <FilesHeader
                   count={this.state.count}
                   createFolderButton={false}
+                  toggleView={this.props.toggleView}
+                  view={this.props.view}
                 />
                 {SearchResultsView}
               </Card>

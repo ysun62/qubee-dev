@@ -46,6 +46,7 @@ class Admin extends Component {
       count: 0,
       folderId: "",
       selectMode: false,
+      view: "gallery",
     };
   }
 
@@ -175,8 +176,20 @@ class Admin extends Component {
     }
   };
 
+  toggleView = (option) => {
+    option === "list"
+      ? this.setState((prevState) => ({
+          ...prevState,
+          view: "list",
+        }))
+      : this.setState((prevState) => ({
+          ...prevState,
+          view: "gallery",
+        }));
+  };
+
   render() {
-    const { collection, selection, count, folderId } = this.state;
+    const { collection, selection, count, folderId, view } = this.state;
 
     //console.log(selection.selectionData, folderId);
 
@@ -231,10 +244,21 @@ class Admin extends Component {
                   getFolderId={folderId}
                   setFileCount={this.handleFileCount}
                   getFileCount={count}
+                  view={view}
+                  toggleView={this.toggleView}
                 />
               )}
             />
-            <Route path="/admin/search/:term" component={SearchResults} />
+            <Route
+              path="/admin/search/:term"
+              render={(props) => (
+                <SearchResults
+                  {...props}
+                  view={view}
+                  toggleView={this.toggleView}
+                />
+              )}
+            />
             <Route path="/admin/search" component={SearchResults} />
             <Route
               path="/admin/files"
@@ -250,6 +274,8 @@ class Admin extends Component {
                   getFolderId={folderId}
                   setFileCount={this.handleFileCount}
                   getFileCount={count}
+                  view={view}
+                  toggleView={this.toggleView}
                 />
               )}
             />
