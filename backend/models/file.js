@@ -76,6 +76,11 @@ const fileSchema = mongoose.model(
       required: true,
       default: false,
     },
+    isVideo: {
+      type: Boolean,
+      required: true,
+      default: false,
+    },
     protectedFolder: {
       type: Boolean,
       required: true,
@@ -95,6 +100,11 @@ const fileSchema = mongoose.model(
       type: [Number],
       required: true,
       default: [1, 2, 3],
+    },
+    thumbnail: {
+      type: String,
+      required: false,
+      default: false,
     },
   })
 );

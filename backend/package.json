@@ -34,6 +34,7 @@
     "express": "^4.17.1",
     "express-easy-zip": "^1.1.5",
     "file-extension": "^4.0.5",
+    "fluent-ffmpeg": "^2.1.2",
     "formidable": "^1.2.2",
     "helmet": "^3.23.3",
     "huge-uploader": "^1.0.6",

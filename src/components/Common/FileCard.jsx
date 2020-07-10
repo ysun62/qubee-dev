@@ -12,7 +12,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import fileSizeConversion from "../../utils/fileSizeConversion";
 import MetaTags from "../Modals/MetaTags";
-import fileIcons from "../../utils/FileIcons";
+import fileIcons from "../../utils/fileIcons";
 
 const H4AndTooltip = ({ file }) => {
   const fileNameLen = file.name.length;
@@ -68,11 +68,15 @@ export default function FileCard({
     setIsScheduled((prevIsScheduled) => !prevIsScheduled);
   };
 
-  const Icon = fileIcons[file.fileExtension && file.fileExtension];
+  const fileIcon = fileIcons[file.fileExtension && file.fileExtension];
 
   return (
     <Card className="mt-3 file-card">
-      <CardHeader tag="h3" className="file-card-header px-3 py-3">
+      <CardHeader
+        tag="h3"
+        className="file-card-header px-3 py-3"
+        style={{ backgroundColor: isSelected[file._id] && "#f7fafc" }}
+      >
         {" "}
         <Button
           color="link"
@@ -95,16 +99,32 @@ export default function FileCard({
           <FontAwesomeIcon icon="ellipsis-v" size="lg" />
         </Button>
       </CardHeader>
-      <CardBody style={{ height: "250px" }} className="file-card-body">
+      <CardBody
+        style={{
+          height: "250px",
+          backgroundColor: isSelected[file._id] && "#f7fafc",
+          backgroundImage: file.isVideo
+            ? `url("http://localhost:5000/${file.thumbnail}")`
+            : "",
+          backgroundSize: "cover",
+          backgroundPosition: "center center",
+        }}
+        className="file-card-body"
+      >
         {file.kind === "FILE" ? (
-          <Icon />
+          !file.isVideo && (
+            <div dangerouslySetInnerHTML={{ __html: fileIcon }} />
+          )
         ) : (
           <FontAwesomeIcon icon="folder-open" />
         )}
       </CardBody>
       <CardFooter
         className="file-card-footer text-muted px-3 pt-2"
-        style={{ height: "120px" }}
+        style={{
+          height: "120px",
+          backgroundColor: isSelected[file._id] && "#f7fafc",
+        }}
       >
         <div>
           <Button
@@ -117,6 +137,7 @@ export default function FileCard({
             <FontAwesomeIcon
               size="lg"
               icon={isFavorite ? "star" : ["far", "star"]}
+              color={isFavorite ? "#ffd600" : ""}
             />
           </Button>
           <Button
@@ -129,6 +150,7 @@ export default function FileCard({
             <FontAwesomeIcon
               size="lg"
               icon={hasComments ? "comment" : ["far", "comment"]}
+              color={isScheduled ? "#5e72e4" : ""}
             />
           </Button>
           <Button
@@ -141,6 +163,7 @@ export default function FileCard({
             <FontAwesomeIcon
               size="lg"
               icon={isScheduled ? "clock" : ["far", "clock"]}
+              color={isScheduled ? "#f5365c" : ""}
             />
           </Button>
         </div>

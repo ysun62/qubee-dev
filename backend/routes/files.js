@@ -12,6 +12,7 @@ const { join } = require("path");
 const mimeTypes = require("../utils/mimetypes");
 const router = express.Router();
 const { File, fileBasePath } = require("../models/file");
+var ffmpeg = require("fluent-ffmpeg");
 
 const tempDir = join(__dirname, "../public", "uploads/");
 const uploadsFolder = join(__dirname, fileBasePath);
@@ -37,6 +38,34 @@ const fileFilter = (req, file, cb) => {
   }
 };
 
+const genThumbnail = async (path) => {
+  let thumbnailPath = "";
+
+  return new Promise((resolve, reject) => {
+    ffmpeg(path)
+      .on("filenames", function (filenames) {
+        thumbnailPath = `public/uploads/thumbnails/` + filenames[0];
+      })
+      .on("end", function (filenames) {
+        resolve({
+          success: true,
+          url: thumbnailPath,
+          fileName: filenames,
+        });
+      })
+      .on("error", function (err) {
+        console.error("error!!!", err);
+        reject(err);
+      })
+      .screenshots({
+        count: 1,
+        folder: `public/uploads/thumbnails/`,
+        size: "1080x1080",
+        filename: "thumbnail-%b.png",
+      });
+  });
+};
+
 const upload = multer({
   storage,
   fileFilter,
@@ -54,6 +83,9 @@ router.post("/", upload.array("mediaFiles", 12), async (req, res) => {
     const fileExt = fileExtension(selectedFile.originalname);
     const slug = selectedFile.originalname.replace(/\s+/g, "-").toLowerCase();
     const parentDirectoryId = JSON.parse(req.body.mediaFiles).parentDirectoryId;
+    const isVideo =
+      selectedFile.mimetype.substring(0, selectedFile.mimetype.indexOf("/")) ===
+      "video";
 
     dbDebug("Parent directory ID ->", parentDirectoryId);
 
@@ -68,6 +100,7 @@ router.post("/", upload.array("mediaFiles", 12), async (req, res) => {
       slug,
       size: selectedFile.size,
       parentDirectoryId,
+      isVideo: isVideo,
     });
 
     try {
@@ -78,9 +111,16 @@ router.post("/", upload.array("mediaFiles", 12), async (req, res) => {
       try {
         await fs.renameAsync(selectedFile.path, join(uploadsFolder, slug));
         fsDebug("File moved to uploads folder successfully.");
+
+        let thumbnail;
+        if (isVideo) {
+          thumbnail = await genThumbnail(join(uploadsFolder, slug));
+          file.thumbnail = thumbnail.success && thumbnail.url;
+        }
         try {
           await file.save();
           dbDebug("Document created successfully in MongoDB.", file);
+
           res.send(file);
         } catch (ex) {
           await fs.unlinkAsync(join(uploadsFolder, slug));
