@@ -12,7 +12,7 @@ const { join } = require("path");
 const mimeTypes = require("../utils/mimetypes");
 const router = express.Router();
 const { File, fileBasePath } = require("../models/file");
-var ffmpeg = require("fluent-ffmpeg");
+const ffmpeg = require("fluent-ffmpeg");
 
 const tempDir = join(__dirname, "../public", "uploads/");
 const uploadsFolder = join(__dirname, fileBasePath);
@@ -39,29 +39,31 @@ const fileFilter = (req, file, cb) => {
 };
 
 const genThumbnail = async (path) => {
-  let thumbnailPath = "";
+  // Leaving the comments in case we need these properties in the future
+
+  // let thumbnailPath = "";
 
   return new Promise((resolve, reject) => {
     ffmpeg(path)
-      .on("filenames", function (filenames) {
-        thumbnailPath = `public/uploads/thumbnails/` + filenames[0];
-      })
+      // .on("filenames", function (filenames) {
+      //   thumbnailPath = uploadsFolder + "/" + filenames[0];
+      // })
       .on("end", function (filenames) {
-        resolve({
-          success: true,
-          url: thumbnailPath,
-          fileName: filenames,
-        });
+        resolve();
+        //   {
+        //      success: true,
+        //      path: thumbnailPath,
+        //      fileName: filenames[0],
+        //   }
       })
       .on("error", function (err) {
-        console.error("error!!!", err);
         reject(err);
       })
       .screenshots({
         count: 1,
-        folder: `public/uploads/thumbnails/`,
+        folder: uploadsFolder,
         size: "1080x1080",
-        filename: "thumbnail-%b.png",
+        filename: "%b_thumbnail.jpg",
       });
   });
 };
@@ -112,10 +114,12 @@ router.post("/", upload.array("mediaFiles", 12), async (req, res) => {
         await fs.renameAsync(selectedFile.path, join(uploadsFolder, slug));
         fsDebug("File moved to uploads folder successfully.");
 
-        let thumbnail;
         if (isVideo) {
-          thumbnail = await genThumbnail(join(uploadsFolder, slug));
-          file.thumbnail = thumbnail.success && thumbnail.url;
+          try {
+            await genThumbnail(join(uploadsFolder, slug));
+          } catch (ex) {
+            dbDebug("Could not generate a thumbnail for this video file.", ex);
+          }
         }
         try {
           await file.save();

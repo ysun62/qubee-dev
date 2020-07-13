@@ -29,17 +29,12 @@ export default function GalleryView({
       </div>
     );
   } else {
-    galleryView = <div></div>;
-    // galleryView = (
-    //   <tbody>
-    //     <tr className="file-list-item">
-    //       <td colSpan="4" style={{ textAlign: "center" }}>
-    //         <h3>This folder is empty</h3>
-    //         Upload your files here
-    //       </td>
-    //     </tr>
-    //   </tbody>
-    // );
+    galleryView = (
+      <div className="text-center p-2" style={{ fontSize: "0.8125rem" }}>
+        <h3>This folder is empty</h3>
+        Upload your files here
+      </div>
+    );
   }
   return galleryView;
 }

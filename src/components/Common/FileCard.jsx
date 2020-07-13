@@ -13,7 +13,9 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import fileSizeConversion from "../../utils/fileSizeConversion";
 import MetaTags from "../Modals/MetaTags";
 import fileIcons from "../../utils/fileIcons";
+import { ReactComponent as Unknown } from "../../utils/SVGs/unknown.svg";
 
+// Shortens the file name and adds a tooltip for long file names. Then returns the file name.
 const H4AndTooltip = ({ file }) => {
   const fileNameLen = file.name.length;
 
@@ -46,6 +48,17 @@ const H4AndTooltip = ({ file }) => {
   );
 };
 
+// Checks the file extension, then returns either an existing fileIcon or an unknown icon
+const Icon = ({ file }) => {
+  const fileIcon = fileIcons[file.fileExtension && file.fileExtension];
+
+  return fileIcon ? (
+    <div dangerouslySetInnerHTML={{ __html: fileIcon }} />
+  ) : (
+    <Unknown />
+  );
+};
+
 export default function FileCard({
   file,
   getFiles,
@@ -67,8 +80,6 @@ export default function FileCard({
   const onClockClick = () => {
     setIsScheduled((prevIsScheduled) => !prevIsScheduled);
   };
-
-  const fileIcon = fileIcons[file.fileExtension && file.fileExtension];
 
   return (
     <Card className="mt-3 file-card">
@@ -103,18 +114,23 @@ export default function FileCard({
         style={{
           height: "250px",
           backgroundColor: isSelected[file._id] && "#f7fafc",
+
+          // If it's a video file, set backgroundImage accordingly
           backgroundImage: file.isVideo
-            ? `url("http://localhost:5000/${file.thumbnail}")`
+            ? `url(
+               /uploads/${file.name.substring(
+                 0,
+                 file.name.lastIndexOf(".")
+               )}_thumbnail.jpg`
             : "",
+
           backgroundSize: "cover",
           backgroundPosition: "center center",
         }}
         className="file-card-body"
       >
         {file.kind === "FILE" ? (
-          !file.isVideo && (
-            <div dangerouslySetInnerHTML={{ __html: fileIcon }} />
-          )
+          !file.isVideo && <Icon file={file} />
         ) : (
           <FontAwesomeIcon icon="folder-open" />
         )}
@@ -195,6 +211,7 @@ export default function FileCard({
                 buttonLabel="add +"
                 fileId={file._id}
                 getFiles={getFiles}
+                file={file}
               />
             </div>
           )}

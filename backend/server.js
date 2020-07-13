@@ -110,7 +110,7 @@ app.use(cors(corsOptions));
 app.use(zip());
 
 // configuring the upload file routes
-app.use("/public", express.static("public"));
+app.use("/static", express.static(join(__dirname, "../public/")));
 app.use("/api/files", filesRoute);
 app.use("/api/folders", foldersRoute);
 app.use("/api/searches", searchesRoute);
@@ -121,6 +121,8 @@ if (app.get("env") === "development") {
   app.use(morgan("tiny"));
   debug("Moregan enabled...");
 }
+
+console.log(join(__dirname, "./public/"), "path--------------------");
 
 app.use((req, res, next) => {
   setImmediate(() => {

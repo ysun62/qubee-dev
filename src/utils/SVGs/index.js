@@ -38,3 +38,4 @@ export { default as Iconwmv } from "./wmv.svg";
 export { default as Iconxls } from "./xls.svg";
 export { default as Iconxml } from "./xml.svg";
 export { default as Iconzip } from "./zip.svg";
+export { default as unknown } from "./unknown.svg";

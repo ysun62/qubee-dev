@@ -64,6 +64,7 @@ function TableBody({
                     buttonLabel="add +"
                     fileId={file._id}
                     getFiles={getFiles}
+                    file={file}
                   />
                 </div>
               )}
