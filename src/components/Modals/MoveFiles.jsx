@@ -29,7 +29,7 @@ const MoveFiles = ({
     files.map(async (file) => {
       // Find the model in the collection that match the selected file ID
       // const model = models.find((m) => m._id === id);
-      file.parentDirectoryId = selectFolderId;
+      file.parentDirectoryId = selectedFolderId;
       // const modelChildren = models.filter(
       //   (data) => data.parentDirectoryId === id
       // );
