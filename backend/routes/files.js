@@ -62,7 +62,7 @@ const genThumbnail = async (path) => {
       .screenshots({
         count: 1,
         folder: uploadsFolder,
-        size: "1080x1080",
+        size: "1920x1080",
         filename: "%b_thumbnail.jpg",
       });
   });

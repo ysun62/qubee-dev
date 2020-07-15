@@ -112,16 +112,15 @@ export default function FileCard({
       </CardHeader>
       <CardBody
         style={{
-          height: "250px",
           backgroundColor: isSelected[file._id] && "#f7fafc",
 
           // If it's a video file, set backgroundImage accordingly
           backgroundImage: file.isVideo
             ? `url(
-               /uploads/${file.name.substring(
+               "/uploads/${file.slug.substring(
                  0,
-                 file.name.lastIndexOf(".")
-               )}_thumbnail.jpg`
+                 file.slug.lastIndexOf(".")
+               )}_thumbnail.jpg")`
             : "",
 
           backgroundSize: "cover",
