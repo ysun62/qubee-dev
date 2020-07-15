@@ -122,8 +122,6 @@ if (app.get("env") === "development") {
   debug("Moregan enabled...");
 }
 
-console.log(join(__dirname, "./public/"), "path--------------------");
-
 app.use((req, res, next) => {
   setImmediate(() => {
     next(new Error("Something went wrong"));

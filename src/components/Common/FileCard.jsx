@@ -81,6 +81,8 @@ export default function FileCard({
     setIsScheduled((prevIsScheduled) => !prevIsScheduled);
   };
 
+  const isVideoOrImage = file.isVideo || file.isImage;
+
   return (
     <Card className="mt-3 file-card">
       <CardHeader
@@ -115,7 +117,7 @@ export default function FileCard({
           backgroundColor: isSelected[file._id] && "#f7fafc",
 
           // If it's a video file, set backgroundImage accordingly
-          backgroundImage: file.isVideo
+          backgroundImage: isVideoOrImage
             ? `url(
                "/uploads/${file.slug.substring(
                  0,
@@ -129,7 +131,7 @@ export default function FileCard({
         className="file-card-body"
       >
         {file.kind === "FILE" ? (
-          !file.isVideo && <Icon file={file} />
+          !isVideoOrImage && <Icon file={file} />
         ) : (
           <FontAwesomeIcon icon="folder-open" />
         )}

@@ -13,6 +13,7 @@ const mimeTypes = require("../utils/mimetypes");
 const router = express.Router();
 const { File, fileBasePath } = require("../models/file");
 const ffmpeg = require("fluent-ffmpeg");
+const imageThumbnail = require("image-thumbnail");
 
 const tempDir = join(__dirname, "../public", "uploads/");
 const uploadsFolder = join(__dirname, fileBasePath);
@@ -38,7 +39,7 @@ const fileFilter = (req, file, cb) => {
   }
 };
 
-const genThumbnail = async (path) => {
+const genVideoThumbnail = async (path) => {
   // Leaving the comments in case we need these properties in the future
 
   // let thumbnailPath = "";
@@ -85,9 +86,14 @@ router.post("/", upload.array("mediaFiles", 12), async (req, res) => {
     const fileExt = fileExtension(selectedFile.originalname);
     const slug = selectedFile.originalname.replace(/\s+/g, "-").toLowerCase();
     const parentDirectoryId = JSON.parse(req.body.mediaFiles).parentDirectoryId;
-    const isVideo =
-      selectedFile.mimetype.substring(0, selectedFile.mimetype.indexOf("/")) ===
-      "video";
+
+    // Checking if the file mimetype is video or image
+    const fileMimeType = selectedFile.mimetype.substring(
+      0,
+      selectedFile.mimetype.indexOf("/")
+    );
+    const isVideo = fileMimeType === "video";
+    const isImage = fileMimeType === "image";
 
     dbDebug("Parent directory ID ->", parentDirectoryId);
 
@@ -103,6 +109,7 @@ router.post("/", upload.array("mediaFiles", 12), async (req, res) => {
       size: selectedFile.size,
       parentDirectoryId,
       isVideo: isVideo,
+      isImage: isImage,
     });
 
     try {
@@ -114,11 +121,35 @@ router.post("/", upload.array("mediaFiles", 12), async (req, res) => {
         await fs.renameAsync(selectedFile.path, join(uploadsFolder, slug));
         fsDebug("File moved to uploads folder successfully.");
 
+        // Generating thumbnails based on video or image file
         if (isVideo) {
           try {
-            await genThumbnail(join(uploadsFolder, slug));
+            await genVideoThumbnail(join(uploadsFolder, slug));
           } catch (ex) {
             dbDebug("Could not generate a thumbnail for this video file.", ex);
+          }
+        } else if (isImage) {
+          let options = {
+            width: 1920,
+            height: 1080,
+            jpegOptions: { force: true, quality: 100 },
+          };
+          try {
+            const thumbnail = await imageThumbnail(
+              join(uploadsFolder, slug),
+              options
+            );
+            const filename = `${file.slug.substring(
+              0,
+              file.slug.lastIndexOf(".")
+            )}_thumbnail.jpg`;
+            fs.writeFile(`${uploadsFolder}/${filename}`, thumbnail, (err) => {
+              if (err) {
+                dbDebug("Could not save the thumbnail.", err);
+              }
+            });
+          } catch (err) {
+            dbDebug("Could not generate a thumbnail for this image file.", err);
           }
         }
         try {
