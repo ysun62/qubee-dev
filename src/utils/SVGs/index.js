@@ -39,3 +39,4 @@ export { default as Iconxls } from "./xls.svg";
 export { default as Iconxml } from "./xml.svg";
 export { default as Iconzip } from "./zip.svg";
 export { default as unknown } from "./unknown.svg";
+export { default as playButton } from "./play-button.svg";

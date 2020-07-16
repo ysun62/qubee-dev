@@ -14,6 +14,7 @@ import fileSizeConversion from "../../utils/fileSizeConversion";
 import MetaTags from "../Modals/MetaTags";
 import fileIcons from "../../utils/fileIcons";
 import { ReactComponent as Unknown } from "../../utils/SVGs/unknown.svg";
+import { ReactComponent as PlayButton } from "../../utils/SVGs/play-button.svg";
 
 // Shortens the file name and adds a tooltip for long file names. Then returns the file name.
 const H4AndTooltip = ({ file }) => {
@@ -48,11 +49,15 @@ const H4AndTooltip = ({ file }) => {
   );
 };
 
-// Checks the file extension, then returns either an existing fileIcon or an unknown icon
+// Returns an Icon for the file
 const Icon = ({ file }) => {
   const fileIcon = fileIcons[file.fileExtension && file.fileExtension];
 
-  return fileIcon ? (
+  // If video file, display the PlayButton
+  // If not video file, display the fileIcon; if the fileIcon is not found, display the Unknown
+  return file.isVideo ? (
+    <PlayButton />
+  ) : fileIcon ? (
     <div dangerouslySetInnerHTML={{ __html: fileIcon }} />
   ) : (
     <Unknown />
@@ -131,7 +136,7 @@ export default function FileCard({
         className="file-card-body"
       >
         {file.kind === "FILE" ? (
-          !isVideoOrImage && <Icon file={file} />
+          !file.isImage && <Icon file={file} />
         ) : (
           <FontAwesomeIcon icon="folder-open" />
         )}

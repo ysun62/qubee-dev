@@ -106,11 +106,6 @@ const fileSchema = mongoose.model(
       required: true,
       default: [1, 2, 3],
     },
-    thumbnailName: {
-      type: String,
-      required: false,
-      default: false,
-    },
   })
 );
 

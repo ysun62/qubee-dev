@@ -121,14 +121,16 @@ router.post("/", upload.array("mediaFiles", 12), async (req, res) => {
         await fs.renameAsync(selectedFile.path, join(uploadsFolder, slug));
         fsDebug("File moved to uploads folder successfully.");
 
-        // Generating thumbnails based on video or image file
+        // Generating a thumbnail for any video file
         if (isVideo) {
           try {
             await genVideoThumbnail(join(uploadsFolder, slug));
           } catch (ex) {
             dbDebug("Could not generate a thumbnail for this video file.", ex);
           }
-        } else if (isImage) {
+        }
+        // Generating a thumbnail for any image file
+        else if (isImage) {
           let options = {
             width: 1920,
             height: 1080,
@@ -234,6 +236,23 @@ router.delete("/:id", async (req, res) => {
 
   if (!file)
     return res.status(404).send("The file with the given ID was not found.");
+
+  // Delete thumbnails for video and image files.
+  if (file.isVideo || file.isImage) {
+    const thumbnailName = `${file.slug.substring(
+      0,
+      file.slug.lastIndexOf(".")
+    )}_thumbnail.jpg`;
+
+    await fs
+      .unlinkAsync(join(uploadsFolder, thumbnailName))
+      .then(() => {
+        fsDebug("Thumbnail deleted successfully!");
+      })
+      .catch((ex) => {
+        fsDebug("Failed to delete the thumbnail.", ex);
+      });
+  }
 
   await fs
     .unlinkAsync(join(uploadsFolder, file.slug))
