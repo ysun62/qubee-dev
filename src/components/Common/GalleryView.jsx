@@ -1,5 +1,5 @@
 import React from "react";
-import FileCard from "./FileCard";
+import FileCard from "./FileCard/FileCard";
 
 export default function GalleryView({
   allFiles,
