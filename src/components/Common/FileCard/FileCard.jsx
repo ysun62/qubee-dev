@@ -11,6 +11,8 @@ export default function FileCard({
   isSelected,
   onCheckboxClick,
 }) {
+  const isFile = file.kind === "FILE";
+
   return (
     <Card className="mt-3 file-card">
       <FileCardHeader
@@ -18,8 +20,13 @@ export default function FileCard({
         isSelected={isSelected}
         onCheckboxClick={onCheckboxClick}
       />
-      <FileCardBody file={file} isSelected={isSelected} />
-      <FileCardFooter file={file} isSelected={isSelected} getFiles={getFiles} />
+      <FileCardBody file={file} isSelected={isSelected} isFile={isFile} />
+      <FileCardFooter
+        file={file}
+        isSelected={isSelected}
+        getFiles={getFiles}
+        isFile={isFile}
+      />
     </Card>
   );
 }

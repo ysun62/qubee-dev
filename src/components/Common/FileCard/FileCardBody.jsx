@@ -22,9 +22,8 @@ const Icon = ({ file }) => {
     );
 };
 
-export default function FileCardBody({ file, isSelected }) {
+export default function FileCardBody({ file, isSelected, isFile }) {
   const isVideoOrImage = file.isVideo || file.isImage;
-  const isFile = file.kind === "FILE";
 
   const cardbody = (
     <CardBody

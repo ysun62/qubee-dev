@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import { Button, CardFooter, Badge, UncontrolledTooltip } from "reactstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
@@ -6,7 +7,7 @@ import fileSizeConversion from "../../../utils/fileSizeConversion";
 import MetaTags from "../../Modals/MetaTags";
 
 // Shortens the file name and adds a tooltip for long file names. Then returns the file name.
-const FileNameAndTooltip = ({ file }) => {
+const FileNameAndTooltip = ({ file, isFile }) => {
   const fileNameLen = file.name.length;
 
   const shortenedFileName =
@@ -17,14 +18,18 @@ const FileNameAndTooltip = ({ file }) => {
 
   const fileName = fileNameLen > 30 ? shortenedFileName : file.name;
 
+  const h4 = (
+    <h4
+      className="mb-0 d-inline"
+      id={fileNameLen > 30 ? `tooltip${file._id}` : ""}
+    >
+      {fileName}
+    </h4>
+  );
+
   return (
     <>
-      <h4
-        className="mb-0 d-inline"
-        id={fileNameLen > 30 ? `tooltip${file._id}` : ""}
-      >
-        {fileName}
-      </h4>
+      {isFile ? h4 : <Link to={`/admin/folder/${file._id}`}>{h4}</Link>}
       {fileNameLen > 30 && (
         <UncontrolledTooltip
           placement="top"
@@ -38,7 +43,7 @@ const FileNameAndTooltip = ({ file }) => {
   );
 };
 
-export default function FileCardFooter({ file, isSelected, getFiles }) {
+export default function FileCardFooter({ file, isSelected, getFiles, isFile }) {
   const [isFavorite, setIsFavorite] = useState(file.isFavorite);
   const [hasComments, setHasComments] = useState(file.hasComments);
   const [isScheduled, setIsScheduled] = useState(file.isScheduled);
@@ -105,7 +110,7 @@ export default function FileCardFooter({ file, isSelected, getFiles }) {
         </Button>
       </div>
       <div className="pt-2">
-        <FileNameAndTooltip file={file} />
+        <FileNameAndTooltip file={file} isFile={isFile} />
         {file.size && (
           <p
             style={{ marginTop: "-0.4rem", fontSize: "0.85rem" }}
