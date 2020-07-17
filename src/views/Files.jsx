@@ -13,6 +13,8 @@ function Files({
   getFolderId,
   setFileCount,
   getFileCount,
+  view,
+  toggleView,
   handleSortFiles,
   ...props
 }) {
@@ -24,14 +26,17 @@ function Files({
             <Card className="shadow file-manager">
               <FilesHeader
                 {...props}
+                view={view}
                 collection={collection}
                 createFolderButton={true}
                 getFiles={getFiles}
                 getFileCount={getFileCount}
                 getFolderId={getFolderId}
+                toggleView={toggleView}
               />
               <FilesBody
                 {...props}
+                view={view}
                 collection={collection}
                 getFiles={getFiles}
                 onSelectAll={onSelectAll}

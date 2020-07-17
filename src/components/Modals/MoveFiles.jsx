@@ -22,17 +22,14 @@ const MoveFiles = ({
   };
 
   const handleProcessedFiles = () => {
-    const fileIds = Object.keys(selectedData);
+    const files = Object.values(selectedData);
     // const models = collection.models;
 
     // Loop through all selected file IDs
-    fileIds.map(async (id) => {
+    files.map(async (file) => {
       // Find the model in the collection that match the selected file ID
       // const model = models.find((m) => m._id === id);
-      const file = {
-        _id: id,
-        parentDirectoryId: selectedFolderId,
-      };
+      file.parentDirectoryId = selectedFolderId;
       // const modelChildren = models.filter(
       //   (data) => data.parentDirectoryId === id
       // );
@@ -53,7 +50,10 @@ const MoveFiles = ({
     });
   };
 
-  const selectFolderId = (id) => setSelectedFolderId(id);
+  const selectFolderId = (id) => {
+    console.log(id);
+    setSelectedFolderId(id);
+  };
 
   return (
     <>

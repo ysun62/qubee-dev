@@ -47,6 +47,7 @@ class Admin extends Component {
       count: 0,
       folderId: "",
       selectMode: false,
+      view: "gallery",
     };
   }
 
@@ -80,31 +81,33 @@ class Admin extends Component {
         rootFolder: folders.find(({ name }) => name === "All"),
         sharedFolder: folders.find(({ name }) => name === "Shared"),
         sorting: {
-          attribute: 'name',
-          direction: 'ASC',
+          attribute: "name",
+          direction: "ASC",
         },
       },
     });
   };
 
   handleSortFiles = (attribute) => {
-    let sorting = this.state.collection.sorting
+    let sorting = this.state.collection.sorting;
     let nextDirection = null;
     if (attribute === sorting.attribute) {
-      nextDirection = sorting.direction === 'DESC' ? 'ASC' : 'DESC';
+      nextDirection = sorting.direction === "DESC" ? "ASC" : "DESC";
     } else {
-      nextDirection = 'DESC';
+      nextDirection = "DESC";
     }
     sorting = {
       attribute,
       direction: nextDirection,
-    }
+    };
 
-    this.setState({ collection: {
-      ...this.state.collection,
-      sorting,
-    } });
-  }
+    this.setState({
+      collection: {
+        ...this.state.collection,
+        sorting,
+      },
+    });
+  };
 
   getRoutes = (routes) => {
     return routes.map((prop, key) => {
@@ -197,8 +200,20 @@ class Admin extends Component {
     }
   };
 
+  toggleView = (option) => {
+    option === "list"
+      ? this.setState((prevState) => ({
+          ...prevState,
+          view: "list",
+        }))
+      : this.setState((prevState) => ({
+          ...prevState,
+          view: "gallery",
+        }));
+  };
+
   render() {
-    const { collection, selection, count, folderId } = this.state;
+    const { collection, selection, count, folderId, view } = this.state;
 
     //console.log(selection.selectionData, folderId);
 
@@ -253,11 +268,23 @@ class Admin extends Component {
                   getFolderId={folderId}
                   setFileCount={this.handleFileCount}
                   getFileCount={count}
+                  view={view}
+                  toggleView={this.toggleView}
                   handleSortFiles={this.handleSortFiles}
                 />
               )}
             />
-            <Route path="/admin/search/:term" component={SearchResults} />
+            <Route
+              path="/admin/search/:term"
+              render={(props) => (
+                <SearchResults
+                  {...props}
+                  view={view}
+                  toggleView={this.toggleView}
+                  handleSortFiles={this.handleSortFiles}
+                />
+              )}
+            />
             <Route path="/admin/search" component={SearchResults} />
             <Route
               path="/admin/files"
@@ -273,6 +300,8 @@ class Admin extends Component {
                   getFolderId={folderId}
                   setFileCount={this.handleFileCount}
                   getFileCount={count}
+                  view={view}
+                  toggleView={this.toggleView}
                   handleSortFiles={this.handleSortFiles}
                 />
               )}

@@ -16,7 +16,12 @@ function Tags({ getFiles, file }) {
           {tag}
         </Badge>
       ))}
-      <MetaTags buttonLabel="add +" fileId={file._id} getFiles={getFiles} />
+      <MetaTags
+        buttonLabel="add +"
+        fileId={file._id}
+        getFiles={getFiles}
+        file={file}
+      />
     </div>
   );
 }

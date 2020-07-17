@@ -19,8 +19,6 @@ const UploadFile = ({
 }) => {
   const [modal, setModal] = useState(false);
 
-  // const [selectedFolderId, setSelectedFolderId] = useState();
-
   const toggle = () => {
     getFiles();
     setModal(!modal);
@@ -29,8 +27,6 @@ const UploadFile = ({
   const handleOnError = (error, file, status) => {
     console.log(error, file, status);
   };
-
-  // const selectFolderId = (id) => setSelectedFolderId(id);
 
   return (
     <div className="file-upload-component">

@@ -40,12 +40,9 @@ const MetaTag = (props) => {
     if (checkDuplicate(tagArray))
       return toast.error("There are duplicate tags.");
 
-    const file = {
-      _id: fileId,
-      metaTags: inputField ? tagArray : [],
-    };
+    props.file.metaTags = inputField ? tagArray : [];
 
-    await saveFile(file)
+    await saveFile(props.file)
       .then((response) => {
         getFiles(); // Update parent component view
         toggle(e);

@@ -1,45 +1,20 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { Media, Button, Badge } from "reactstrap";
 import { Link } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import MetaTags from "../Modals/MetaTags";
 import fileSizeConversion from "../../utils/fileSizeConversion";
-import { sortFiles } from '../../utils/sortFiles';
 
 function TableBody({
-  collection,
+  allFiles,
   getFiles,
   isSelected,
   onCheckboxClick,
+  collection,
   setFolderId,
   setFileCount,
   ...props
 }) {
-  const [allFiles, setAllFiles] = useState([]);
-
-  useEffect(() => {
-    const folderId = props.match.params.id
-      ? props.match.params.id
-      : collection.rootFolder._id;
-
-    let _allFiles = collection.dataCache.filter((file) => file.parentDirectoryId === folderId);
-    if (collection.sorting) {
-      sortFiles(_allFiles, collection.sorting.attribute, collection.sorting.direction)
-    }
-    setAllFiles(_allFiles);
-
-    setFileCount(allFiles.length);
-    setFolderId(folderId);
-  }, [
-    allFiles.length,
-    collection.sorting,
-    collection.dataCache,
-    collection.rootFolder._id,
-    props.match.params.id,
-    setFileCount,
-    setFolderId,
-  ]);
-
   let tableBody;
 
   if (allFiles.length) {
@@ -89,6 +64,7 @@ function TableBody({
                     buttonLabel="add +"
                     fileId={file._id}
                     getFiles={getFiles}
+                    file={file}
                   />
                 </div>
               )}

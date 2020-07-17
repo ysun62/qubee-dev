@@ -1,9 +1,10 @@
-import React from "react";
-import TableHeader from "./TableHeader";
-import TableBody from "./TableBody";
-import { Table } from "reactstrap";
+import React, { useState, useEffect } from "react";
+import GalleryView from "./GalleryView";
+import ListView from "./ListView";
+import { sortFiles } from "../../utils/sortFiles";
 
 function FilesBody({
+  view,
   collection,
   getFiles,
   isSelected,
@@ -14,30 +15,63 @@ function FilesBody({
   handleSortFiles,
   ...props
 }) {
+  const [allFiles, setAllFiles] = useState([]);
+
+  useEffect(() => {
+    const folderId = props.match.params.id
+      ? props.match.params.id
+      : collection.rootFolder._id;
+
+    let _allFiles = collection.dataCache.filter(
+      (file) => file.parentDirectoryId === folderId
+    );
+    if (collection.sorting) {
+      sortFiles(
+        _allFiles,
+        collection.sorting.attribute,
+        collection.sorting.direction
+      );
+    }
+    setAllFiles(_allFiles);
+
+    setFileCount(allFiles.length);
+    setFolderId(folderId);
+  }, [
+    allFiles.length,
+    collection.sorting,
+    collection.dataCache,
+    collection.rootFolder._id,
+    props.match.params.id,
+    setFileCount,
+    setFolderId,
+  ]);
+
   return (
-    <Table
-      className="align-items-center table-flush"
-      hover
-      responsive
-      size="sm"
-    >
-      <TableHeader
-        {...props}
-        isSelected={isSelected}
-        onSelectAll={onSelectAll}
-        handleSortFiles={handleSortFiles}
-        collection={collection}
-      />
-      <TableBody
-        {...props}
-        collection={collection}
-        getFiles={getFiles}
-        isSelected={isSelected}
-        onCheckboxClick={onCheckboxClick}
-        setFolderId={setFolderId}
-        setFileCount={setFileCount}
-      />
-    </Table>
+    <>
+      {view === "list" ? (
+        <ListView
+          {...props}
+          allFiles={allFiles}
+          getFiles={getFiles}
+          isSelected={isSelected}
+          onCheckboxClick={onCheckboxClick}
+          onSelectAll={onSelectAll}
+          handleSortFiles={handleSortFiles}
+          collection={collection}
+          setFolderId={setFolderId}
+          setFileCount={setFileCount}
+        />
+      ) : (
+        <GalleryView
+          {...props}
+          allFiles={allFiles}
+          getFiles={getFiles}
+          isSelected={isSelected}
+          onCheckboxClick={onCheckboxClick}
+          onSelectAll={onSelectAll}
+        />
+      )}
+    </>
   );
 }
 

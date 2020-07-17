@@ -35,11 +35,23 @@ import {
   faCheckSquare,
   faFileImage,
   faFolderOpen,
+  faTh,
+  faThList,
+  faEllipsisV,
+  faStar,
+  faComment,
+  faCommentDots,
+  faClock,
   faDownload,
   faArrowUp,
   faArrowDown,
 } from "@fortawesome/free-solid-svg-icons";
-import { faSquare } from "@fortawesome/free-regular-svg-icons";
+import {
+  faSquare,
+  faStar as faRegStar,
+  faClock as faRegClock,
+  faComment as faRegComment,
+} from "@fortawesome/free-regular-svg-icons";
 import { BrowserRouter, Route, Switch, Redirect } from "react-router-dom";
 
 import "./assets/plugins/nucleo/css/nucleo.css";
@@ -63,9 +75,19 @@ library.add(
   faCheckSquare,
   faFileImage,
   faFolderOpen,
+  faTh,
+  faThList,
+  faEllipsisV,
+  faStar,
+  faRegStar,
+  faComment,
+  faCommentDots,
+  faRegComment,
+  faClock,
+  faRegClock,
   faDownload,
   faArrowUp,
-  faArrowDown,
+  faArrowDown
 );
 
 //logger.init();

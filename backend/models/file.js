@@ -56,6 +56,36 @@ const fileSchema = mongoose.model(
       required: true,
       default: false,
     },
+    isFavorite: {
+      type: Boolean,
+      required: true,
+      default: false,
+    },
+    hasComments: {
+      type: Boolean,
+      required: true,
+      default: false,
+    },
+    isScheduled: {
+      type: Boolean,
+      required: true,
+      default: false,
+    },
+    isApproved: {
+      type: Boolean,
+      required: true,
+      default: false,
+    },
+    isImage: {
+      type: Boolean,
+      required: true,
+      default: false,
+    },
+    isVideo: {
+      type: Boolean,
+      required: true,
+      default: false,
+    },
     protectedFolder: {
       type: Boolean,
       required: true,

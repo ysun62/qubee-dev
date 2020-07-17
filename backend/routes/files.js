@@ -12,6 +12,8 @@ const { join } = require("path");
 const mimeTypes = require("../utils/mimetypes");
 const router = express.Router();
 const { File, fileBasePath } = require("../models/file");
+const ffmpeg = require("fluent-ffmpeg");
+const imageThumbnail = require("image-thumbnail");
 
 const tempDir = join(__dirname, "../public", "uploads/");
 const uploadsFolder = join(__dirname, fileBasePath);
@@ -37,6 +39,36 @@ const fileFilter = (req, file, cb) => {
   }
 };
 
+const genVideoThumbnail = async (path) => {
+  // Leaving the comments in case we need these properties in the future
+
+  // let thumbnailPath = "";
+
+  return new Promise((resolve, reject) => {
+    ffmpeg(path)
+      // .on("filenames", function (filenames) {
+      //   thumbnailPath = uploadsFolder + "/" + filenames[0];
+      // })
+      .on("end", function (filenames) {
+        resolve();
+        //   {
+        //      success: true,
+        //      path: thumbnailPath,
+        //      fileName: filenames[0],
+        //   }
+      })
+      .on("error", function (err) {
+        reject(err);
+      })
+      .screenshots({
+        count: 1,
+        folder: uploadsFolder,
+        size: "1920x1080",
+        filename: "%b_thumbnail.jpg",
+      });
+  });
+};
+
 const upload = multer({
   storage,
   fileFilter,
@@ -55,6 +87,14 @@ router.post("/", upload.array("mediaFiles", 12), async (req, res) => {
     const slug = selectedFile.originalname.replace(/\s+/g, "-").toLowerCase();
     const parentDirectoryId = JSON.parse(req.body.mediaFiles).parentDirectoryId;
 
+    // Checking if the file mimetype is video or image
+    const fileMimeType = selectedFile.mimetype.substring(
+      0,
+      selectedFile.mimetype.indexOf("/")
+    );
+    const isVideo = fileMimeType === "video";
+    const isImage = fileMimeType === "image";
+
     dbDebug("Parent directory ID ->", parentDirectoryId);
 
     if (!parentDirectoryId) {
@@ -68,6 +108,8 @@ router.post("/", upload.array("mediaFiles", 12), async (req, res) => {
       slug,
       size: selectedFile.size,
       parentDirectoryId,
+      isVideo: isVideo,
+      isImage: isImage,
     });
 
     try {
@@ -78,9 +120,44 @@ router.post("/", upload.array("mediaFiles", 12), async (req, res) => {
       try {
         await fs.renameAsync(selectedFile.path, join(uploadsFolder, slug));
         fsDebug("File moved to uploads folder successfully.");
+
+        // Generating a thumbnail for any video file
+        if (isVideo) {
+          try {
+            await genVideoThumbnail(join(uploadsFolder, slug));
+          } catch (ex) {
+            dbDebug("Could not generate a thumbnail for this video file.", ex);
+          }
+        }
+        // Generating a thumbnail for any image file
+        else if (isImage) {
+          let options = {
+            width: 1920,
+            height: 1080,
+            jpegOptions: { force: true, quality: 100 },
+          };
+          try {
+            const thumbnail = await imageThumbnail(
+              join(uploadsFolder, slug),
+              options
+            );
+            const filename = `${file.slug.substring(
+              0,
+              file.slug.lastIndexOf(".")
+            )}_thumbnail.jpg`;
+            fs.writeFile(`${uploadsFolder}/${filename}`, thumbnail, (err) => {
+              if (err) {
+                dbDebug("Could not save the thumbnail.", err);
+              }
+            });
+          } catch (err) {
+            dbDebug("Could not generate a thumbnail for this image file.", err);
+          }
+        }
         try {
           await file.save();
           dbDebug("Document created successfully in MongoDB.", file);
+
           res.send(file);
         } catch (ex) {
           await fs.unlinkAsync(join(uploadsFolder, slug));
@@ -159,6 +236,23 @@ router.delete("/:id", async (req, res) => {
 
   if (!file)
     return res.status(404).send("The file with the given ID was not found.");
+
+  // Delete thumbnails for video and image files.
+  if (file.isVideo || file.isImage) {
+    const thumbnailName = `${file.slug.substring(
+      0,
+      file.slug.lastIndexOf(".")
+    )}_thumbnail.jpg`;
+
+    await fs
+      .unlinkAsync(join(uploadsFolder, thumbnailName))
+      .then(() => {
+        fsDebug("Thumbnail deleted successfully!");
+      })
+      .catch((ex) => {
+        fsDebug("Failed to delete the thumbnail.", ex);
+      });
+  }
 
   await fs
     .unlinkAsync(join(uploadsFolder, file.slug))
