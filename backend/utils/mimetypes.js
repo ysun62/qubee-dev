@@ -1,5 +1,4 @@
-const mimeTypes = [
-  // Images
+const imageMimetypes = [
   "image/png",
   "image/jpeg",
   "image/gif",
@@ -21,7 +20,9 @@ const mimeTypes = [
   "image/vnd.adobe.premiere",
   "image/mov",
   "image/x-quicktime",
-  // Videos
+];
+
+const videoMimetypes = [
   "video/JPEG",
   "video/jpeg2000",
   "video/3gpp",
@@ -40,7 +41,9 @@ const mimeTypes = [
   "video/webm",
   "video/mp1s",
   "video/mp2p",
-  // Audio
+];
+
+const audioMimetypes = [
   "audio/aac",
   "sound/aiff",
   "audio/x-pn-aiff",
@@ -59,7 +62,9 @@ const mimeTypes = [
   "audio/x-mpeg-3",
   "audio/wav",
   "audio/webm",
-  // Documents
+];
+
+const documentMimetypes = [
   "application/vnd.adobe.xdp+xml",
   "application/vnd.adobe.aftereffects.project",
   "application/vnd.adobe.aftereffects.template",
@@ -95,11 +100,17 @@ const mimeTypes = [
   "application/json",
   "application/ld+json",
   "application/epub+zip",
+];
+
+const fontMimetypes = [
   "font/otf",
   "font/ttf",
   "font/woff",
   "font/woff2",
-  // Compresses
+  "application/font-woff",
+];
+
+const compressMimetypes = [
   "application/x-freearc",
   "application/zip",
   "application/x-zip-compressed",
@@ -112,4 +123,12 @@ const mimeTypes = [
   "application/x-rar-compressed",
   "application/x-7z-compressed",
 ];
-module.exports = mimeTypes;
+
+module.exports = {
+  imageMimetypes,
+  videoMimetypes,
+  audioMimetypes,
+  documentMimetypes,
+  fontMimetypes,
+  compressMimetypes,
+};

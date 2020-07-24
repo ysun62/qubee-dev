@@ -9,7 +9,14 @@ const fileExtension = require("file-extension");
 const MyCustomStorage = require("../utils/customStorage");
 const fs = Promise.promisifyAll(require("fs"));
 const { join } = require("path");
-const mimeTypes = require("../utils/mimetypes");
+const {
+  imageMimetypes,
+  videoMimetypes,
+  audioMimetypes,
+  documentMimetypes,
+  fontMimetypes,
+  compressMimetypes,
+} = require("../utils/mimetypes");
 const router = express.Router();
 const { File, fileBasePath } = require("../models/file");
 const ffmpeg = require("fluent-ffmpeg");
@@ -31,9 +38,32 @@ const storage = MyCustomStorage({
 });
 
 const fileFilter = (req, file, cb) => {
-  if (mimeTypes.indexOf(file.mimetype) !== -1) {
+  let { mimetype } = file;
+
+  const hasMimetype = (file_mimetype, mimetypes) => {
+    return mimetypes.indexOf(file_mimetype) !== -1;
+  };
+
+  if (hasMimetype(mimetype, imageMimetypes)) {
+    file.fileType = "image";
+    cb(null, true);
+  } else if (hasMimetype(mimetype, videoMimetypes)) {
+    file.fileType = "video";
+    cb(null, true);
+  } else if (hasMimetype(mimetype, audioMimetypes)) {
+    file.fileType = "audio";
+    cb(null, true);
+  } else if (hasMimetype(mimetype, documentMimetypes)) {
+    file.fileType = "document";
+    cb(null, true);
+  } else if (hasMimetype(mimetype, fontMimetypes)) {
+    file.fileType = "font";
+    cb(null, true);
+  } else if (hasMimetype(mimetype, compressMimetypes)) {
+    file.fileType = "compress";
     cb(null, true);
   } else {
+    console.log(mimetype);
     req.fileValidationError = "The file type is invalid.";
     return cb(new Error("The file type is invalid."), false);
   }
@@ -87,14 +117,6 @@ router.post("/", upload.array("mediaFiles", 12), async (req, res) => {
     const slug = selectedFile.originalname.replace(/\s+/g, "-").toLowerCase();
     const parentDirectoryId = JSON.parse(req.body.mediaFiles).parentDirectoryId;
 
-    // Checking if the file mimetype is video or image
-    const fileMimeType = selectedFile.mimetype.substring(
-      0,
-      selectedFile.mimetype.indexOf("/")
-    );
-    const isVideo = fileMimeType === "video";
-    const isImage = fileMimeType === "image";
-
     dbDebug("Parent directory ID ->", parentDirectoryId);
 
     if (!parentDirectoryId) {
@@ -108,8 +130,7 @@ router.post("/", upload.array("mediaFiles", 12), async (req, res) => {
       slug,
       size: selectedFile.size,
       parentDirectoryId,
-      isVideo: isVideo,
-      isImage: isImage,
+      fileType: selectedFile.fileType,
     });
 
     try {
@@ -122,7 +143,7 @@ router.post("/", upload.array("mediaFiles", 12), async (req, res) => {
         fsDebug("File moved to uploads folder successfully.");
 
         // Generating a thumbnail for any video file
-        if (isVideo) {
+        if (file.fileType === "video") {
           try {
             await genVideoThumbnail(join(uploadsFolder, slug));
           } catch (ex) {
@@ -130,7 +151,7 @@ router.post("/", upload.array("mediaFiles", 12), async (req, res) => {
           }
         }
         // Generating a thumbnail for any image file
-        else if (isImage) {
+        else if (file.fileType === "image") {
           let options = {
             width: 1920,
             height: 1080,
@@ -238,7 +259,7 @@ router.delete("/:id", async (req, res) => {
     return res.status(404).send("The file with the given ID was not found.");
 
   // Delete thumbnails for video and image files.
-  if (file.isVideo || file.isImage) {
+  if (file.fileType === "video" || file.fileType === "image") {
     const thumbnailName = `${file.slug.substring(
       0,
       file.slug.lastIndexOf(".")

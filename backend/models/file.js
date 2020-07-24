@@ -76,15 +76,9 @@ const fileSchema = mongoose.model(
       required: true,
       default: false,
     },
-    isImage: {
-      type: Boolean,
+    fileType: {
+      type: String,
       required: true,
-      default: false,
-    },
-    isVideo: {
-      type: Boolean,
-      required: true,
-      default: false,
     },
     protectedFolder: {
       type: Boolean,
