@@ -36,7 +36,7 @@
     "file-extension": "^4.0.5",
     "fluent-ffmpeg": "^2.1.2",
     "formidable": "^1.2.2",
-    "helmet": "^3.23.3",
+    "helmet": "^6.0.0",
     "huge-uploader": "^1.0.6",
     "huge-uploader-nodejs": "^1.2.1",
     "image-thumbnail": "^1.0.9",
