@@ -47,7 +47,7 @@
     "@fortawesome/free-solid-svg-icons": "^5.13.1",
     "@fortawesome/react-fontawesome": "^0.1.11",
     "@hapi/joi": "^17.1.1",
-    "@sentry/browser": "^5.19.1",
+    "@sentry/browser": "^7.24.2",
     "axios": "^0.19.2",
     "bootstrap": "^4.5.0",
     "chart.js": "2.9.3",
